@@ -1056,7 +1056,8 @@ function exportDirectQueries() {
    竞品只用于小句归属（避免把别家的说法算到本品牌头上），不是口径。 */
 // build_public.py 只读下面这一行（JSON），生成公开版时按同一套规则替换；改名单请改这里
 const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains": ["doterra.cn", "doterra.com"], "extra": [["多特瑞（上海）商贸有限公司", "品牌 A 中国公司"], ["多特瑞(上海)商贸有限公司", "品牌 A 中国公司"], "9131000009421894XY", "YB13101060018558", "400-920-9191", "沪ICP备14052891号-1", "沪 ICP 备 14052891 号-1", "南京西路 699 号", "南京西路699号", "南京西路", "3101–3108", "CPTG", "LRP", "轻松购"]};
-const DIRECT_A_SRC = 'https://doterra.cn/';   // 帮助中心各条的具体网址待补，先记站点根地址 + 页面路径
+// 帮助中心是单页应用，所有问题共用一个网址；具体位置写在 evidence_locator，报告里显示在链接旁边
+const DIRECT_A_SRC = 'https://doterra.cn/client/index.html#/show/help';
 const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', ...x });
 const DIRECT_A_TRUTH = {
   product_id: 'direct_a', entity_name: '多特瑞', aliases: DIRECT_A_PUBLIC.names,
@@ -1066,38 +1067,38 @@ const DIRECT_A_TRUTH = {
   // 除 cap_cptg 外，各条只有对话端的转述（source_note），原文引语（source_quote）待逐字补录，补录前不能确认
   capabilities: [
     DIRECT_A_FACT({ claim_id: 'cap_entity', category: '资质与经营主体', statement: '中国经营主体为多特瑞（上海）商贸有限公司，有限责任公司（港澳台法人独资），2014 年 5 月 28 日成立，注册资本 8000 万元，住所上海市静安区南京西路 699 号 3101–3108 室',
-      match: '(上海).{0,4}商贸有限公司|港澳台法人独资|2014 ?年.{0,8}(成立|注册)|成立于 ?2014|注册资本.{0,6}8 ?000 ?万', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', source_path: '企业证照页 → 营业执照（图片）',
+      match: '(上海).{0,4}商贸有限公司|港澳台法人独资|2014 ?年.{0,8}(成立|注册)|成立于 ?2014|注册资本.{0,6}8 ?000 ?万', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 营业执照（图片）',
       source_note: '名称为多特瑞（上海）商贸有限公司，类型为有限责任公司（港澳台法人独资），统一社会信用代码 9131000009421894XY，成立日期 2014 年 5 月 28 日，注册资本 8000 万元，住所为上海市静安区南京西路 699 号 3101–3108 室，登记机关为上海市市场监督管理局，发照日期 2022 年 6 月 21 日。' }),
     DIRECT_A_FACT({ claim_id: 'cap_food_license', category: '资质与经营主体', statement: '食品经营备案：备案编号 YB13101060018558，预包装食品销售（不含冷藏冷冻食品），批发兼零售，有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日',
-      match: '食品经营(备案|许可)|预包装食品|YB13101060018558', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', source_path: '企业证照页 → 备案信息',
+      match: '食品经营(备案|许可)|预包装食品|YB13101060018558', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 备案信息',
       source_note: '备案编号 YB13101060018558；销售方式为食品销售经营者（商贸企业，批发兼零售）；经营项目为预包装食品销售（不含冷藏冷冻食品）；有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日。' }),
     DIRECT_A_FACT({ claim_id: 'cap_contact', category: '资质与经营主体', statement: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1',
-      match: '400.?920.?9191|沪 ?ICP ?备|南京西路', source_path: '官网页脚',
+      match: '400.?920.?9191|沪 ?ICP ?备|南京西路', evidence_url: 'https://doterra.cn/', evidence_locator: '官网页脚',
       source_note: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1。' }),
     DIRECT_A_FACT({ claim_id: 'cap_cptg', category: '功效表述边界', statement: '精油经过自有的 CPTG 检测标准检验，用来保证质量和纯度；官方原话只说“是安全、纯正、有效的”，没有界定是哪方面的作用',
-      match: 'CPTG|检测标准|纯度|纯正', source_quote: '是安全、纯正、有效的', source_path: '帮助中心 → 产品及售后 → 产品品质？',
+      match: 'CPTG|检测标准|纯度|纯正', source_quote: '是安全、纯正、有效的', evidence_locator: '帮助中心 → 产品及售后 → 产品品质？',
       source_note: '精油都经过多特瑞自有的 CPTG 检测标准检验，用来保证质量和纯度。',
       cause: '推断：官方自己用了“有效”，但没有界定是哪方面的作用；模型把“有效”展开成具体疗效时，报告要区分“官方原话”和“AI 的延伸”。' }),
     DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单退换货；已开发票的退货后发票作废；在“我的订单”里申请',
-      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', source_path: '帮助中心 → 产品及售后 → 如何办理退货？',
+      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
       source_note: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，产品完好无损、不影响二次销售的，可以凭商品清单退换货；已开发票的，退货后发票作废；在“我的订单”里申请。' }),
     DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，在“我的订单”里操作',
-      match: '换货', source_path: '帮助中心 → 产品及售后 → 如何办理换货',
+      match: '换货', evidence_locator: '帮助中心 → 产品及售后 → 如何办理换货',
       source_note: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，同样在“我的订单”里操作。' }),
     DIRECT_A_FACT({ claim_id: 'cap_refund', category: '购买与售后', statement: '退货后，仓库收货并确认不影响二次销售的，一般 5 个工作日内原路退款；该订单获得的回馈点数会被扣回',
-      match: '5 ?个工作日|五个工作日|原路退(款|回)|退款', source_path: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
+      match: '5 ?个工作日|五个工作日|原路退(款|回)|退款', evidence_locator: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
       source_note: '仓库收货、确认不影响二次销售后，一般 5 个工作日内原路退款，该订单获得的回馈点数会被扣回。' }),
     DIRECT_A_FACT({ claim_id: 'cap_join', category: '商业模式说明', statement: '从 2026 年 7 月 1 日起，年满 18 周岁可通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上即成为优惠顾客；注册时默认勾选参加 LRP 轻松购',
-      match: '优惠顾客|125 ?(个)?(产品)?点数|125 ?PV|轻松购|LRP|18 ?周岁|年满 ?18', valid_from: '2026-07-01', source_path: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
+      match: '优惠顾客|125 ?(个)?(产品)?点数|125 ?PV|轻松购|LRP|18 ?周岁|年满 ?18', valid_from: '2026-07-01', evidence_locator: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
       source_note: '从 2026 年 7 月 1 日起，年满 18 周岁，可以通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上，就能成为优惠顾客。注册时默认勾选参加 LRP 轻松购。' }),
     DIRECT_A_FACT({ claim_id: 'cap_discount', category: '商业模式说明', statement: '优惠顾客首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动',
-      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价', source_path: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
+      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价', evidence_locator: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
       source_note: '首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动。' }),
     DIRECT_A_FACT({ claim_id: 'cap_retail', category: '商业模式说明', statement: '不是优惠顾客也可以购买：注册为零售顾客，按原价购买',
-      match: '零售顾客|按原价|原价购买|零售价购买', source_path: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
+      match: '零售顾客|按原价|原价购买|零售价购买', evidence_locator: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
       source_note: '可以，注册为零售顾客，按原价购买。' }),
     DIRECT_A_FACT({ claim_id: 'cap_starter', category: '商业模式说明', statement: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区',
-      match: '首购套装|首购', source_path: '帮助中心 → 注册问题 → 注册首购套装？',
+      match: '首购套装|首购', evidence_locator: '帮助中心 → 注册问题 → 注册首购套装？',
       source_note: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区。' })
   ],
   offers: [], prohibited_claims: [], limitations: [],
@@ -1152,6 +1153,7 @@ function reportData() {
       official: (cap && (cap.source_quote || cap.statement)) || (pc && pc.note) || fact.text || (g.type === 'overclaim' ? (eff ? `官方原话只有“${eff.source_quote}”，没有界定是哪方面的作用；具体疗效是 AI 的延伸` : '官方口径未宣称疗效（请在事实底账中补充“功效表述边界”原文）') : '事实底账中没有对应口径'),
       url: (cap && cap.evidence_url) || (pc && pc.evidence_url) || fact.url || (g.type === 'overclaim' && eff ? eff.evidence_url : '') || '',
       pending: !!(cap || pc || (g.type === 'overclaim' && eff)) && !isConfirmed(cap || pc || eff),
+      locator: (cap && cap.evidence_locator) || (pc && pc.evidence_locator) || (g.type === 'overclaim' && eff ? eff.evidence_locator : '') || '',
       cause: (cap && cap.cause) || (pc && pc.cause) || '' };
   }).sort((a, b) => (b.sev - a.sev) || (b.k - a.k));
   const withDev = new Set(); list.forEach(g => g.runs.forEach(id => withDev.add(id)));
@@ -1187,7 +1189,7 @@ function reportMarkdown(d) {
   L.push('', '## 逐条发现', '');
   d.list.forEach((g, i) => {
     L.push(`### ${i + 1}. ${TYPE_NAME[g.type] || g.label}：${g.title}`, '');
-    L.push(`- 官网口径${g.pending ? '（待复核）' : ''}：${g.official}${g.url ? `（${g.url}）` : ''}`);
+    L.push(`- 官网口径${g.pending ? '（待复核）' : ''}：${g.official}${g.url ? `（${g.url}${g.locator ? '，' + g.locator : ''}）` : g.locator ? `（${g.locator}）` : ''}`);
     g.quotes.forEach(q => L.push(`- AI 原句（${engName(q.engine)}）：“${q.q}”`));
     L.push(`- 出现：${g.k} / ${g.n} 条回答，${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}；分模型：${Object.entries(g.engines).map(([e, c]) => engName(e) + ' ' + c).join('，')}`);
     if (g.cause) L.push(`- 推断：${g.cause.replace(/^推断：/, '')}`);
@@ -1227,7 +1229,7 @@ function page_report() {
   ${d.list.map((g, i) => `<div class="editor" style="background:var(--surface)">
     <div class="spread"><b>${i + 1}. ${esc(g.title)}</b><span><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span></div>
     <div class="grid2" style="margin-top:10px">
-      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}</div>
+      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div>
       <div><div class="small muted">AI 原句</div>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
     </div>
     <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c).join('，')}</p>
@@ -2518,7 +2520,7 @@ function factCard({ list, kind, i, x }) {
       <button class="btn quiet sm danger" data-act="truth-del" data-list="${list}" data-i="${i}">删除</button></div>
     ${fields}
     <label class="small muted" style="display:block;margin-top:8px">官网原文（逐字）<textarea class="inp sm" rows="2" data-path="${p}.source_quote" aria-label="官网原文" placeholder="从官方页面逐字复制；没有原文就不能确认">${esc(x.source_quote || '')}</textarea></label>
-    ${x.source_note ? `<div class="small muted" style="margin-top:4px"><b>对话端整理（转述，不能代替原文）</b>${x.source_path ? `　${esc(x.source_path)}` : ''}<br>${esc(x.source_note)}</div>` : ''}
+    ${x.source_note ? `<div class="small muted" style="margin-top:4px"><b>对话端整理（转述，不能代替原文）</b><br>${esc(x.source_note)}</div>` : ''}
     <div class="grid2">
       <label class="small muted">来源网址${inp(`${p}.evidence_url`, x.evidence_url, { sm: 1, label: '来源网址', ph: 'https://官方页面' })}</label>
       <div class="grid2" style="gap:8px">
@@ -2529,7 +2531,7 @@ function factCard({ list, kind, i, x }) {
     <div class="row" style="margin-top:8px">
       ${ok ? `<span class="small muted">由${esc(x.reviewed_by || '—')}于 ${esc(x.reviewed_at || '—')} 确认</span><button class="btn sm" data-act="fact-unconfirm" data-list="${list}" data-i="${i}">撤回确认</button>`
         : `<button class="btn sm ${q ? 'primary' : ''}" data-act="fact-confirm" data-list="${list}" data-i="${i}" ${q ? '' : 'disabled title="没有原文引语，不能确认"'}>我已看过原文，确认</button>${q ? '' : '<span class="small muted">先填入官网原文，才能确认。</span>'}`}
-      ${extLink(x.evidence_url, '打开原文', 'small')}
+      ${extLink(x.evidence_url, '打开原文', 'small')}${x.evidence_locator ? `<span class="small muted">${esc(x.evidence_locator)}</span>` : ''}
     </div>
   </div>`;
 }

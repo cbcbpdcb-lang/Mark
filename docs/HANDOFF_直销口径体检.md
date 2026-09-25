@@ -134,6 +134,8 @@
   "category": "资质与经营主体 | 产品事实 | 使用与安全 | 功效表述边界 | 购买与售后 | 商业模式说明",
   "source_quote": "官网原文逐字引语",
   "evidence_url": "网址（沿用已有字段，不另建 source_url）",
+  "evidence_locator": "页面内位置，如“帮助中心 → 产品及售后 → 如何办理退货？”（单页应用共用一个网址时用）",
+  "source_note": "对话端整理的转述（不能代替 source_quote）",
   "checked_at": "YYYY-MM-DD",
   "review_status": "待复核 | 已确认",
   "reviewed_by": "确认人",
