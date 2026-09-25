@@ -772,7 +772,7 @@ function anonActive(key = S.preset) { const p = PRESETS[key]; return !!(p && p.a
 const _maskers = {};
 function maskerFor(key) { return _maskers[key] || (_maskers[key] = makeMasker(PRESETS[key].truth, PRESETS[key].mask_extra || [])); }
 function makeMasker(t, extras = []) {
-  // 顺序：整条网址 → 裸域名 → 额外可识别信息（证照号、电话、专有名词等）→ 品牌名。build_public.py 用同一顺序
+  // 顺序：整条网址 → 额外可识别信息（证照号、电话、邮箱、专有名词等）→ 裸域名 → 品牌名。build_public.py 用同一顺序
   const names = [t.entity_name, ...(t.aliases || [])].filter(Boolean).sort((a, b) => b.length - a.length).map(escRx).join('|');
   const nameG = new RegExp(names, 'gi'), nameT = new RegExp(names, 'i');
   const domains = (t.official_domains || []).map(d => d.replace(/^www\./, ''));
@@ -781,8 +781,8 @@ function makeMasker(t, extras = []) {
   const rules = extras.map(x => Array.isArray(x) ? [new RegExp(escRx(x[0]), 'gi'), x[1]] : [new RegExp(escRx(x), 'gi'), MASK_HIDDEN]).sort((a, b) => b[0].source.length - a[0].source.length);
   const one = str => {
     let out = String(str).replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; });
+    rules.forEach(([re, to]) => { out = out.replace(re, to); });   // 先于裸域名：邮箱这类含域名的整体先换掉
     if (bareDom) out = out.replace(bareDom, MASK_DOMAIN);
-    rules.forEach(([re, to]) => { out = out.replace(re, to); });
     return out.replace(nameG, ANON_NAME);
   };
   return one;
@@ -1055,7 +1055,7 @@ function exportDirectQueries() {
    问题集与 queries_多特瑞.json 同源（directQueries），id 一致，采集结果可以直接对上。
    竞品只用于小句归属（避免把别家的说法算到本品牌头上），不是口径。 */
 // build_public.py 只读下面这一行（JSON），生成公开版时按同一套规则替换；改名单请改这里
-const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains": ["doterra.cn", "doterra.com"], "extra": [["多特瑞（上海）商贸有限公司", "品牌 A 中国公司"], ["多特瑞(上海)商贸有限公司", "品牌 A 中国公司"], "9131000009421894XY", "YB13101060018558", "400-920-9191", "沪ICP备14052891号-1", "沪 ICP 备 14052891 号-1", "南京西路 699 号", "南京西路699号", "南京西路", "3101–3108", "CPTG", "LRP", "轻松购"]};
+const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains": ["doterra.cn", "doterra.com"], "extra": [["多特瑞（上海）商贸有限公司", "品牌 A 中国公司"], ["多特瑞(上海)商贸有限公司", "品牌 A 中国公司"], "9131000009421894XY", "YB13101060018558", "400-920-9191", "沪ICP备14052891号-1", "沪 ICP 备 14052891 号-1", "南京西路 699 号", "南京西路699号", "南京西路", "3101–3108", "3101-3108", "chinaservice@doterra.com", "021-2227-1888", "31010602004501", ["小多", "客服"], "赋活呼吸", "Air Repair", "CPTG", "LRP", "轻松购"]};
 // 帮助中心是单页应用，所有问题共用一个网址；具体位置写在 evidence_locator，报告里显示在链接旁边
 const DIRECT_A_SRC = 'https://doterra.cn/client/index.html#/show/help';
 const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', ...x });
@@ -1068,49 +1068,65 @@ const DIRECT_A_TRUTH = {
   capabilities: [
     DIRECT_A_FACT({ claim_id: 'cap_entity', category: '资质与经营主体', statement: '中国经营主体为多特瑞（上海）商贸有限公司，有限责任公司（港澳台法人独资），2014 年 5 月 28 日成立，注册资本 8000 万元，住所上海市静安区南京西路 699 号 3101–3108 室',
       match: '(上海).{0,4}商贸有限公司|港澳台法人独资|2014 ?年.{0,8}(成立|注册)|成立于 ?2014|注册资本.{0,6}8 ?000 ?万', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 营业执照（图片）',
-      source_note: '名称为多特瑞（上海）商贸有限公司，类型为有限责任公司（港澳台法人独资），统一社会信用代码 9131000009421894XY，成立日期 2014 年 5 月 28 日，注册资本 8000 万元，住所为上海市静安区南京西路 699 号 3101–3108 室，登记机关为上海市市场监督管理局，发照日期 2022 年 6 月 21 日。' }),
+      source_quote: '名称 多特瑞（上海）商贸有限公司；类型 有限责任公司(港澳台法人独资)；统一社会信用代码 9131000009421894XY；注册资本 人民币8000.0000万；成立日期 2014年05月28日；营业期限 2014年05月28日至2044年05月27日；住所 上海市静安区南京西路699号3101-3108室；登记机关 上海市市场监督管理局，2022年06月21日。',
+      source_note: '营业执照是图片，引语为对照图片转录；经营范围为图片小字，需人工核对全文。' }),
     DIRECT_A_FACT({ claim_id: 'cap_food_license', category: '资质与经营主体', statement: '食品经营备案：备案编号 YB13101060018558，预包装食品销售（不含冷藏冷冻食品），批发兼零售，有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日',
       match: '食品经营(备案|许可)|预包装食品|YB13101060018558', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 备案信息',
-      source_note: '备案编号 YB13101060018558；销售方式为食品销售经营者（商贸企业，批发兼零售）；经营项目为预包装食品销售（不含冷藏冷冻食品）；有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_contact', category: '资质与经营主体', statement: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1',
-      match: '400.?920.?9191|沪 ?ICP ?备|南京西路', evidence_url: 'https://doterra.cn/', evidence_locator: '官网页脚',
-      source_note: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_cptg', category: '功效表述边界', statement: '精油经过自有的 CPTG 检测标准检验，用来保证质量和纯度；官方原话只说“是安全、纯正、有效的”，没有界定是哪方面的作用',
-      match: 'CPTG|检测标准|纯度|纯正', source_quote: '是安全、纯正、有效的', evidence_locator: '帮助中心 → 产品及售后 → 产品品质？',
-      source_note: '精油都经过多特瑞自有的 CPTG 检测标准检验，用来保证质量和纯度。',
+      source_quote: '备案编号 YB13101060018558；销售方式 食品销售经营者（商贸企业，批发兼零售）；经营项目 食品销售经营者：预包装食品销售(不含冷藏冷冻食品销售)；有效期 2023年04月03日至2044年05月27日。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_contact', category: '资质与经营主体', statement: '版权方为多特瑞（上海）商贸有限公司，公司地址上海市静安区南京西路 699 号 12 层，客服专线 400-920-9191，公司电话 021-2227-1888，沪 ICP 备 14052891 号-1',
+      match: '400.?920.?9191|021.?2227.?1888|沪 ?ICP ?备|南京西路', evidence_url: 'https://doterra.cn/', evidence_locator: '官网页脚（每页相同）',
+      source_quote: '© 2020 多特瑞（上海）商贸有限公司所有；公司地址：上海市静安区南京西路699号12层；客服专线：400-920-9191；公司电话：021-2227-1888；电子邮箱：chinaservice@doterra.com；沪ICP备14052891号-1；沪公网安备 31010602004501号' }),
+    DIRECT_A_FACT({ claim_id: 'cap_cptg', category: '功效表述边界', statement: '精油经过自有的 CPTG 检测标准检验，确保质量及纯度；官方对作用的描述只有“是安全、纯正、有效的”，没有界定是哪方面的作用',
+      match: 'CPTG|检测标准|纯度|纯正|GC.?MS|气相色谱', evidence_locator: '帮助中心 → 产品及售后 → 产品品质？',
+      source_quote: '多特瑞精油产品都是通过多特瑞CPTG检测标准严格检验程序的检测，确保每一瓶精油的质量及纯度，是安全、纯正、有效的。',
+      source_note: '附图标题：每批精油皆经过一系列严格且有效的测试。包括以下测试：感官性能测试、特定重力、气相色谱/质谱分析(GC/MS)、傅里叶转换红外光谱仪测试(FTIR)、旋光度、折射率、污染物测试、稳定性测试。（各项说明为图片小字，需人工核对）',
       cause: '推断：官方自己用了“有效”，但没有界定是哪方面的作用；模型把“有效”展开成具体疗效时，报告要区分“官方原话”和“AI 的延伸”。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单退换货；已开发票的退货后发票作废；在“我的订单”里申请',
+    DIRECT_A_FACT({ claim_id: 'cap_product_claim', category: '功效表述边界', statement: '产品页宣传图写“纯正、安全、有效”和“效果出众”；瓶身标签为 Aroma Essential Oil Blend（芳香用复方精油）；页面没有使用方法、禁忌人群和“不能替代药物”之类的说明',
+      match: '效果出众|芳香用|Aroma Essential Oil', evidence_url: 'https://doterra.cn/', evidence_locator: '产品页（赋活呼吸 Air Repair）底部宣传图与瓶身标签（图片）',
+      source_quote: '纯正、安全、有效；效果出众；Aroma Essential Oil Blend',
+      source_note: '整页由图片拼成，引语为图片上的文字；产品页网址待补。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）商贸有限公司认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单办理退换货；已开发票的退货后发票自动作废；在“我的订单”里申请',
       match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
-      source_note: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，产品完好无损、不影响二次销售的，可以凭商品清单退换货；已开发票的，退货后发票作废；在“我的订单”里申请。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，在“我的订单”里操作',
+      source_quote: '凡通过多特瑞（上海）商贸有限公司认可的渠道购买的产品，自购买之日起30天内，只要产品完好无损，不影响二次销售，均可凭商品清单办理退换货，如已开具发票，退货后发票将自动作废。进入“我的订单”中，选择需退货的订单，点击“申请退货”。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对产品质量不满意的，可以申请换货，在“我的订单”里操作',
       match: '换货', evidence_locator: '帮助中心 → 产品及售后 → 如何办理换货',
-      source_note: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，同样在“我的订单”里操作。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_refund', category: '购买与售后', statement: '退货后，仓库收货并确认不影响二次销售的，一般 5 个工作日内原路退款；该订单获得的回馈点数会被扣回',
+      source_quote: '凡通过多特瑞(上海)商贸有限公司官方渠道购买之产品，自购买之日起30天内，如对产品质量不满意，可申请换货。进入“我的订单”中，选择需换货的订单，点击“申请换货”。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_refund', category: '购买与售后', statement: '仓库收到退回产品并确认不影响二次销售的，一般 5 个工作日内原路退回支付账户；该订单所获回馈点数扣回',
       match: '5 ?个工作日|五个工作日|原路退(款|回)|退款', evidence_locator: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
-      source_note: '仓库收货、确认不影响二次销售后，一般 5 个工作日内原路退款，该订单获得的回馈点数会被扣回。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_join', category: '商业模式说明', statement: '从 2026 年 7 月 1 日起，年满 18 周岁可通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上即成为优惠顾客；注册时默认勾选参加 LRP 轻松购',
+      source_quote: '仓库收到退回产品，审核确认不影响二次销售，一般在5个工作日内原路退回支付账户，退货后该订单所获回馈点数将扣回。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_support', category: '购买与售后', statement: '产品有瑕疵可联系客服：在线客服、客服电话 400-920-9191、客服邮箱；服务时间周一至周六 10:00–19:00，15 日及月末最后一日 10:00–21:00，周日及法定节假日除外',
+      match: '瑕疵|联系客服|客服(电话|热线|邮箱)|服务时间', evidence_locator: '帮助中心 → 产品及售后 → 产品有瑕疵，如何处理？',
+      source_quote: '我们会全力确保商品品质，但若还有不全之处，可与我们的客服联系。在线客服：小多在线；客服电话：400-920-9191；客服邮箱：chinaservice@doterra.com；服务时间：周一至周六10:00-19:00，15日及月末最后一日10:00-21:00（周日及法定节假日除外）' }),
+    DIRECT_A_FACT({ claim_id: 'cap_join', category: '商业模式说明', statement: '2026 年 7 月 1 日起，年满 18 周岁可通过官网、微信公众号、小程序、APP 注册优惠顾客：提交注册申请并完成首张订单 ≥125 产品点数，即成为优惠顾客；注册时默认勾选参加 LRP 轻松购',
       match: '优惠顾客|125 ?(个)?(产品)?点数|125 ?PV|轻松购|LRP|18 ?周岁|年满 ?18', valid_from: '2026-07-01', evidence_locator: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
-      source_note: '从 2026 年 7 月 1 日起，年满 18 周岁，可以通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上，就能成为优惠顾客。注册时默认勾选参加 LRP 轻松购。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_discount', category: '商业模式说明', statement: '优惠顾客首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动',
-      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价', evidence_locator: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
-      source_note: '首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_retail', category: '商业模式说明', statement: '不是优惠顾客也可以购买：注册为零售顾客，按原价购买',
-      match: '零售顾客|按原价|原价购买|零售价购买', evidence_locator: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
-      source_note: '可以，注册为零售顾客，按原价购买。' }),
-    DIRECT_A_FACT({ claim_id: 'cap_starter', category: '商业模式说明', statement: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区',
+      source_quote: '2026年7月1日起，年满18周岁，即可通过多特瑞官网、微信公众号、小程序、APP注册优惠顾客，首先填写个人信息提交注册申请，同时完成首张订单≥125产品点数，即可成为优惠顾客。',
+      source_note: '小多温馨提示：1. 如果注册时选择申请为零售顾客，购物车页面点击“进行结账”，会跳出“成为优惠顾客”按钮，可根据页面提示选择是否注册成为优惠顾客。2. 注册时会默认勾选参加LRP轻松购，记得设置提醒时间，否则可能会错失很多福利机会哦！' }),
+    DIRECT_A_FACT({ claim_id: 'cap_discount', category: '商业模式说明', statement: '优惠顾客首次订单起享受优惠顾客价格（约为零售价的 6.5–7 折），次月可参加忠诚顾客回馈计划（LRP）等优惠活动',
+      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价|忠诚顾客回馈', evidence_locator: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
+      source_quote: '优惠顾客福利多多，首次订单即可开始享受优惠顾客价格（约为零售价的6.5-7折），次月还可参加忠诚顾客回馈计划（LRP）等丰富多彩的优惠活动。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_sponsor', category: '商业模式说明', statement: '注册优惠顾客时需要填写朋友的优惠顾客号码及姓名；没有认识的会员朋友可以联系客服',
+      match: '推荐人|介绍人|邀请人|朋友的?(优惠)?顾客(号|编号)|会员朋友|需要.{0,6}(推荐|邀请|介绍)', evidence_locator: '帮助中心 → 注册问题 → 优惠顾客注册中的朋友如何填写？',
+      source_quote: '注册时需要填写您朋友的优惠顾客号码及姓名，如果您没有认识的会员朋友，可以联系客服。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_starter', category: '商业模式说明', statement: '每位新优惠顾客注册首单可享首购套装优惠价，详情见下载专区',
       match: '首购套装|首购', evidence_locator: '帮助中心 → 注册问题 → 注册首购套装？',
-      source_note: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区。' })
+      source_quote: '每位新优惠顾客注册首单，可享有首购套装优惠价（点此至下载专区，点击首购套装了解详情）' }),
+    DIRECT_A_FACT({ claim_id: 'cap_customer_id', category: '商业模式说明', statement: '完成首单支付后页面提示优惠顾客编号，注册手机会收到欢迎短信；忘记编号可在登录页点“忘记顾客编号”找回',
+      match: '顾客编号|会员编号|会员号|忘记.{0,4}编号', evidence_locator: '帮助中心 → 注册问题 → 注册支付成功没有看到优惠顾客号码？',
+      source_quote: '1，填写注册资料并完成首单支付后，页面会提示您的优惠顾客编号，同时您的注册手机会收到1条包含顾客编号的欢迎短信。2，若注册时未留意或忘记编号，可通过官网、APP、微信公众号或小程序登陆页面，点击“忘记顾客编号”找回。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_retail', category: '商业模式说明', statement: '不是优惠顾客也可以购买：注册为零售顾客，原价购买产品',
+      match: '零售顾客|按原价|原价购买|零售价购买', evidence_locator: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
+      source_quote: '可以购买。可根据需要注册申请为零售顾客，原价购买产品。', source_note: '此条由对话端在浏览器中读取，未附截图。' })
   ],
   offers: [], prohibited_claims: [], limitations: [],
   // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
   unresolved: [
     { topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
-    { topic: '使用与安全（能否内服、禁忌人群）', note: '产品页在自动读取时一直加载不出来，口径待录入。' },
+    { topic: '使用与安全（能否内服、孕妇儿童能否使用）', note: '产品页整页由营销图片拼成，没有使用方法、禁忌人群，也没有“不能替代药物”之类的说明；瓶身标签为 Aroma Essential Oil Blend（芳香用复方精油）。用户问 AI 最多的安全问题，官网恰好没有给出答案。可补的官方来源：产品实物标签（外包装上的使用方法和警示语），以及下载专区的产品手册或说明书。' },
     { topic: '经销商制度与收入说明', note: '帮助中心里没有找到。优惠顾客制度写得很清楚，但官网没有出现“经销商”“直销”这些说法。' },
     { topic: '“不宣称疗效”之类的声明', note: '目前没有找到。官方对产品的描述只有“是安全、纯正、有效的”。' },
     { topic: '加入是否收费', note: '官网只写了首单达到 125 个产品点数即成为优惠顾客，没有写明是否有入会费。AI 说“要交入会费”或“免费加入”都缺乏官网依据。' }
   ],
-  fictional: false, status: 'APPROVED', version: 1, approved_by: '对话端依据官网整理（2026-09-25），全部待复核', approved_at: '2026-09-25'
+  fictional: false, status: 'APPROVED', version: 1, approved_by: '对话端依据官网逐字复制（2026-09-25），全部待复核', approved_at: '2026-09-25'
 };
 const DIRECT_A_COMPETITORS = [
   { name: 'Young Living', aliases: ['Young Living'], domains: ['youngliving.com'], relation: '精油直销同业（仅用于小句归属）' },
@@ -1121,7 +1137,7 @@ const DIRECT_A_COMPETITORS = [
 PRESETS.direct_a = {
   name: '多特瑞（直销口径体检）', publicName: '某精油直销品牌（直销口径体检）', anonymize: true, mask_extra: DIRECT_A_PUBLIC.extra,
   batches: ['R3'], truth: DIRECT_A_TRUTH, competitors: DIRECT_A_COMPETITORS, queries: directQueries('多特瑞'),
-  note: '口径由对话端依据官网整理，全部待复核；除“产品品质”一条外，原文引语待逐字补录。采集批次 R3 待导入。公开网站上品牌名显示为“品牌 A”，官网链接只显示“官方页面（已核对）”。'
+  note: '口径由对话端从官网逐字复制，全部待复核（营业执照和产品页为图片，引语为转录）。采集批次 R3 待导入。公开网站上品牌名显示为“品牌 A”，官网链接只显示“官方页面（已核对）”。'
 };
 
 /* ---------- 体检报告 ---------- */

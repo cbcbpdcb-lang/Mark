@@ -8,8 +8,8 @@
 替换名单只有一处：index.html 里 `const DIRECT_A_PUBLIC = {...}` 那一行（JSON）。
 替换顺序和页面运行时的匿名（【改这里 23】makeMasker）一致：
   1. 整条网址：官网域名的网址 → “官方页面（已核对）”；网址里含品牌名的 → “外部页面（已隐藏）”
-  2. 裸域名（doterra.cn 这类没有 https:// 的写法）→ “官方网站（已隐藏）”
-  3. 额外可识别信息（证照号、电话、地址、专有名词）→ “（已隐藏）”，或名单里指定的替换文字
+  2. 额外可识别信息（证照号、电话、邮箱、地址、专有名词）→ “（已隐藏）”，或名单里指定的替换文字
+  3. 裸域名（doterra.cn 这类没有 https:// 的写法）→ “官方网站（已隐藏）”
   4. 品牌名和别名（不分大小写，长的先换）→ “品牌 A”
 
 用法：
@@ -78,16 +78,16 @@ def build(html):
 
     out = url_re.sub(url_sub, html)
 
-    # 2. 裸域名
+    # 2. 额外可识别信息（先于裸域名：邮箱这类含域名的整体先换掉）
+    for src, to in extra:
+        out, n = re.subn(re.escape(src), to, out, flags=re.I)
+        bump('额外信息：' + src, n)
+
+    # 3. 裸域名
     if domains:
         bare = re.compile(r'(?<![\w.-])(?:www\.)?(?:' + '|'.join(re.escape(d) for d in domains) + r')(?![\w-])', re.I)
         out, n = bare.subn(MASK_DOMAIN, out)
         bump('裸域名', n)
-
-    # 3. 额外可识别信息
-    for src, to in extra:
-        out, n = re.subn(re.escape(src), to, out, flags=re.I)
-        bump('额外信息：' + src, n)
 
     # 4. 品牌名
     out, n = name_re.subn(ANON, out)
