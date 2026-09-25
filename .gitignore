@@ -2,3 +2,4 @@
 /runs_*.json
 .DS_Store
 __pycache__/
+/dist/

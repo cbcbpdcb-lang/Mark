@@ -47,6 +47,17 @@
 2. 采集：复制 `.env.example` 为 `.env`，填入密钥后 `source .env`，运行 `python3 collect.py --dry-run`，再 `python3 collect.py --repeats 2`。
 3. 把生成的 `runs_*.json` 在页面「数据导入」导入。
 
+## 公开版
+
+仓库里的 `index.html` 保留真实品牌名，作为内部工作数据。公开网站上传的是匿名版：
+
+```bash
+python3 build_public.py        # 生成 dist/index.html，源代码里不再有真实品牌名、官网链接、证照号、电话
+python3 build_public.py --check   # 只检查不写文件
+```
+
+替换名单在 `index.html` 的 `DIRECT_A_PUBLIC` 一行。生成后先在浏览器里打开 `dist/index.html` 看一遍，再上传。页面运行时还有一层匿名（预设的 `anonymize`），本地打开显示真实版，侧栏可以勾选“按公开版预览”。
+
 ## 文档
 
 - `docs/HANDOFF_直销口径体检.md` 当前阶段的交接文档：目标、流程、任务拆分与进度
