@@ -1120,12 +1120,15 @@ const DIRECT_A_TRUTH = {
   offers: [], prohibited_claims: [], limitations: [],
   // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
   unresolved: [
-    { topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
-    { topic: '使用与安全（能否内服、孕妇儿童能否使用）', note: '产品页整页由营销图片拼成，没有使用方法、禁忌人群，也没有“不能替代药物”之类的说明；瓶身标签为 Aroma Essential Oil Blend（芳香用复方精油）。用户问 AI 最多的安全问题，中国官网恰好没有给出答案。可补的官方来源：产品实物标签（外包装上的使用方法和警示语），以及下载专区的产品手册或说明书（2026-09-25 检索未找到中国版）。线索（其他地区官网，不能作为中国口径）：香港区产品页写这款复方“专为扩香而设计”、外用 1–2 滴并建议稀释；香港区《精油使用方法》手册写有孕妇或接受治疗者先咨询医生、儿童稀释后先涂足底、两岁以下先从扩香开始、内服一次一至两滴等安全指导。中国官网若有对应版本，这些正是 AI 最需要引用的口径。',
+    { category: '资质与经营主体', topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
+    { category: '使用与安全', topic: '能否内服', note: '中国官网没有说明。产品页整页由营销图片拼成，没有使用方法；瓶身标签为 Aroma Essential Oil Blend（芳香用复方精油）。线索（其他地区官网，不能作为中国口径）：香港区产品页写这款复方“专为扩香而设计”、外用 1–2 滴并建议稀释；香港区《精油使用方法》手册写内服一次一至两滴。',
       cause_links: ['https://wave0.doterra.com/HK/zh_HK/p/doterra-air-repair-oil', 'https://media.doterra.com/hk-otg/zh/brochures/usage-guide.pdf'] },
-    { topic: '经销商制度与收入说明', note: '帮助中心里没有找到。优惠顾客制度写得很清楚，但官网没有出现“经销商”“直销”这些说法。' },
-    { topic: '“不宣称疗效”之类的声明', note: '目前没有找到。官方对产品的描述只有“是安全、纯正、有效的”。' },
-    { topic: '加入是否收费', note: '官网只写了首单达到 125 个产品点数即成为优惠顾客，没有写明是否有入会费。AI 说“要交入会费”或“免费加入”都缺乏官网依据。' }
+    { category: '使用与安全', topic: '孕妇和儿童能否使用', note: '中国官网没有说明，产品页没有禁忌人群。线索（其他地区官网，不能作为中国口径）：香港区《精油使用方法》手册写孕妇或接受治疗者先咨询医生、儿童稀释后先涂足底、两岁以下先从扩香开始、孩童务必在大人陪同下使用。用户问 AI 最多的安全问题，中国官网恰好没有给出答案。',
+      cause_links: ['https://media.doterra.com/hk-otg/zh/brochures/usage-guide.pdf'] },
+    { category: '使用与安全', topic: '是否说明“不能代替药物”', note: '中国官网没有找到“不能代替药物”“不用于诊断、治疗”之类的声明；官方对产品的描述只有“是安全、纯正、有效的”和产品页的“效果出众”。线索（其他地区官方材料，不能作为中国口径）：美国区中文手册印有“本产品不用于诊断、治疗、治愈或预防任何疾病”。',
+      cause_links: ['https://media.doterra.com/us/zh/brochures/%E5%A4%A9%E7%84%B6%E4%BF%9D%E5%81%A5%E5%85%A5%E6%9C%83%E5%A5%97%E8%A3%9D-natural-solutions-kit-brochure.pdf'] },
+    { category: '商业模式说明', topic: '经销商制度与收入说明', note: '帮助中心里没有找到。优惠顾客制度写得很清楚，但官网没有出现“经销商”“直销”这些说法。' },
+    { category: '商业模式说明', topic: '加入是否收费', note: '官网只写了首单达到 125 个产品点数即成为优惠顾客，没有写明是否有入会费。AI 说“要交入会费”或“免费加入”都缺乏官网依据。' }
   ],
   fictional: false, status: 'APPROVED', version: 1, approved_by: '对话端依据官网逐字复制（2026-09-25），全部待复核', approved_at: '2026-09-25'
 };
@@ -1142,6 +1145,33 @@ PRESETS.direct_a = {
 };
 
 /* ---------- 体检报告 ---------- */
+// 问题的分组：直销问题集有 group 字段；没有的按阶段分组
+const groupOfQuery = q => q.group || STAGES[q.stage] || q.stage || '未分组';
+/* 采集完整性：模型 × 分组的成功次数。应有 = 该组问题数 × 重复次数（取这批数据里最大的 repeat）；
+   同一（问题，第几次）有多条记录时（补跑），只要有一条成功就算成功，所以补跑后的表是完整的。 */
+function collectionCoverage(runs, groupOrder = []) {
+  const qs = S.querySet.queries;
+  const groups = [...new Set(qs.map(groupOfQuery))].sort((a, b) => ((groupOrder.indexOf(a) + 1) || 99) - ((groupOrder.indexOf(b) + 1) || 99));
+  const repeats = Math.max(1, ...runs.map(r => Number(r.repeat) || 1));
+  const engines = [...new Set(runs.map(r => r.engine))];
+  const okKeys = new Set(runs.filter(r => r.status === 'SUCCESS').map(r => `${r.engine}|${r.query_id}|${r.repeat || 1}`));
+  const cells = {}, byEngine = {};
+  engines.forEach(e => {
+    cells[e] = {}; let ok = 0, expected = 0;
+    groups.forEach(g => {
+      const ids = qs.filter(q => groupOfQuery(q) === g).map(q => q.id);
+      const exp = ids.length * repeats;
+      let n = 0; ids.forEach(id => { for (let k = 1; k <= repeats; k++) if (okKeys.has(`${e}|${id}|${k}`)) n++; });
+      cells[e][g] = { ok: n, expected: exp, missing: exp - n }; ok += n; expected += exp;
+    });
+    byEngine[e] = { ok, expected, missing: expected - ok };
+  });
+  const missing = Object.values(byEngine).reduce((a, x) => a + x.missing, 0);
+  return { groups, engines, repeats, cells, byEngine, missing, complete: missing === 0 };
+}
+// 分模型的数字旁自动注明缺数据：“豆包 7（缺 5 条）”
+const engineNote = (cov, e) => cov.byEngine[e] && cov.byEngine[e].missing ? `（缺 ${cov.byEngine[e].missing} 条）` : '';
+
 function reportData() {
   const T = S.truth;
   const runs = realRuns().filter(r => r.status === 'SUCCESS');
@@ -1176,31 +1206,35 @@ function reportData() {
   const withDev = new Set(); list.forEach(g => g.runs.forEach(id => withDev.add(id)));
   // 按问题分组汇总：同一组里的回答合在一起算，样本比单条发现大，区间窄得多
   const overRuns = new Set(); list.filter(g => g.type === 'overclaim').forEach(g => g.runs.forEach(id => overRuns.add(id)));
-  const groupOrder = DIRECT_TEMPLATES.map(t => t[0]);
+  const groupOrder = DIRECT_TEMPLATES.map(t => t[0]).concat(Object.values(STAGES));
   const byGroup = {};
   evs.forEach(x => {
-    const q = Q(x.r.query_id), name = q && q.group; if (!name) return;
+    const q = Q(x.r.query_id), name = q && groupOfQuery(q); if (!name) return;
     const b = byGroup[name] || (byGroup[name] = { name, n: 0, dev: 0, over: 0, qids: new Set() });
     b.n++; b.qids.add(x.r.query_id);
     if (withDev.has(x.r.run_id)) b.dev++;
     if (overRuns.has(x.r.run_id)) b.over++;
   });
   const qGroups = Object.values(byGroup).sort((a, b) => ((groupOrder.indexOf(a.name) + 1) || 99) - ((groupOrder.indexOf(b.name) + 1) || 99));
+  const coverage = collectionCoverage(realRuns(), groupOrder);
   const extras = {};
   evs.forEach(x => (x.e.extras || []).forEach(s => { const key = s.slice(0, 40); if (!extras[key]) extras[key] = { s, n: 0, engines: new Set() }; extras[key].n++; extras[key].engines.add(x.r.engine); }));
-  return { T, evs, list, qGroups, unresolved: T.unresolved || [], nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
+  return { T, evs, list, qGroups, coverage, unresolved: T.unresolved || [], nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
     extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length };
 }
 function reportMarkdown(d) {
   const engName = id => (ENG(id) || { name: id }).name;
   const L = [];
-  L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(engName).join('、')}`, '');
+  L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(e => engName(e) + engineNote(d.coverage, e)).join('、')}`, '');
   L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
   if (d.qGroups.length) {
     L.push('## 按问题分组汇总', '', '同一组问题的回答合在一起统计，样本比单条发现大，区间更窄。', '', '| 分组 | 问题数 | 提到品牌的回答 | 至少一处不一致 | 比例（95% 区间） | 可信度 | 合规风险 |', '| --- | ---: | ---: | ---: | --- | --- | ---: |');
     d.qGroups.forEach(g => L.push(`| ${g.name} | ${g.qids.size} | ${g.n} | ${g.dev} | ${pct(g.dev, g.n)}（${wilsonText(g.dev, g.n)}） | ${cred(g.dev, g.n, false).label} | ${g.over} |`));
     L.push('');
   }
+  L.push('## 采集完整性', '', `每题每个模型应有 ${d.coverage.repeats} 次回答。${d.coverage.complete ? '本批数据完整。' : `本批缺 ${d.coverage.missing} 条，缺数据的模型在分模型数字旁有注明。`}`, '', `| 模型 | ${d.coverage.groups.join(' | ')} | 合计 |`, `| --- | ${d.coverage.groups.map(() => '---:').join(' | ')} | ---: |`);
+  d.coverage.engines.forEach(e => L.push(`| ${engName(e)} | ${d.coverage.groups.map(g => { const c = d.coverage.cells[e][g]; return c.missing ? `**${c.ok}/${c.expected}（缺 ${c.missing}）**` : `${c.ok}/${c.expected}`; }).join(' | ')} | ${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected} |`));
+  L.push('');
   L.push('## 最需要关注的三条', '');
   d.list.slice(0, 3).forEach((g, i) => L.push(`${i + 1}. 【${TYPE_NAME[g.type] || g.label}】${g.title}（${g.k} / ${g.n} 条回答）`));
   L.push('', '## 逐条发现', '');
@@ -1208,13 +1242,13 @@ function reportMarkdown(d) {
     L.push(`### ${i + 1}. ${TYPE_NAME[g.type] || g.label}：${g.title}`, '');
     L.push(`- 官网口径${g.pending ? '（待复核）' : ''}：${g.official}${g.url ? `（${g.url}${g.locator ? '，' + g.locator : ''}）` : g.locator ? `（${g.locator}）` : ''}`);
     g.quotes.forEach(q => L.push(`- AI 原句（${engName(q.engine)}）：“${q.q}”`));
-    L.push(`- 出现：${g.k} / ${g.n} 条回答，${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}；分模型：${Object.entries(g.engines).map(([e, c]) => engName(e) + ' ' + c).join('，')}`);
+    L.push(`- 出现：${g.k} / ${g.n} 条回答，${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}；分模型：${Object.entries(g.engines).map(([e, c]) => engName(e) + ' ' + c + engineNote(d.coverage, e)).join('，')}`);
     if (g.cause) L.push(`- 推断：${g.cause.replace(/^推断：/, '')}`);
     L.push(`- 修改方向：${(NEXT_STEP[g.type] || ['', '查看原文后决定'])[1]}`, '');
   });
   if (d.unresolved.length || d.extras.length) {
     L.push('## 建议补充的口径', '');
-    if (d.unresolved.length) { L.push('官网未说明的话题（AI 在这些话题上说什么都缺乏官网依据）：', ''); d.unresolved.forEach(u => L.push(`- **${u.topic}**：${u.note}`)); L.push(''); }
+    if (d.unresolved.length) { L.push('官网未说明的话题（AI 在这些话题上说什么都缺乏官网依据）：', ''); d.unresolved.forEach(u => L.push(`- **${u.category ? u.category + '：' : ''}${u.topic}**：${u.note}${(u.cause_links || []).length ? `（线索，非中国口径：${u.cause_links.join('，')}）` : ''}`)); L.push(''); }
     if (d.extras.length) { L.push('以下说法在官网口径里找不到对应内容，各模型说法不一，建议官方给出明确说明：', ''); d.extras.forEach(x => L.push(`- “${x.s.slice(0, 80)}”（${x.n} 次）`)); L.push(''); }
   }
   L.push('## 方法与局限', '', '- 口径只来自官方页面，每条附原文或链接；标注“待复核”的口径需要品牌方确认。', '- 统计以回答为单位，区间为 Wilson 95% 区间；样本少时区间很宽，只能看方向。', '- 采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。', '- 判定由规则完成，已知会漏判逗号隔开的否定句；所有发现都应对照原文复核。', '- 本报告只列出问题和修改方向，不包含代写或代发内容。');
@@ -1227,7 +1261,7 @@ function page_report() {
   if (!d.nA) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>还没有提到${esc(d.T.entity_name)}的回答</h4><p>先用「用户提问」导出问题集，用采集脚本跑一轮，再到「数据导入」导入结果。</p></div>`;
   return `
   <header class="ph"><h1>${esc(d.T.entity_name)}：官网口径体检报告</h1>
-    <p class="lede">检查口径 ${d.facts} 条，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e))).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
+    <p class="lede">检查口径 ${d.facts} 条，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
   <div class="kpis">
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div><div class="ks">95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>
@@ -1242,6 +1276,12 @@ function page_report() {
     ${d.qGroups.map(g => `<tr><td>${esc(g.name)}</td><td class="num">${g.qids.size}</td><td class="num">${g.n}</td><td class="num">${g.dev}</td><td>${pct(g.dev, g.n)}　<span class="small muted">${wilsonText(g.dev, g.n)}</span></td><td>${credTag(cred(g.dev, g.n, false))}</td><td class="num">${g.over}</td></tr>`).join('')}
   </tbody></table></div>` : ''}
 
+  <h2>采集完整性</h2>
+  <p class="prose muted">模型 × 分组的成功次数。每题每个模型应有 ${d.coverage.repeats} 次回答；${d.coverage.complete ? '本批数据完整。' : `本批缺 ${d.coverage.missing} 条，缺数据的格子标红，分模型的数字旁也会注明。`}</p>
+  <div class="scroll"><table class="tbl"><thead><tr><th>模型</th>${d.coverage.groups.map(g => `<th class="num">${esc(g)}</th>`).join('')}<th class="num">合计</th></tr></thead><tbody>
+    ${d.coverage.engines.map(e => `<tr><td>${esc(engName(e))}</td>${d.coverage.groups.map(g => { const c = d.coverage.cells[e][g]; return `<td class="num">${c.missing ? `<span class="tag bad">${c.ok}/${c.expected}　缺 ${c.missing}</span>` : `${c.ok}/${c.expected}`}</td>`; }).join('')}<td class="num">${d.coverage.byEngine[e].missing ? `<span class="tag bad">${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected}</span>` : `${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected}`}</td></tr>`).join('')}
+  </tbody></table></div>
+
   <h2>逐条发现</h2>
   ${d.list.map((g, i) => `<div class="editor" style="background:var(--surface)">
     <div class="spread"><b>${i + 1}. ${esc(g.title)}</b><span><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span></div>
@@ -1249,14 +1289,14 @@ function page_report() {
       <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div>
       <div><div class="small muted">AI 原句</div>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
     </div>
-    <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c).join('，')}</p>
+    <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
     ${g.cause ? `<p class="small">推断：${esc(g.cause.replace(/^推断：/, ''))}</p>` : ''}
     <p class="small"><b>修改方向</b>　${esc((NEXT_STEP[g.type] || ['', '查看原文后决定'])[1])}</p>
   </div>`).join('') || '<p class="muted">没有发现不一致。</p>'}
 
   <h2>建议补充的口径</h2>
   ${d.unresolved.length ? `<p class="prose muted">官网未说明的话题。AI 在这些话题上无论怎么说，都缺乏官网依据。</p>
-  ${d.unresolved.map(u => `<div class="editor" style="background:var(--surface)"><b>${esc(u.topic)}</b><p class="small" style="margin:6px 0 0">${esc(u.note)}</p></div>`).join('')}` : ''}
+  ${d.unresolved.map(u => `<div class="editor" style="background:var(--surface)"><span class="tag">${esc(u.category || '未分类')}</span><b>${esc(u.topic)}</b><p class="small" style="margin:6px 0 0">${esc(u.note)}</p>${(u.cause_links || []).length ? `<p class="small muted" style="margin:6px 0 0">线索（非中国口径）：${u.cause_links.map(l => extLink(l, hostOf(l))).join('、')}</p>` : ''}</div>`).join('')}` : ''}
   <p class="prose muted">下面这些说法在官网口径里找不到对应内容。它们不一定是错的，但说明官方在这些地方没有给出可以被引用的说法。</p>
   <div class="scroll"><table class="tbl"><thead><tr><th>AI 的说法</th><th class="num">次数</th><th>模型</th></tr></thead><tbody>
     ${d.extras.map(x => `<tr><td class="wide">“${esc(x.s.replace(/\*\*/g, '').slice(0, 100))}”</td><td class="num">${x.n}</td><td class="small">${[...x.engines].map(e => esc(engName(e))).join('、')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">无</td></tr>'}
@@ -1442,7 +1482,7 @@ const ITERATIONS = [
   { v: 'v2', date: '2026-09-23', title: '可信度、溯源、导入', trigger: '竞品研究发现营销人最大的疑虑是“结果不稳定、只能当参照”', changed: '每个比例带 Wilson 区间和可信度等级；错误溯源到引用页并标疑似软文；官网文字抽取事实并做原文校验；国产模型采集脚本与人工导入', why: '“数据本身可不可信”是竞品都没回答的问题', dropped: '豆包、元宝 App 的界面自动化采集（合规风险）', evidence: '竞品矩阵 30 款；Digiday、3·15 报道', lesson: '把测量的不确定性放在台前，反而更可信' },
   { v: 'R1', date: '2026-09-24', title: '第一批真实数据', trigger: '四家 API 跑通，96 次调用 89 次成功', changed: '真实批次写进页面；发现虚构品牌被三个模型编造事实', why: '需要真实数据来验证平台，而不是继续演示', dropped: '把编造率当北极星（它测的是模型，不是 GEO）', evidence: '32 条品牌问题回答，逐条人工标注', lesson: '真实数据会推翻你原来的叙事，这是好事' },
   { v: 'v3', date: '2026-09-24', title: '看板风格', trigger: '用户希望像 AnswerBit 一样自然的看板', changed: '卡片布局、指标卡、条形图、分组导航', why: '演示给品牌方看时，形式要像日常在用的工具', dropped: '环比、综合分（换成区间和可信度）', evidence: 'AnswerBit 界面截图', lesson: '审美可以借，指标不能借' },
-  { v: 'v5.2', date: '2026-09-25', title: '直销演示案例（T6）：匿名、分组汇总、口径录入', trigger: '仓库是公开的、网站手动上传：公开版本不能出现真实品牌名；单条口径样本只有几条回答，区间太宽；对话端从官网整理出 12 条口径，但只有 1 条是逐字原文', changed: '预设可标 anonymize：公开网站上品牌名、别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”，证照号、电话、专有名词等一起隐藏，AI 原句同样替换；本地和 Claude 里显示真实版，可勾选按公开版预览；build_public.py 生成源代码里也没有真实信息的公开版；体检报告增加“按问题分组汇总”；事实底账新增“对话端整理（转述）”和“官网未说明”两类信息，转述不能代替原文，未说明的话题进报告的“建议补充的口径”；合规风险的官网依据改为引用“功效表述边界”里的官方原话，区分官方原话和 AI 的延伸', why: '匿名要在数据层做，评测结果才能和真实版一致；分组的样本比单条大一个数量级，才可能给出“仅作方向”以上的结论；转述录进原文字段会让“逐字原文”失去意义', dropped: '只在显示层替换品牌名（源代码里仍然全是真实信息）；把对话端的转述直接当作原文引语', evidence: '回归测试 16 → 17 条全部通过；用虚构回答比对真实版和匿名版，回答数、不一致数、五组数字完全一致；模拟公开网站逐页扫描 16 个页面，屏幕文字、输入框、链接和 Markdown 导出里都没有品牌名', lesson: '“匿名”不只是换掉名字：证照号、客服电话、地址、专有的项目名都能把品牌认回来，名单要和口径一起维护' },
+  { v: 'v5.2', date: '2026-09-25', title: '直销演示案例（T6）：匿名、分组汇总、口径录入', trigger: '仓库是公开的、网站手动上传：公开版本不能出现真实品牌名；单条口径样本只有几条回答，区间太宽；对话端从官网整理出 12 条口径，但只有 1 条是逐字原文', changed: '预设可标 anonymize：公开网站上品牌名、别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”，证照号、电话、专有名词等一起隐藏，AI 原句同样替换；本地和 Claude 里显示真实版，可勾选按公开版预览；build_public.py 生成源代码里也没有真实信息的公开版；体检报告增加“按问题分组汇总”；事实底账新增“对话端整理（转述）”和“官网未说明”两类信息，转述不能代替原文，未说明的话题进报告的“建议补充的口径”；合规风险的官网依据改为引用“功效表述边界”里的官方原话，区分官方原话和 AI 的延伸；报告新增“采集完整性”（模型 × 分组的成功次数，补跑后按“同一题同一次只要有一条成功”合并，缺数据的格子标出并在分模型数字旁注明）；没有 group 字段的问题集按阶段分组；修复被逗号隔开的否定句漏判（前一小句只有主题、后一小句只有否定时合起来判，前一小句已肯定的不合并）', why: '匿名要在数据层做，评测结果才能和真实版一致；分组的样本比单条大一个数量级，才可能给出“仅作方向”以上的结论；转述录进原文字段会让“逐字原文”失去意义', dropped: '只在显示层替换品牌名（源代码里仍然全是真实信息）；把对话端的转述直接当作原文引语', evidence: '回归测试 16 → 20 条全部通过（R-06/R-07 逗号否定、R-08 反例、A-01 至 A-03 匿名）；用虚构回答比对真实版和匿名版，回答数、不一致数、五组数字完全一致；模拟公开网站逐页扫描 16 个页面，屏幕文字、输入框、链接和 Markdown 导出里都没有品牌名', lesson: '“匿名”不只是换掉名字：证照号、客服电话、地址、专有的项目名都能把品牌认回来，名单要和口径一起维护' },
   { v: 'v5.1', date: '2026-09-25', title: '官网口径逐条复核（T3）', trigger: '交接文档 T3：事实底账要能按分类看、看到原文和核对日期、逐条确认；同时发现官网抽取默认用 DeepSeek，而 DeepSeek 也是被测模型', changed: '「事实底账」页把能力、套餐、不应出现的说法合并为“官网口径”，按六类分组展示，每条显示原文引语、来源、核对日期、复核状态，可以逐条确认或撤回并记下复核人和时间；没有原文引语不能确认，已确认的口径改了原文或来源会退回待复核；从官网导入的口径保留校验过的引语，标为待复核；体检报告里待复核的口径会标出来；Worker 的官网抽取和理由抽取改用 EXTRACT_ENGINE（默认 Claude），不允许设成被测模型', why: '人是最后一道门：确认必须针对一句能被别人核对的原文，而不是一句转述；裁判和被测对象是同一个模型时，它的偏差会同时出现在答案和判卷里', dropped: '让“已确认”决定参不参与评测（会让腾讯会议预设里没有引语的 5 条口径一下子失效）；另建 source_url 字段（与已有的 evidence_url 重复）', evidence: '回归测试改动前 14/14、改动后 14/14 通过；腾讯会议预设 11 条口径里，2 条有引语的可以确认，其余 9 条（5 条能力、3 个套餐、1 条不应出现的说法）确认按钮不可用；绕过按钮直接触发确认也会被拦下', lesson: '“已验证”和“已确认”是两件事：前者说这条口径能不能用来判卷，后者说有没有人看过原文。混在一个字段里，任何一个都说不清' },
   { v: 'v5.0', date: '2026-09-25', title: '直销口径体检：只做“发现问题”', trigger: '还没有真实用户和数据来源，持续监测暂时做不起来；直销品牌最关心的是 AI 的说法和官网口径哪里不一样', changed: '新增「体检报告」页和 Markdown 导出：逐条发现附官网原文、AI 原句、出现比例和区间、推断原因、一句修改方向；新增“合规风险”判定（AI 替品牌宣称疗效，否定、转述争议、问句、竞品说法都不算）；新增“建议补充的口径”（官网没说清、模型各说各话的地方）；新增直销问题模板（五组 30 条）和导出；事实底账增加原文引语、分类、核对日期、复核状态；回归测试增加到 14 条', why: '“发现问题”这一步不依赖持续数据，一轮采集就能交付，而且合规风险对应的是法务和合规的预算', dropped: '持续监测列入待办；不代写、不代发、不删帖', evidence: '交接文档 HANDOFF_直销口径体检.md', lesson: '先做一次就能交付价值的事，需要数据积累的事排在后面' },
   { v: 'v4.0', date: '2026-09-25', title: '口径对照：官网与 AI 的偏差', trigger: '方向确定为“品牌官网口径和 AI 表现的出入有多大、为什么”；同时在核对官方帮助中心时，发现我们自己的事实底账错了', changed: '新增「口径对照」页：逐条官网口径统计一致、说反了、该说没说，给出偏差率和 95% 区间，并写出偏差背后的推断和参考来源；事实底账 v2：补上“元宝纪要（原 AI 纪要）免费版限时免费”，AI 小助手单列为付费；新增“否认官方口径”判定；案例页按修正后的结论重写；示例文案只开放一条，其余标为付费服务；回归测试增加到 8 条', why: '偏差本身是结果，品牌方要知道偏在哪、为什么偏、改什么；而事实底账错一条，整个结论就会翻转', dropped: '不做代运营式的内容发布；不核对具体额度数字（官方没写）', evidence: '腾讯会议帮助中心两篇文档；R2 批次“AI 纪要免费版”一题 8 次回答', lesson: '先核对自己的尺子。我们第一次判断“千问是唯一说对的”，恰恰是最错的那一个' },
@@ -1816,7 +1856,11 @@ function evaluate(run, ctx = {}) {
   const capsHit = [];
   T.capabilities.filter(c => c.status === 'VERIFIED').forEach(cap => {
     // 关键口径被否认：说“不能”“已收费”，而官方口径是“可以”
-    const den = cap.critical ? tsubs.find(({ s }) => (test(cap.match, s) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, s))) : null;
+    // 否定被逗号隔开时（“…的元宝纪要功能，免费版不能用”）：前一小句提到了主题但没有肯定，后一小句只有否定，
+    // 把两句合起来再判。前一小句已经肯定过的不合并（“免费版可以用，但不支持离线部署”是另一件事的限制，不是否认）
+    const denies = (s, prev) => (test(cap.match, s) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, s))
+      || (prev != null && NEG.test(s) && !(test(cap.match, prev) && !NEG.test(prev)) && (() => { const j = prev + '，' + s; return (test(cap.match, j) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, j)); })());
+    const den = cap.critical ? tsubs.find(({ i, s }, k) => denies(s, k > 0 && tsubs[k - 1].i === i ? tsubs[k - 1].s : null)) : null;
     if (den) { flags.set(den.i, 'bad'); issues.push({ type: 'denied', label: '否认官方口径', text: `说“${den.s.replace(/\*\*/g, '').slice(0, 36)}…”，官方口径是“${cap.statement}”`, clause: den.s, claim: cap.claim_id, idx: [den.i] }); }
     const hit = tsubs.find(({ s }) => test(cap.match, s) && !NEG.test(s) && !(cap.deny_match && test(cap.deny_match, s)));
     if (hit) { capsHit.push(cap.claim_id); goods.push({ claim: cap.claim_id, text: cap.statement, clause: hit.s }); if (!flags.has(hit.i)) flags.set(hit.i, 'ok'); }
@@ -1900,6 +1944,12 @@ const REGRESSION_CASES = [
     expect: e => e.issues.some(i => i.type === 'denied'), want: '否认官方口径（元宝纪要限时免费）' },
   { id: 'R-05', found: '口径核对 2026-09-25', truth: TENCENT_TRUTH, text: '腾讯会议的AI纪要免费版可以用，AI 小助手也免费。', focus: ['cap_free_minutes'], before: '把“AI 纪要免费”判为冲突',
     expect: e => e.capsHit.includes('cap_free_minutes') && e.issues.some(i => i.claim.startsWith('prohibited:')), want: 'AI 纪要说对，AI 小助手说错' },
+  { id: 'R-06', found: '交接文档已知问题 2026-09-25', truth: TENCENT_TRUTH, text: '腾讯会议的元宝纪要功能，免费版不能用。', focus: ['cap_free_minutes'], before: '否定被逗号隔开：前半句只有主题，后半句只有否定，两个小句都对不上口径，判成“该说没说”',
+    expect: e => e.issues.some(i => i.type === 'denied') && !e.capsHit.includes('cap_free_minutes'), want: '否认官方口径' },
+  { id: 'R-07', found: '交接文档已知问题 2026-09-25', truth: TENCENT_TRUTH, text: '腾讯会议的AI纪要已经全面商业化，个人免费版基本不能用了。', focus: ['cap_free_minutes'], before: '同上（交接文档里的原例）',
+    expect: e => e.issues.some(i => i.type === 'denied'), want: '否认官方口径' },
+  { id: 'R-08', found: '防回退（R-06 的反例）', truth: TENCENT_TRUTH, text: '腾讯会议的元宝纪要免费版可以用，但不支持离线部署。', focus: ['cap_free_minutes'], before: '—',
+    expect: e => e.capsHit.includes('cap_free_minutes') && !e.issues.some(i => i.type === 'denied'), want: '前半句已肯定，后半句的“不支持”不算否认' },
   { id: 'O-01', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的薰衣草精油可以治疗失眠。', focus: [], before: '新规则', expect: e => e.issues.some(i => i.type === 'overclaim'), want: '合规风险' },
   { id: 'O-02', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油不能治病，也不能替代药物。', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '否定语境，不算' },
   { id: 'O-03', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A曾因经销商宣称精油能治疗新冠被起诉。', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '转述争议，不算' },
@@ -2573,8 +2623,9 @@ function factLedger(T) {
   <p class="hint">套餐有失效日且早于今天（${TODAY}）时，被 AI 引用算“过期事实”。</p>
   <h3>官网未说明 <span class="small muted" style="font-weight:400">${(T.unresolved || []).length} 条</span></h3>
   <p class="prose muted">这些话题官网没有给出口径。它们不参与评测；报告里列在“建议补充的口径”，提醒品牌方补上可以被引用的说法。</p>
-  ${(T.unresolved || []).map((u, i) => `<div class="cand"><div class="spread">${inp(`unresolved.${i}.topic`, u.topic, { sm: 1, label: '话题' })}<button class="btn quiet sm danger" data-act="truth-del" data-list="unresolved" data-i="${i}">删除</button></div>
-    <textarea class="inp sm" rows="2" data-path="unresolved.${i}.note" aria-label="说明" style="margin-top:6px">${esc(u.note || '')}</textarea></div>`).join('')}
+  ${(T.unresolved || []).map((u, i) => `<div class="cand"><div class="spread"><span><span class="tag">${esc(u.category || '未分类')}</span>${inp(`unresolved.${i}.topic`, u.topic, { sm: 1, label: '话题' })}</span><button class="btn quiet sm danger" data-act="truth-del" data-list="unresolved" data-i="${i}">删除</button></div>
+    <textarea class="inp sm" rows="2" data-path="unresolved.${i}.note" aria-label="说明" style="margin-top:6px">${esc(u.note || '')}</textarea>
+    ${(u.cause_links || []).length ? `<div class="small muted">线索（非中国口径）：${u.cause_links.map(l => extLink(l, hostOf(l))).join('、')}</div>` : ''}</div>`).join('')}
   <button class="btn sm" data-act="truth-add" data-list="unresolved">添加未说明的话题</button>`;
 }
 
@@ -3134,7 +3185,7 @@ document.addEventListener('click', e => {
         offers: { offer_id: 'offer_' + Date.now().toString(36), name: '新套餐', price: 0, purchase_channel: '官网', valid_from: TODAY, valid_to: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
         prohibited_claims: { text: '新说法', match: '', note: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
         limitations: { text: '新限制', match: '', owner: '' },
-        unresolved: { topic: '新话题', note: '' }
+        unresolved: { category: '', topic: '新话题', note: '' }
       }[d.list];
       (S.truth[d.list] = S.truth[d.list] || []).push(blank); markTruthDraft(); commit(); break;
     }
