@@ -765,20 +765,26 @@ function applyPreset(key) {
    预设写了 anonymize: true 时，公开网站上把品牌名和别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”、不显示网址，
    AI 原句里的品牌名也一起替换。本地打开（file://、localhost）和在 Claude 里预览时显示真实版；本地可以勾选“按公开版预览”。
    替换发生在数据层（事实底账、竞品、问题、回答原文一起换），所以评测结果和真实版一致，导出的 Markdown 也不会漏出品牌名。 */
-const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）';
+const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）', MASK_DOMAIN = '官方网站（已隐藏）', MASK_HIDDEN = '（已隐藏）';
 const isMaskedUrl = u => u === MASK_OFFICIAL || u === MASK_OTHER;
 function isLocalView() { return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || !!(window.claude && window.claude.use); }
 function anonActive(key = S.preset) { const p = PRESETS[key]; return !!(p && p.anonymize) && (!isLocalView() || !!UI.anonPreview); }
 const _maskers = {};
-function maskerFor(key) { return _maskers[key] || (_maskers[key] = makeMasker(PRESETS[key].truth)); }
-function makeMasker(t) {
+function maskerFor(key) { return _maskers[key] || (_maskers[key] = makeMasker(PRESETS[key].truth, PRESETS[key].mask_extra || [])); }
+function makeMasker(t, extras = []) {
+  // 顺序：整条网址 → 裸域名 → 额外可识别信息（证照号、电话、专有名词等）→ 品牌名。build_public.py 用同一顺序
   const names = [t.entity_name, ...(t.aliases || [])].filter(Boolean).sort((a, b) => b.length - a.length).map(escRx).join('|');
   const nameG = new RegExp(names, 'gi'), nameT = new RegExp(names, 'i');
   const domains = (t.official_domains || []).map(d => d.replace(/^www\./, ''));
   const urlRe = /https?:\/\/[^\s"'<>（）()\[\]【】，。；、]+/g;
-  const one = str => String(str)
-    .replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; })
-    .replace(nameG, ANON_NAME);
+  const bareDom = domains.length ? new RegExp('(?<![\\w.-])(?:www\\.)?(?:' + domains.map(escRx).join('|') + ')(?![\\w-])', 'gi') : null;
+  const rules = extras.map(x => Array.isArray(x) ? [new RegExp(escRx(x[0]), 'gi'), x[1]] : [new RegExp(escRx(x), 'gi'), MASK_HIDDEN]).sort((a, b) => b[0].source.length - a[0].source.length);
+  const one = str => {
+    let out = String(str).replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; });
+    if (bareDom) out = out.replace(bareDom, MASK_DOMAIN);
+    rules.forEach(([re, to]) => { out = out.replace(re, to); });
+    return out.replace(nameG, ANON_NAME);
+  };
   return one;
 }
 function maskDeep(v, f) {
@@ -1048,24 +1054,73 @@ function exportDirectQueries() {
    口径只能来自官方页面（官网、官方公众号、监管公示），每条附原文、网址、读取日期，录入后一律“待复核”。
    问题集与 queries_多特瑞.json 同源（directQueries），id 一致，采集结果可以直接对上。
    竞品只用于小句归属（避免把别家的说法算到本品牌头上），不是口径。 */
-const DOTERRA_TRUTH = {
-  product_id: 'direct_a', entity_name: '多特瑞', aliases: ['多特瑞', 'doTERRA', 'dōTERRA'],
+// build_public.py 只读下面这一行（JSON），生成公开版时按同一套规则替换；改名单请改这里
+const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains": ["doterra.cn", "doterra.com"], "extra": [["多特瑞（上海）商贸有限公司", "品牌 A 中国公司"], ["多特瑞(上海)商贸有限公司", "品牌 A 中国公司"], "9131000009421894XY", "YB13101060018558", "400-920-9191", "沪ICP备14052891号-1", "沪 ICP 备 14052891 号-1", "南京西路 699 号", "南京西路699号", "南京西路", "3101–3108", "CPTG", "LRP", "轻松购"]};
+const DIRECT_A_SRC = 'https://doterra.cn/';   // 帮助中心各条的具体网址待补，先记站点根地址 + 页面路径
+const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', ...x });
+const DIRECT_A_TRUTH = {
+  product_id: 'direct_a', entity_name: '多特瑞', aliases: DIRECT_A_PUBLIC.names,
   category: '精油与个人护理（直销）', positioning: '', target_users: [],
-  official_domains: ['doterra.cn', 'doterra.com'],
+  official_domains: DIRECT_A_PUBLIC.domains,
   positioning_match: { aligned: '', deviation: '' },
-  capabilities: [], offers: [], prohibited_claims: [], limitations: [],
-  fictional: false, status: 'APPROVED', version: 1, approved_by: '官网口径待录入', approved_at: ''
+  // 除 cap_cptg 外，各条只有对话端的转述（source_note），原文引语（source_quote）待逐字补录，补录前不能确认
+  capabilities: [
+    DIRECT_A_FACT({ claim_id: 'cap_entity', category: '资质与经营主体', statement: '中国经营主体为多特瑞（上海）商贸有限公司，有限责任公司（港澳台法人独资），2014 年 5 月 28 日成立，注册资本 8000 万元，住所上海市静安区南京西路 699 号 3101–3108 室',
+      match: '(上海).{0,4}商贸有限公司|港澳台法人独资|2014 ?年.{0,8}(成立|注册)|成立于 ?2014|注册资本.{0,6}8 ?000 ?万', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', source_path: '企业证照页 → 营业执照（图片）',
+      source_note: '名称为多特瑞（上海）商贸有限公司，类型为有限责任公司（港澳台法人独资），统一社会信用代码 9131000009421894XY，成立日期 2014 年 5 月 28 日，注册资本 8000 万元，住所为上海市静安区南京西路 699 号 3101–3108 室，登记机关为上海市市场监督管理局，发照日期 2022 年 6 月 21 日。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_food_license', category: '资质与经营主体', statement: '食品经营备案：备案编号 YB13101060018558，预包装食品销售（不含冷藏冷冻食品），批发兼零售，有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日',
+      match: '食品经营(备案|许可)|预包装食品|YB13101060018558', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', source_path: '企业证照页 → 备案信息',
+      source_note: '备案编号 YB13101060018558；销售方式为食品销售经营者（商贸企业，批发兼零售）；经营项目为预包装食品销售（不含冷藏冷冻食品）；有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_contact', category: '资质与经营主体', statement: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1',
+      match: '400.?920.?9191|沪 ?ICP ?备|南京西路', source_path: '官网页脚',
+      source_note: '版权方为多特瑞（上海）商贸有限公司，公司地址南京西路 699 号 12 层，客服热线 400-920-9191，备案号沪 ICP 备 14052891 号-1。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_cptg', category: '功效表述边界', statement: '精油经过自有的 CPTG 检测标准检验，用来保证质量和纯度；官方原话只说“是安全、纯正、有效的”，没有界定是哪方面的作用',
+      match: 'CPTG|检测标准|纯度|纯正', source_quote: '是安全、纯正、有效的', source_path: '帮助中心 → 产品及售后 → 产品品质？',
+      source_note: '精油都经过多特瑞自有的 CPTG 检测标准检验，用来保证质量和纯度。',
+      cause: '推断：官方自己用了“有效”，但没有界定是哪方面的作用；模型把“有效”展开成具体疗效时，报告要区分“官方原话”和“AI 的延伸”。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单退换货；已开发票的退货后发票作废；在“我的订单”里申请',
+      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', source_path: '帮助中心 → 产品及售后 → 如何办理退货？',
+      source_note: '通过多特瑞（上海）认可渠道购买的产品，自购买之日起 30 天内，产品完好无损、不影响二次销售的，可以凭商品清单退换货；已开发票的，退货后发票作废；在“我的订单”里申请。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，在“我的订单”里操作',
+      match: '换货', source_path: '帮助中心 → 产品及售后 → 如何办理换货',
+      source_note: '通过官方渠道购买、30 天内对质量不满意的，可以申请换货，同样在“我的订单”里操作。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_refund', category: '购买与售后', statement: '退货后，仓库收货并确认不影响二次销售的，一般 5 个工作日内原路退款；该订单获得的回馈点数会被扣回',
+      match: '5 ?个工作日|五个工作日|原路退(款|回)|退款', source_path: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
+      source_note: '仓库收货、确认不影响二次销售后，一般 5 个工作日内原路退款，该订单获得的回馈点数会被扣回。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_join', category: '商业模式说明', statement: '从 2026 年 7 月 1 日起，年满 18 周岁可通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上即成为优惠顾客；注册时默认勾选参加 LRP 轻松购',
+      match: '优惠顾客|125 ?(个)?(产品)?点数|125 ?PV|轻松购|LRP|18 ?周岁|年满 ?18', valid_from: '2026-07-01', source_path: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
+      source_note: '从 2026 年 7 月 1 日起，年满 18 周岁，可以通过官网、微信公众号、小程序、App 注册；首张订单达到 125 个产品点数以上，就能成为优惠顾客。注册时默认勾选参加 LRP 轻松购。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_discount', category: '商业模式说明', statement: '优惠顾客首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动',
+      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价', source_path: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
+      source_note: '首单起享受优惠顾客价，约为零售价的 6.5 到 7 折，次月起可参加 LRP 等活动。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_retail', category: '商业模式说明', statement: '不是优惠顾客也可以购买：注册为零售顾客，按原价购买',
+      match: '零售顾客|按原价|原价购买|零售价购买', source_path: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
+      source_note: '可以，注册为零售顾客，按原价购买。' }),
+    DIRECT_A_FACT({ claim_id: 'cap_starter', category: '商业模式说明', statement: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区',
+      match: '首购套装|首购', source_path: '帮助中心 → 注册问题 → 注册首购套装？',
+      source_note: '新优惠顾客的首单可以享受首购套装优惠价，详情见下载专区。' })
+  ],
+  offers: [], prohibited_claims: [], limitations: [],
+  // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
+  unresolved: [
+    { topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
+    { topic: '使用与安全（能否内服、禁忌人群）', note: '产品页在自动读取时一直加载不出来，口径待录入。' },
+    { topic: '经销商制度与收入说明', note: '帮助中心里没有找到。优惠顾客制度写得很清楚，但官网没有出现“经销商”“直销”这些说法。' },
+    { topic: '“不宣称疗效”之类的声明', note: '目前没有找到。官方对产品的描述只有“是安全、纯正、有效的”。' },
+    { topic: '加入是否收费', note: '官网只写了首单达到 125 个产品点数即成为优惠顾客，没有写明是否有入会费。AI 说“要交入会费”或“免费加入”都缺乏官网依据。' }
+  ],
+  fictional: false, status: 'APPROVED', version: 1, approved_by: '对话端依据官网整理（2026-09-25），全部待复核', approved_at: '2026-09-25'
 };
-const DOTERRA_COMPETITORS = [
+const DIRECT_A_COMPETITORS = [
   { name: 'Young Living', aliases: ['Young Living'], domains: ['youngliving.com'], relation: '精油直销同业（仅用于小句归属）' },
   { name: '安利', aliases: ['安利', 'Amway'], domains: ['amway.com.cn'], relation: '直销同业（仅用于小句归属）' },
   { name: '无限极', aliases: ['无限极', 'Infinitus'], domains: ['infinitus-int.com'], relation: '直销同业（仅用于小句归属）' },
   { name: '如新', aliases: ['如新', 'Nu Skin'], domains: ['nuskin.com'], relation: '直销同业（仅用于小句归属）' }
 ];
 PRESETS.direct_a = {
-  name: '多特瑞（直销口径体检）', publicName: '某精油直销品牌（直销口径体检）', anonymize: true,
-  batches: ['R3'], truth: DOTERRA_TRUTH, competitors: DOTERRA_COMPETITORS, queries: directQueries('多特瑞'),
-  note: '官网口径与采集结果待录入。公开网站上品牌名显示为“品牌 A”，官网链接只显示“官方页面（已核对）”。'
+  name: '多特瑞（直销口径体检）', publicName: '某精油直销品牌（直销口径体检）', anonymize: true, mask_extra: DIRECT_A_PUBLIC.extra,
+  batches: ['R3'], truth: DIRECT_A_TRUTH, competitors: DIRECT_A_COMPETITORS, queries: directQueries('多特瑞'),
+  note: '口径由对话端依据官网整理，全部待复核；除“产品品质”一条外，原文引语待逐字补录。采集批次 R3 待导入。公开网站上品牌名显示为“品牌 A”，官网链接只显示“官方页面（已核对）”。'
 };
 
 /* ---------- 体检报告 ---------- */
@@ -1085,6 +1140,8 @@ function reportData() {
       if (g.quotes.length < 3 && i.clause && !g.quotes.some(q => q.q === i.clause)) g.quotes.push({ q: String(i.clause).replace(/\*\*/g, '').replace(/\s+/g, ' ').slice(0, 120), engine: x.r.engine, qid: x.r.query_id });
     });
   });
+  // 合规风险的官网依据：优先用“功效表述边界”一类里有原文引语的口径，区分“官方原话”和“AI 的延伸”
+  const eff = T.capabilities.find(c => c.category === '功效表述边界' && hasQuote(c) && c.status === 'VERIFIED');
   const list = Object.values(groups).map(g => {
     const base = evs.filter(x => g.qids.has(x.r.query_id)).length;
     const fact = factFor(g.claim) || {};
@@ -1092,9 +1149,9 @@ function reportData() {
     const pc = T.prohibited_claims.find(p => 'prohibited:' + p.text === g.claim);
     return { ...g, k: g.runs.size, n: base, sev: SEVERITY[g.type] || 1, fact, cap, pc,
       title: g.type === 'overclaim' ? '替品牌宣称疗效' : cap ? cap.statement : pc ? '不应说：' + pc.text : g.text.split('，')[0],
-      official: (cap && (cap.source_quote || cap.statement)) || (pc && pc.note) || fact.text || (g.type === 'overclaim' ? '官方口径未宣称疗效（请在事实底账中补充“功效表述边界”原文）' : '事实底账中没有对应口径'),
-      url: (cap && cap.evidence_url) || (pc && pc.evidence_url) || fact.url || '',
-      pending: !!(cap || pc) && !isConfirmed(cap || pc),
+      official: (cap && (cap.source_quote || cap.statement)) || (pc && pc.note) || fact.text || (g.type === 'overclaim' ? (eff ? `官方原话只有“${eff.source_quote}”，没有界定是哪方面的作用；具体疗效是 AI 的延伸` : '官方口径未宣称疗效（请在事实底账中补充“功效表述边界”原文）') : '事实底账中没有对应口径'),
+      url: (cap && cap.evidence_url) || (pc && pc.evidence_url) || fact.url || (g.type === 'overclaim' && eff ? eff.evidence_url : '') || '',
+      pending: !!(cap || pc || (g.type === 'overclaim' && eff)) && !isConfirmed(cap || pc || eff),
       cause: (cap && cap.cause) || (pc && pc.cause) || '' };
   }).sort((a, b) => (b.sev - a.sev) || (b.k - a.k));
   const withDev = new Set(); list.forEach(g => g.runs.forEach(id => withDev.add(id)));
@@ -1112,7 +1169,7 @@ function reportData() {
   const qGroups = Object.values(byGroup).sort((a, b) => ((groupOrder.indexOf(a.name) + 1) || 99) - ((groupOrder.indexOf(b.name) + 1) || 99));
   const extras = {};
   evs.forEach(x => (x.e.extras || []).forEach(s => { const key = s.slice(0, 40); if (!extras[key]) extras[key] = { s, n: 0, engines: new Set() }; extras[key].n++; extras[key].engines.add(x.r.engine); }));
-  return { T, evs, list, qGroups, nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
+  return { T, evs, list, qGroups, unresolved: T.unresolved || [], nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
     extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length };
 }
 function reportMarkdown(d) {
@@ -1136,7 +1193,11 @@ function reportMarkdown(d) {
     if (g.cause) L.push(`- 推断：${g.cause.replace(/^推断：/, '')}`);
     L.push(`- 修改方向：${(NEXT_STEP[g.type] || ['', '查看原文后决定'])[1]}`, '');
   });
-  if (d.extras.length) { L.push('## 建议补充的口径', '', '以下说法在官网口径里找不到对应内容，各模型说法不一，建议官方给出明确说明：', ''); d.extras.forEach(x => L.push(`- “${x.s.slice(0, 80)}”（${x.n} 次）`)); L.push(''); }
+  if (d.unresolved.length || d.extras.length) {
+    L.push('## 建议补充的口径', '');
+    if (d.unresolved.length) { L.push('官网未说明的话题（AI 在这些话题上说什么都缺乏官网依据）：', ''); d.unresolved.forEach(u => L.push(`- **${u.topic}**：${u.note}`)); L.push(''); }
+    if (d.extras.length) { L.push('以下说法在官网口径里找不到对应内容，各模型说法不一，建议官方给出明确说明：', ''); d.extras.forEach(x => L.push(`- “${x.s.slice(0, 80)}”（${x.n} 次）`)); L.push(''); }
+  }
   L.push('## 方法与局限', '', '- 口径只来自官方页面，每条附原文或链接；标注“待复核”的口径需要品牌方确认。', '- 统计以回答为单位，区间为 Wilson 95% 区间；样本少时区间很宽，只能看方向。', '- 采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。', '- 判定由规则完成，已知会漏判逗号隔开的否定句；所有发现都应对照原文复核。', '- 本报告只列出问题和修改方向，不包含代写或代发内容。');
   return L.join('\n');
 }
@@ -1152,7 +1213,7 @@ function page_report() {
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div><div class="ks">95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>
     <div class="kpi"><div class="kt"><i></i>发现</div><div class="kv">${d.list.length}<small>类</small></div><div class="ks">先按严重度，再按出现次数排序</div></div>
-    <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>建议补充的口径</div><div class="kv">${d.extras.length}</div><div class="ks">官网没说清，模型各说各话</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>建议补充的口径</div><div class="kv">${d.unresolved.length + d.extras.length}</div><div class="ks">官网没说清，模型各说各话</div></div>
   </div>
   <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。</p><button class="btn primary" data-act="report-md">导出 Markdown</button></div></div>
 
@@ -1175,7 +1236,9 @@ function page_report() {
   </div>`).join('') || '<p class="muted">没有发现不一致。</p>'}
 
   <h2>建议补充的口径</h2>
-  <p class="prose muted">这些说法在官网口径里找不到对应内容。它们不一定是错的，但说明官方在这些地方没有给出可以被引用的说法。</p>
+  ${d.unresolved.length ? `<p class="prose muted">官网未说明的话题。AI 在这些话题上无论怎么说，都缺乏官网依据。</p>
+  ${d.unresolved.map(u => `<div class="editor" style="background:var(--surface)"><b>${esc(u.topic)}</b><p class="small" style="margin:6px 0 0">${esc(u.note)}</p></div>`).join('')}` : ''}
+  <p class="prose muted">下面这些说法在官网口径里找不到对应内容。它们不一定是错的，但说明官方在这些地方没有给出可以被引用的说法。</p>
   <div class="scroll"><table class="tbl"><thead><tr><th>AI 的说法</th><th class="num">次数</th><th>模型</th></tr></thead><tbody>
     ${d.extras.map(x => `<tr><td class="wide">“${esc(x.s.replace(/\*\*/g, '').slice(0, 100))}”</td><td class="num">${x.n}</td><td class="small">${[...x.engines].map(e => esc(engName(e))).join('、')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">无</td></tr>'}
   </tbody></table></div>
@@ -1360,6 +1423,7 @@ const ITERATIONS = [
   { v: 'v2', date: '2026-09-23', title: '可信度、溯源、导入', trigger: '竞品研究发现营销人最大的疑虑是“结果不稳定、只能当参照”', changed: '每个比例带 Wilson 区间和可信度等级；错误溯源到引用页并标疑似软文；官网文字抽取事实并做原文校验；国产模型采集脚本与人工导入', why: '“数据本身可不可信”是竞品都没回答的问题', dropped: '豆包、元宝 App 的界面自动化采集（合规风险）', evidence: '竞品矩阵 30 款；Digiday、3·15 报道', lesson: '把测量的不确定性放在台前，反而更可信' },
   { v: 'R1', date: '2026-09-24', title: '第一批真实数据', trigger: '四家 API 跑通，96 次调用 89 次成功', changed: '真实批次写进页面；发现虚构品牌被三个模型编造事实', why: '需要真实数据来验证平台，而不是继续演示', dropped: '把编造率当北极星（它测的是模型，不是 GEO）', evidence: '32 条品牌问题回答，逐条人工标注', lesson: '真实数据会推翻你原来的叙事，这是好事' },
   { v: 'v3', date: '2026-09-24', title: '看板风格', trigger: '用户希望像 AnswerBit 一样自然的看板', changed: '卡片布局、指标卡、条形图、分组导航', why: '演示给品牌方看时，形式要像日常在用的工具', dropped: '环比、综合分（换成区间和可信度）', evidence: 'AnswerBit 界面截图', lesson: '审美可以借，指标不能借' },
+  { v: 'v5.2', date: '2026-09-25', title: '直销演示案例（T6）：匿名、分组汇总、口径录入', trigger: '仓库是公开的、网站手动上传：公开版本不能出现真实品牌名；单条口径样本只有几条回答，区间太宽；对话端从官网整理出 12 条口径，但只有 1 条是逐字原文', changed: '预设可标 anonymize：公开网站上品牌名、别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”，证照号、电话、专有名词等一起隐藏，AI 原句同样替换；本地和 Claude 里显示真实版，可勾选按公开版预览；build_public.py 生成源代码里也没有真实信息的公开版；体检报告增加“按问题分组汇总”；事实底账新增“对话端整理（转述）”和“官网未说明”两类信息，转述不能代替原文，未说明的话题进报告的“建议补充的口径”；合规风险的官网依据改为引用“功效表述边界”里的官方原话，区分官方原话和 AI 的延伸', why: '匿名要在数据层做，评测结果才能和真实版一致；分组的样本比单条大一个数量级，才可能给出“仅作方向”以上的结论；转述录进原文字段会让“逐字原文”失去意义', dropped: '只在显示层替换品牌名（源代码里仍然全是真实信息）；把对话端的转述直接当作原文引语', evidence: '回归测试 16 → 17 条全部通过；用虚构回答比对真实版和匿名版，回答数、不一致数、五组数字完全一致；模拟公开网站逐页扫描 16 个页面，屏幕文字、输入框、链接和 Markdown 导出里都没有品牌名', lesson: '“匿名”不只是换掉名字：证照号、客服电话、地址、专有的项目名都能把品牌认回来，名单要和口径一起维护' },
   { v: 'v5.1', date: '2026-09-25', title: '官网口径逐条复核（T3）', trigger: '交接文档 T3：事实底账要能按分类看、看到原文和核对日期、逐条确认；同时发现官网抽取默认用 DeepSeek，而 DeepSeek 也是被测模型', changed: '「事实底账」页把能力、套餐、不应出现的说法合并为“官网口径”，按六类分组展示，每条显示原文引语、来源、核对日期、复核状态，可以逐条确认或撤回并记下复核人和时间；没有原文引语不能确认，已确认的口径改了原文或来源会退回待复核；从官网导入的口径保留校验过的引语，标为待复核；体检报告里待复核的口径会标出来；Worker 的官网抽取和理由抽取改用 EXTRACT_ENGINE（默认 Claude），不允许设成被测模型', why: '人是最后一道门：确认必须针对一句能被别人核对的原文，而不是一句转述；裁判和被测对象是同一个模型时，它的偏差会同时出现在答案和判卷里', dropped: '让“已确认”决定参不参与评测（会让腾讯会议预设里没有引语的 5 条口径一下子失效）；另建 source_url 字段（与已有的 evidence_url 重复）', evidence: '回归测试改动前 14/14、改动后 14/14 通过；腾讯会议预设 11 条口径里，2 条有引语的可以确认，其余 9 条（5 条能力、3 个套餐、1 条不应出现的说法）确认按钮不可用；绕过按钮直接触发确认也会被拦下', lesson: '“已验证”和“已确认”是两件事：前者说这条口径能不能用来判卷，后者说有没有人看过原文。混在一个字段里，任何一个都说不清' },
   { v: 'v5.0', date: '2026-09-25', title: '直销口径体检：只做“发现问题”', trigger: '还没有真实用户和数据来源，持续监测暂时做不起来；直销品牌最关心的是 AI 的说法和官网口径哪里不一样', changed: '新增「体检报告」页和 Markdown 导出：逐条发现附官网原文、AI 原句、出现比例和区间、推断原因、一句修改方向；新增“合规风险”判定（AI 替品牌宣称疗效，否定、转述争议、问句、竞品说法都不算）；新增“建议补充的口径”（官网没说清、模型各说各话的地方）；新增直销问题模板（五组 30 条）和导出；事实底账增加原文引语、分类、核对日期、复核状态；回归测试增加到 14 条', why: '“发现问题”这一步不依赖持续数据，一轮采集就能交付，而且合规风险对应的是法务和合规的预算', dropped: '持续监测列入待办；不代写、不代发、不删帖', evidence: '交接文档 HANDOFF_直销口径体检.md', lesson: '先做一次就能交付价值的事，需要数据积累的事排在后面' },
   { v: 'v4.0', date: '2026-09-25', title: '口径对照：官网与 AI 的偏差', trigger: '方向确定为“品牌官网口径和 AI 表现的出入有多大、为什么”；同时在核对官方帮助中心时，发现我们自己的事实底账错了', changed: '新增「口径对照」页：逐条官网口径统计一致、说反了、该说没说，给出偏差率和 95% 区间，并写出偏差背后的推断和参考来源；事实底账 v2：补上“元宝纪要（原 AI 纪要）免费版限时免费”，AI 小助手单列为付费；新增“否认官方口径”判定；案例页按修正后的结论重写；示例文案只开放一条，其余标为付费服务；回归测试增加到 8 条', why: '偏差本身是结果，品牌方要知道偏在哪、为什么偏、改什么；而事实底账错一条，整个结论就会翻转', dropped: '不做代运营式的内容发布；不核对具体额度数字（官方没写）', evidence: '腾讯会议帮助中心两篇文档；R2 批次“AI 纪要免费版”一题 8 次回答', lesson: '先核对自己的尺子。我们第一次判断“千问是唯一说对的”，恰恰是最错的那一个' },
@@ -1827,6 +1891,8 @@ const REGRESSION_CASES = [
     expect: e => e.issues.some(i => i.type === 'overclaim') && !/品牌A|brand-a/i.test(e._text), want: '替换品牌名和官网链接后，合规风险照样识别，原文里不再出现真实品牌' },
   { id: 'A-02', found: '公开版匿名 v5.2', anon: true, truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A主要用于芳香护理，而竞品B说可以治疗失眠。', focus: [], before: '新规则',
     expect: e => !e.issues.some(i => i.type === 'overclaim') && e.mentioned, want: '替换后竞品归属不变，不误判' },
+  { id: 'A-03', found: '公开版匿名 v5.2', anon: true, extras: ['400-000-0000', ['品牌A（上海）商贸有限公司', '品牌 A 中国公司']], truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A（上海）商贸有限公司客服 400-000-0000，官网 brand-a.example，精油以外用为主。', focus: [], before: '新规则',
+    expect: e => !/400-000-0000|brand-a\.example|商贸有限公司/.test(e._text) && e.capsHit.includes('cap_care'), want: '证照号、电话、裸域名、经营主体全称一起隐藏，判定不变' },
   { id: 'G-01', found: '防回退', text: 'NovaNote 专业版每人每月 99 元。', focus: [], before: '—',
     expect: e => e.priceOk && e.verifiable, want: '当前价格说对' },
   { id: 'G-02', found: '防回退', text: 'NovaNote 支持私有化部署，适合大企业。', focus: [], before: '—',
@@ -1838,7 +1904,7 @@ function runRegression() {
   return REGRESSION_CASES.map(c => {
     let truth = c.truth || DEFAULT_TRUTH, text = c.text;
     // 匿名用例：事实底账和回答原文用同一个替换规则，结果应与真实版一致
-    if (c.anon) { const f = makeMasker({ ...truth, official_domains: ['brand-a.example'] }); truth = maskDeep(truth, f); text = f(text); }
+    if (c.anon) { const f = makeMasker({ ...truth, official_domains: ['brand-a.example'] }, c.extras || []); truth = maskDeep(truth, f); text = f(text); }
     const e = evaluate({ run_id: c.id, status: 'SUCCESS', raw: text, query_id: '_test' }, { truth, competitors: c.comps || (c.truth ? TENCENT_COMPETITORS : DEFAULT_COMPETITORS), focus: c.focus });
     e._text = text;
     let pass = false; try { pass = !!c.expect(e); } catch (err) {}
@@ -2452,6 +2518,7 @@ function factCard({ list, kind, i, x }) {
       <button class="btn quiet sm danger" data-act="truth-del" data-list="${list}" data-i="${i}">删除</button></div>
     ${fields}
     <label class="small muted" style="display:block;margin-top:8px">官网原文（逐字）<textarea class="inp sm" rows="2" data-path="${p}.source_quote" aria-label="官网原文" placeholder="从官方页面逐字复制；没有原文就不能确认">${esc(x.source_quote || '')}</textarea></label>
+    ${x.source_note ? `<div class="small muted" style="margin-top:4px"><b>对话端整理（转述，不能代替原文）</b>${x.source_path ? `　${esc(x.source_path)}` : ''}<br>${esc(x.source_note)}</div>` : ''}
     <div class="grid2">
       <label class="small muted">来源网址${inp(`${p}.evidence_url`, x.evidence_url, { sm: 1, label: '来源网址', ph: 'https://官方页面' })}</label>
       <div class="grid2" style="gap:8px">
@@ -2484,7 +2551,12 @@ function factLedger(T) {
     <button class="btn sm" data-act="truth-add" data-list="offers">添加套餐</button>
     <button class="btn sm" data-act="truth-add" data-list="prohibited_claims">添加不应出现的说法</button>
   </div>
-  <p class="hint">套餐有失效日且早于今天（${TODAY}）时，被 AI 引用算“过期事实”。</p>`;
+  <p class="hint">套餐有失效日且早于今天（${TODAY}）时，被 AI 引用算“过期事实”。</p>
+  <h3>官网未说明 <span class="small muted" style="font-weight:400">${(T.unresolved || []).length} 条</span></h3>
+  <p class="prose muted">这些话题官网没有给出口径。它们不参与评测；报告里列在“建议补充的口径”，提醒品牌方补上可以被引用的说法。</p>
+  ${(T.unresolved || []).map((u, i) => `<div class="cand"><div class="spread">${inp(`unresolved.${i}.topic`, u.topic, { sm: 1, label: '话题' })}<button class="btn quiet sm danger" data-act="truth-del" data-list="unresolved" data-i="${i}">删除</button></div>
+    <textarea class="inp sm" rows="2" data-path="unresolved.${i}.note" aria-label="说明" style="margin-top:6px">${esc(u.note || '')}</textarea></div>`).join('')}
+  <button class="btn sm" data-act="truth-add" data-list="unresolved">添加未说明的话题</button>`;
 }
 
 function page_truth() {
@@ -3042,9 +3114,10 @@ document.addEventListener('click', e => {
         capabilities: { claim_id: 'cap_' + Date.now().toString(36), statement: '新口径', match: '', status: 'VERIFIED', valid_from: TODAY, evidence_url: '', category: '', source_quote: '', checked_at: '', review_status: '待复核' },
         offers: { offer_id: 'offer_' + Date.now().toString(36), name: '新套餐', price: 0, purchase_channel: '官网', valid_from: TODAY, valid_to: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
         prohibited_claims: { text: '新说法', match: '', note: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
-        limitations: { text: '新限制', match: '', owner: '' }
+        limitations: { text: '新限制', match: '', owner: '' },
+        unresolved: { topic: '新话题', note: '' }
       }[d.list];
-      S.truth[d.list].push(blank); markTruthDraft(); commit(); break;
+      (S.truth[d.list] = S.truth[d.list] || []).push(blank); markTruthDraft(); commit(); break;
     }
     case 'truth-del': S.truth[d.list].splice(Number(d.i), 1); markTruthDraft(); commit(); break;
     case 'fact-confirm': case 'fact-unconfirm': {
