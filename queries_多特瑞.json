@@ -1,0 +1,187 @@
+{
+  "query_set_version": 1,
+  "frozen": true,
+  "product": "多特瑞",
+  "queries": [
+    {
+      "id": "q_bt_01",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "多特瑞是传销吗？"
+    },
+    {
+      "id": "q_bt_02",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "多特瑞在中国有直销牌照吗？"
+    },
+    {
+      "id": "q_bt_03",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "多特瑞是正规公司吗？"
+    },
+    {
+      "id": "q_bt_04",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "多特瑞在中国的经营主体是哪家公司？"
+    },
+    {
+      "id": "q_bt_05",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "听说多特瑞是资金盘，是真的吗？"
+    },
+    {
+      "id": "q_bt_06",
+      "stage": "Consideration",
+      "group": "品牌可信",
+      "text": "多特瑞是靠拉人头赚钱吗？"
+    },
+    {
+      "id": "q_ef_01",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "多特瑞的精油有什么作用？"
+    },
+    {
+      "id": "q_ef_02",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "多特瑞精油能治失眠吗？"
+    },
+    {
+      "id": "q_ef_03",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "听说多特瑞精油可以治病，是真的吗？"
+    },
+    {
+      "id": "q_ef_04",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "多特瑞精油能提高免疫力吗？"
+    },
+    {
+      "id": "q_ef_05",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "多特瑞的精油能替代药物吗？"
+    },
+    {
+      "id": "q_ef_06",
+      "stage": "Consideration",
+      "group": "功效",
+      "text": "多特瑞精油对焦虑有用吗？"
+    },
+    {
+      "id": "q_sf_01",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "多特瑞精油可以内服吗？"
+    },
+    {
+      "id": "q_sf_02",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "孕妇能用多特瑞精油吗？"
+    },
+    {
+      "id": "q_sf_03",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "多特瑞精油能给孩子用吗？"
+    },
+    {
+      "id": "q_sf_04",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "多特瑞精油会过敏吗？"
+    },
+    {
+      "id": "q_sf_05",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "多特瑞精油可以直接涂在皮肤上吗？"
+    },
+    {
+      "id": "q_sf_06",
+      "stage": "Decision",
+      "group": "安全",
+      "text": "多特瑞精油有没有出过质量问题？"
+    },
+    {
+      "id": "q_pr_01",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "多特瑞为什么这么贵？"
+    },
+    {
+      "id": "q_pr_02",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "在哪里买多特瑞才是正品？"
+    },
+    {
+      "id": "q_pr_03",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "多特瑞和普通精油有什么区别？"
+    },
+    {
+      "id": "q_pr_04",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "多特瑞精油值得买吗？"
+    },
+    {
+      "id": "q_pr_05",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "网上卖得便宜的多特瑞是真的吗？"
+    },
+    {
+      "id": "q_pr_06",
+      "stage": "Decision",
+      "group": "价格与购买",
+      "text": "多特瑞和 Young Living 哪个好？"
+    },
+    {
+      "id": "q_jo_01",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "多特瑞买了能退吗？"
+    },
+    {
+      "id": "q_jo_02",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "多特瑞退货要多久？"
+    },
+    {
+      "id": "q_jo_03",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "加入多特瑞要交钱吗？"
+    },
+    {
+      "id": "q_jo_04",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "成为多特瑞会员有什么要求？"
+    },
+    {
+      "id": "q_jo_05",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "做多特瑞的经销商能赚钱吗？"
+    },
+    {
+      "id": "q_jo_06",
+      "stage": "Decision",
+      "group": "售后与加入",
+      "text": "多特瑞有什么缺点？"
+    }
+  ]
+}

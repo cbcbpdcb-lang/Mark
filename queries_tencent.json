@@ -1,0 +1,67 @@
+{
+  "query_set_version": 1,
+  "frozen": true,
+  "product": "腾讯会议",
+  "queries": [
+    {
+      "id": "q_aw_01",
+      "stage": "Awareness",
+      "text": "开会时总是来不及记笔记，有什么办法能自动整理会议内容？"
+    },
+    {
+      "id": "q_aw_02",
+      "stage": "Awareness",
+      "text": "小团队每周开很多会，信息散落在各处，怎么沉淀成可以搜索的知识？"
+    },
+    {
+      "id": "q_aw_03",
+      "stage": "Awareness",
+      "text": "跟日本客户开会时中日英混着说，有没有工具能把会议内容都转成文字？"
+    },
+    {
+      "id": "q_aw_04",
+      "stage": "Awareness",
+      "text": "销售团队怎么快速复盘客户会议里的关键需求？"
+    },
+    {
+      "id": "q_co_01",
+      "stage": "Consideration",
+      "text": "适合 20 人左右产品团队的 AI 会议记录工具有哪些？"
+    },
+    {
+      "id": "q_co_02",
+      "stage": "Consideration",
+      "text": "有哪些支持中文和日文的会议转写软件？"
+    },
+    {
+      "id": "q_co_03",
+      "stage": "Consideration",
+      "text": "推荐几款能自动生成会议待办的 AI 工具。"
+    },
+    {
+      "id": "q_co_04",
+      "stage": "Consideration",
+      "text": "国内能用、能和飞书日历同步的会议助手有哪些？"
+    },
+    {
+      "id": "q_tm_01",
+      "stage": "Decision",
+      "text": "腾讯会议和飞书妙记哪个更适合中小团队？"
+    },
+    {
+      "id": "q_tm_02",
+      "stage": "Decision",
+      "text": "腾讯会议的 AI 纪要免费版能用吗？"
+    },
+    {
+      "id": "q_tm_03",
+      "stage": "Decision",
+      "text": "腾讯会议支持日语会议的转写和翻译吗？"
+    },
+    {
+      "id": "q_tm_04",
+      "stage": "Decision",
+      "text": "腾讯会议有什么缺点？"
+    }
+  ]
+}
