@@ -5,6 +5,8 @@
  *   1. 读取官网页面并抽取候选事实        POST /facts    {url, product}
  *   2. 用国产模型 API 跑一段对话（支持多轮） POST /chat     {engine, messages}
  *   3. 用模型抽取回答里的理由             POST /reasons  {prompt}
+ * 裁判和被测对象分开：/chat 只调用被测的国产模型；/facts 和 /reasons 的抽取只用 EXTRACT_ENGINE（默认 Claude），
+ * 不允许把它设成被测模型。
  * 密钥只存在 Worker 的 Secrets 里，网页里没有任何密钥。
  *
  * 部署（不需要命令行）：
@@ -16,6 +18,9 @@
  *        MOONSHOT_MODEL    例如 kimi-k3（可选，默认 kimi-k3）
  *        DASHSCOPE_MODEL   例如 qwen3.7-plus（可选，默认 qwen-plus）
  *        DEEPSEEK_MODEL    可选，默认 deepseek-chat
+ *        ANTHROPIC_API_KEY 抽取用的 Claude 密钥（官网事实抽取、理由抽取）
+ *        EXTRACT_ENGINE    可选，默认 claude；目前只支持 claude
+ *        ANTHROPIC_MODEL   可选，默认 claude-opus-5
  *   3. 把 Worker 的地址（https://echorank-api.xxx.workers.dev）和 ACCESS_TOKEN 填进 EchoRank「分析一个产品」页。
  *
  * 限制：单次请求最多 8 轮消息；每次读取官网最多 60,000 字符；只允许 http/https 网址。
@@ -26,6 +31,11 @@ const PROVIDERS = {
   kimi:       { base: 'https://api.moonshot.cn/v1',                          key: 'MOONSHOT_API_KEY',  model: 'MOONSHOT_MODEL',  def: 'kimi-k3',       temperature: 1 },
   qwen:       { base: 'https://dashscope.aliyuncs.com/compatible-mode/v1',   key: 'DASHSCOPE_API_KEY', model: 'DASHSCOPE_MODEL', def: 'qwen-plus',     temperature: 0.7 },
   doubao_api: { base: 'https://ark.cn-beijing.volces.com/api/v3',            key: 'ARK_API_KEY',       model: 'ARK_MODEL',       def: '',              temperature: 0.7 },
+};
+
+// 抽取用的模型：不能和被测模型是同一个
+const EXTRACTORS = {
+  claude: { key: 'ANTHROPIC_API_KEY', model: 'ANTHROPIC_MODEL', def: 'claude-opus-5' },
 };
 
 const CORS = {
@@ -50,6 +60,37 @@ async function chat(env, engine, messages, temperature) {
   const data = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(`HTTP ${res.status} ${JSON.stringify(data).slice(0, 200)}`);
   return { text: data.choices?.[0]?.message?.content || '', model: data.model || model, usage: data.usage || {} };
+}
+
+async function claude(env, content) {
+  const p = EXTRACTORS.claude;
+  const key = env[p.key];
+  if (!key) throw new Error('Worker 里没有设置 ' + p.key);
+  const model = env[p.model] || p.def;
+  // Worker 直接粘贴进 Cloudflare 编辑器、没有打包步骤，所以用 fetch 调 Messages API，不引入 SDK
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      // 被安全分类器拒绝时，由服务端按类别换一个模型重跑
+      'anthropic-beta': 'server-side-fallback-2026-07-01',
+    },
+    body: JSON.stringify({ model, max_tokens: 16000, fallbacks: 'default', messages: [{ role: 'user', content }] }),
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(`HTTP ${res.status} ${JSON.stringify(data).slice(0, 200)}`);
+  if (data.stop_reason === 'refusal') throw new Error('Claude 拒绝了这次抽取');
+  const text = (data.content || []).filter(b => b.type === 'text').map(b => b.text).join('');
+  return { text, model: data.model || model, usage: data.usage || {} };
+}
+
+async function extract(env, content) {
+  const engine = env.EXTRACT_ENGINE || 'claude';
+  if (PROVIDERS[engine]) throw new Error(`EXTRACT_ENGINE 不能设为被测模型 ${engine}：裁判和被测对象要分开`);
+  if (!EXTRACTORS[engine]) throw new Error('未知的抽取引擎 ' + engine);
+  return claude(env, content);
 }
 
 function stripHtml(html) {
@@ -99,13 +140,13 @@ export default {
         if (!page.ok) return json({ error: '官网返回 HTTP ' + page.status }, 502);
         const text = stripHtml(await page.text()).slice(0, 60000);
         if (text.length < 50) return json({ error: '页面文字太少，可能是动态渲染的页面，请改为粘贴文字' }, 422);
-        const out = await chat(env, body.engine || 'deepseek', [{ role: 'user', content: factPrompt(String(body.product || ''), text) }], 0.2);
+        const out = await extract(env, factPrompt(String(body.product || ''), text));
         const data = parseJSON(out.text);
         return json({ text, facts: Array.isArray(data.facts) ? data.facts : [], model: out.model });
       }
       if (url.pathname === '/reasons') {
         if (!body.prompt) return json({ error: '缺少 prompt' }, 400);
-        const out = await chat(env, body.engine || 'deepseek', [{ role: 'user', content: String(body.prompt) }], 0.2);
+        const out = await extract(env, String(body.prompt));
         return json(parseJSON(out.text));
       }
       return json({ error: '未知路径' }, 404);
