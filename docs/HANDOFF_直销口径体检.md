@@ -133,11 +133,17 @@
 {
   "category": "资质与经营主体 | 产品事实 | 使用与安全 | 功效表述边界 | 购买与售后 | 商业模式说明",
   "source_quote": "官网原文逐字引语",
-  "source_url": "网址",
+  "evidence_url": "网址（沿用已有字段，不另建 source_url）",
   "checked_at": "YYYY-MM-DD",
-  "review_status": "待复核 | 已确认"
+  "review_status": "待复核 | 已确认",
+  "reviewed_by": "确认人",
+  "reviewed_at": "YYYY-MM-DD HH:MM"
 }
 ```
+
+这些字段适用于能力（`capabilities`）、套餐（`offers`）和不应出现的说法（`prohibited_claims`）。套餐未填分类时默认归“产品事实”，不应出现的说法默认归“功效表述边界”。
+
+`status`（VERIFIED / DRAFT）和 `review_status` 分开：`status` 只决定这条口径参不参与评测；`review_status` 记录有没有人看过原文确认。“待复核”的口径照常参与评测，报告里标注出来。没有 `source_quote` 的口径不能标为“已确认”；已确认的口径改了原文或来源，自动退回“待复核”。
 
 抽取流程沿用现有的：读取官网文字，模型抽取候选事实，程序校验引语是否逐字出现在原文里，校验不过的直接拦下，人工逐条确认。
 
@@ -209,7 +215,7 @@
 每个任务一个 PR，按顺序做。
 
 **T1　数据结构扩展**
-- 事实底账增加 `category`、`source_quote`、`source_url`、`checked_at`、`review_status`
+- 事实底账增加 `category`、`source_quote`、`checked_at`、`review_status`（来源网址沿用 `evidence_url`）
 - 判定结果增加类型 `overclaim`（合规风险）和 `extra`（无法核对的额外说法）
 - 验收：旧的腾讯会议和 NovaNote 预设照常工作；8 条回归测试仍然通过
 
@@ -313,7 +319,7 @@ Claude 已在 `index.html` 里完成以下任务，请不要重复实现，直�
 | --- | --- | --- |
 | T1 数据结构扩展 | 部分完成 | 事实字段已支持 `category`、`source_quote`、`checked_at`、`review_status`（腾讯会议两条关键口径已填）；判定新增 `overclaim` 类型；每条回答新增 `extras`（无法核对的额外说法） |
 | T2 直销问题模板 | 完成 | `DIRECT_TEMPLATES`、`directQueries()`；「用户提问」页可输入品牌名导出问题集；已生成 `queries_多特瑞.json`（30 条） |
-| T3 官网口径整理 | 未开始 | **由协作 AI 接手**：事实底账页按分类展示、显示原文引语和核对日期；没有原文引语的口径不能标为“已确认” |
+| T3 官网口径整理 | 完成（待合并） | 「事实底账」页的能力、套餐、不应出现的说法合并为“官网口径”，按六类分组；每条显示原文引语、来源、核对日期、复核状态，可逐条确认或撤回，记下 `reviewed_by`、`reviewed_at`；没有原文引语不能确认；从官网导入的口径保留引语、标为待复核；报告里标出待复核的口径。`worker.js` 的抽取改用 `EXTRACT_ENGINE`（默认 Claude，密钥 `ANTHROPIC_API_KEY`），不允许设为被测模型 |
 | T4 合规风险与额外说法 | 完成（规则 v1） | `EFFICACY_RX`、`REPORTED_RX`；否定、转述争议、问句、竞品说法都不算；新增回归测试 O-01 至 O-06，共 14 条全部通过 |
 | T5 体检报告页与导出 | 完成 | 「体检报告」页：先按严重度、再按次数排序；每条发现附官网原文、AI 原句、比例和区间、推断、修改方向；支持导出 Markdown |
 | T6 演示案例 | 未开始 | **由协作 AI 接手**：见下方“多特瑞案例的下一步” |
