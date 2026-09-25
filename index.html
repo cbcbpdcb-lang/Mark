@@ -752,12 +752,60 @@ const PRESETS = {
 };
 function applyPreset(key) {
   const p = PRESETS[key]; if (!p) return;
+  const d = presetData(key);
   S.preset = key;
-  S.truth = clone(p.truth); guardReview(S.truth); S.truthApproved = clone(S.truth);
-  S.competitors = clone(p.competitors);
-  S.querySet = { version: 1, frozen: true, frozen_at: '2026-09-20 09:30', queries: clone(p.queries) };
+  S.truth = d.truth; guardReview(S.truth); S.truthApproved = clone(S.truth);
+  S.competitors = d.competitors;
+  S.querySet = { version: 1, frozen: true, frozen_at: p.frozen_at || '2026-09-20 09:30', queries: d.queries };
   S.factImport = { source_url: '', origin: '', extracted_at: '', candidates: [] };
-  UI.scope = key === 'novanote' ? 'real' : 'real'; UI.q = key === 'tencent' ? 'q_aw_01' : 'q_de_04'; UI.reasonBrand = null;
+  UI.scope = 'real'; UI.q = key === 'tencent' ? 'q_aw_01' : key === 'novanote' ? 'q_de_04' : (d.queries[0] || {}).id; UI.reasonBrand = null;
+}
+
+/* ---------- 【改这里 23】公开版匿名 ----------
+   预设写了 anonymize: true 时，公开网站上把品牌名和别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”、不显示网址，
+   AI 原句里的品牌名也一起替换。本地打开（file://、localhost）和在 Claude 里预览时显示真实版；本地可以勾选“按公开版预览”。
+   替换发生在数据层（事实底账、竞品、问题、回答原文一起换），所以评测结果和真实版一致，导出的 Markdown 也不会漏出品牌名。 */
+const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）';
+const isMaskedUrl = u => u === MASK_OFFICIAL || u === MASK_OTHER;
+function isLocalView() { return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || !!(window.claude && window.claude.use); }
+function anonActive(key = S.preset) { const p = PRESETS[key]; return !!(p && p.anonymize) && (!isLocalView() || !!UI.anonPreview); }
+const _maskers = {};
+function maskerFor(key) { return _maskers[key] || (_maskers[key] = makeMasker(PRESETS[key].truth)); }
+function makeMasker(t) {
+  const names = [t.entity_name, ...(t.aliases || [])].filter(Boolean).sort((a, b) => b.length - a.length).map(escRx).join('|');
+  const nameG = new RegExp(names, 'gi'), nameT = new RegExp(names, 'i');
+  const domains = (t.official_domains || []).map(d => d.replace(/^www\./, ''));
+  const urlRe = /https?:\/\/[^\s"'<>（）()\[\]【】，。；、]+/g;
+  const one = str => String(str)
+    .replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; })
+    .replace(nameG, ANON_NAME);
+  return one;
+}
+function maskDeep(v, f) {
+  if (typeof v === 'string') return f(v);
+  if (Array.isArray(v)) return v.map(x => maskDeep(x, f));
+  if (v && typeof v === 'object') return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, maskDeep(x, f)]));
+  return v;
+}
+function presetData(key) {
+  const p = PRESETS[key];
+  const d = { truth: clone(p.truth), competitors: clone(p.competitors), queries: clone(p.queries) };
+  if (!anonActive(key)) return d;
+  const f = maskerFor(key);
+  return { truth: maskDeep(d.truth, f), competitors: d.competitors, queries: maskDeep(d.queries, f) };
+}
+const presetLabel = (key) => anonActive(key) ? (PRESETS[key].publicName || ANON_NAME) : PRESETS[key].name;
+const _maskedRuns = new Map();
+function viewRun(r) {
+  if (!anonActive() || !presetBatches().includes(r.batch)) return r;
+  if (!_maskedRuns.has(r.run_id)) _maskedRuns.set(r.run_id, { ...r, raw: maskerFor(S.preset)(r.raw) });
+  return _maskedRuns.get(r.run_id);
+}
+// 外链：匿名后的链接只显示占位文字，不生成可点击的网址
+function extLink(url, label, cls = '') {
+  if (!url) return '';
+  if (isMaskedUrl(url)) return `<span class="${cls} muted">${esc(url)}</span>`;
+  return `<a class="${cls}" href="${esc(url)}" target="_blank" rel="noopener">${esc(label)}</a>`;
 }
 
 /* =========================================================
@@ -805,7 +853,7 @@ function todoCard(m) {
     <div class="scroll"><table class="tbl"><thead><tr><th style="width:36px">#</th><th>发现</th><th class="num">次数</th><th>下一步</th><th></th></tr></thead><tbody>
     ${g.map((x, k) => { const ns = NEXT_STEP[x.type] || ['查看', '查看原文后决定']; const f = factFor(x.claim); return `<tr>
       <td class="num"><b>${k + 1}</b></td>
-      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">事实库：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　<a href="${esc(f.url)}" target="_blank" rel="noopener">来源</a>` : ''}</div>` : ''}</td>
+      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">事实库：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　${extLink(f.url, '来源')}` : ''}</div>` : ''}</td>
       <td class="num">${x.count}</td>
       <td class="small" style="min-width:220px"><b>${ns[0]}</b>　${ns[1]}</td>
       <td><button class="btn sm" data-act="open-run" data-q="${x.runs[0].query_id}">看原文</button></td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">没有发现需要处理的问题。</td></tr>'}
@@ -935,7 +983,7 @@ function page_gap() {
   <div class="scroll"><table class="tbl">
     <thead><tr><th>官网口径</th><th class="num">一致</th><th class="num">说反了</th><th class="num">该说没说</th><th>偏差率</th><th>各模型偏差</th></tr></thead>
     <tbody>${fr.map(f => `<tr>
-      <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${f.kind}${f.url ? `　<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(THIRD_PARTY[f.url] || hostOf(f.url))}</a>` : ''}${f.note ? '　' + esc(f.note.length > 50 ? f.note.slice(0, 50) + '…' : f.note) : ''}</div></td>
+      <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${f.kind}${f.url ? `　${extLink(f.url, THIRD_PARTY[f.url] || hostOf(f.url))}` : ''}${f.note ? '　' + esc(f.note.length > 50 ? f.note.slice(0, 50) + '…' : f.note) : ''}</div></td>
       <td class="num">${f.okN}</td><td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td><td class="num">${f.missN}</td>
       <td class="small">${f.n ? `${frac(f.dev, f.n)}<br><span class="muted">${wilsonText(f.dev, f.n)}</span>` : '<span class="muted">未涉及</span>'}</td>
       <td class="small">${f.engines.map(x => `${esc(engName(x.e))} ${x.dev}/${x.n}`).join('<br>') || '—'}</td></tr>`).join('')}</tbody>
@@ -946,7 +994,7 @@ function page_gap() {
   ${fr.filter(f => f.dev > 0).sort((a, b) => (b.badN - a.badN) || (b.dev - a.dev)).map(f => `<div class="editor">
     <div class="spread"><b>${esc(f.statement)}</b><span class="tag bad">偏差 ${frac(f.dev, f.n)}</span></div>
     <p style="margin-top:8px">${esc(f.cause || '暂无推断。常见原因有三类：官方页面没有一句可以直接引用的话；说法写在新闻稿里而不是功能页；第三方稿件里流传着旧说法。')}</p>
-    ${f.causeLinks.length ? `<p class="small muted">参考：${f.causeLinks.map(u => `<a href="${esc(u)}" target="_blank" rel="noopener">${esc(THIRD_PARTY[u] || hostOf(u))}</a>`).join('、')}</p>` : ''}
+    ${f.causeLinks.length ? `<p class="small muted">参考：${f.causeLinks.map(u => extLink(u, THIRD_PARTY[u] || hostOf(u))).join('、')}</p>` : ''}
     <p class="small muted">验证方法：官方补一句可直接引用的说明后，用开启联网的渠道复测这条口径，看偏差率是否下降。</p>
     <div class="row" style="margin-top:6px">${COPY_DEMO[f.key] ? `<a class="btn sm primary" href="#copy-${f.key}">查看示例文案</a>` : `<button class="btn sm" disabled title="开通服务后可用">生成可引用的官方说明</button><span class="tag">开通服务后可用</span>`}</div>
   </div>`).join('') || '<p class="muted">没有发现偏差。</p>'}
@@ -996,6 +1044,30 @@ function exportDirectQueries() {
   commit(`导出直销问题集：${brand}，${qs.length} 条`);
 }
 
+/* ---------- 【改这里 24】演示预设：某精油直销品牌（多特瑞，公开版匿名） ----------
+   口径只能来自官方页面（官网、官方公众号、监管公示），每条附原文、网址、读取日期，录入后一律“待复核”。
+   问题集与 queries_多特瑞.json 同源（directQueries），id 一致，采集结果可以直接对上。
+   竞品只用于小句归属（避免把别家的说法算到本品牌头上），不是口径。 */
+const DOTERRA_TRUTH = {
+  product_id: 'direct_a', entity_name: '多特瑞', aliases: ['多特瑞', 'doTERRA', 'dōTERRA'],
+  category: '精油与个人护理（直销）', positioning: '', target_users: [],
+  official_domains: ['doterra.cn', 'doterra.com'],
+  positioning_match: { aligned: '', deviation: '' },
+  capabilities: [], offers: [], prohibited_claims: [], limitations: [],
+  fictional: false, status: 'APPROVED', version: 1, approved_by: '官网口径待录入', approved_at: ''
+};
+const DOTERRA_COMPETITORS = [
+  { name: 'Young Living', aliases: ['Young Living'], domains: ['youngliving.com'], relation: '精油直销同业（仅用于小句归属）' },
+  { name: '安利', aliases: ['安利', 'Amway'], domains: ['amway.com.cn'], relation: '直销同业（仅用于小句归属）' },
+  { name: '无限极', aliases: ['无限极', 'Infinitus'], domains: ['infinitus-int.com'], relation: '直销同业（仅用于小句归属）' },
+  { name: '如新', aliases: ['如新', 'Nu Skin'], domains: ['nuskin.com'], relation: '直销同业（仅用于小句归属）' }
+];
+PRESETS.direct_a = {
+  name: '多特瑞（直销口径体检）', publicName: '某精油直销品牌（直销口径体检）', anonymize: true,
+  batches: ['R3'], truth: DOTERRA_TRUTH, competitors: DOTERRA_COMPETITORS, queries: directQueries('多特瑞'),
+  note: '官网口径与采集结果待录入。公开网站上品牌名显示为“品牌 A”，官网链接只显示“官方页面（已核对）”。'
+};
+
 /* ---------- 体检报告 ---------- */
 function reportData() {
   const T = S.truth;
@@ -1026,9 +1098,21 @@ function reportData() {
       cause: (cap && cap.cause) || (pc && pc.cause) || '' };
   }).sort((a, b) => (b.sev - a.sev) || (b.k - a.k));
   const withDev = new Set(); list.forEach(g => g.runs.forEach(id => withDev.add(id)));
+  // 按问题分组汇总：同一组里的回答合在一起算，样本比单条发现大，区间窄得多
+  const overRuns = new Set(); list.filter(g => g.type === 'overclaim').forEach(g => g.runs.forEach(id => overRuns.add(id)));
+  const groupOrder = DIRECT_TEMPLATES.map(t => t[0]);
+  const byGroup = {};
+  evs.forEach(x => {
+    const q = Q(x.r.query_id), name = q && q.group; if (!name) return;
+    const b = byGroup[name] || (byGroup[name] = { name, n: 0, dev: 0, over: 0, qids: new Set() });
+    b.n++; b.qids.add(x.r.query_id);
+    if (withDev.has(x.r.run_id)) b.dev++;
+    if (overRuns.has(x.r.run_id)) b.over++;
+  });
+  const qGroups = Object.values(byGroup).sort((a, b) => ((groupOrder.indexOf(a.name) + 1) || 99) - ((groupOrder.indexOf(b.name) + 1) || 99));
   const extras = {};
   evs.forEach(x => (x.e.extras || []).forEach(s => { const key = s.slice(0, 40); if (!extras[key]) extras[key] = { s, n: 0, engines: new Set() }; extras[key].n++; extras[key].engines.add(x.r.engine); }));
-  return { T, evs, list, nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
+  return { T, evs, list, qGroups, nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
     extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length };
 }
 function reportMarkdown(d) {
@@ -1036,6 +1120,11 @@ function reportMarkdown(d) {
   const L = [];
   L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(engName).join('、')}`, '');
   L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
+  if (d.qGroups.length) {
+    L.push('## 按问题分组汇总', '', '同一组问题的回答合在一起统计，样本比单条发现大，区间更窄。', '', '| 分组 | 问题数 | 提到品牌的回答 | 至少一处不一致 | 比例（95% 区间） | 可信度 | 合规风险 |', '| --- | ---: | ---: | ---: | --- | --- | ---: |');
+    d.qGroups.forEach(g => L.push(`| ${g.name} | ${g.qids.size} | ${g.n} | ${g.dev} | ${pct(g.dev, g.n)}（${wilsonText(g.dev, g.n)}） | ${cred(g.dev, g.n, false).label} | ${g.over} |`));
+    L.push('');
+  }
   L.push('## 最需要关注的三条', '');
   d.list.slice(0, 3).forEach((g, i) => L.push(`${i + 1}. 【${TYPE_NAME[g.type] || g.label}】${g.title}（${g.k} / ${g.n} 条回答）`));
   L.push('', '## 逐条发现', '');
@@ -1067,11 +1156,17 @@ function page_report() {
   </div>
   <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。</p><button class="btn primary" data-act="report-md">导出 Markdown</button></div></div>
 
+  ${d.qGroups.length ? `<h2>按问题分组汇总</h2>
+  <p class="prose muted">同一组问题的回答合在一起统计。分组的样本比单条发现大，区间更窄，适合先看哪一类问题最容易出错；单条发现的样本小，多数只能看方向。</p>
+  <div class="scroll"><table class="tbl"><thead><tr><th>分组</th><th class="num">问题</th><th class="num">回答</th><th class="num">至少一处不一致</th><th>比例与 95% 区间</th><th>可信度</th><th class="num">合规风险</th></tr></thead><tbody>
+    ${d.qGroups.map(g => `<tr><td>${esc(g.name)}</td><td class="num">${g.qids.size}</td><td class="num">${g.n}</td><td class="num">${g.dev}</td><td>${pct(g.dev, g.n)}　<span class="small muted">${wilsonText(g.dev, g.n)}</span></td><td>${credTag(cred(g.dev, g.n, false))}</td><td class="num">${g.over}</td></tr>`).join('')}
+  </tbody></table></div>` : ''}
+
   <h2>逐条发现</h2>
   ${d.list.map((g, i) => `<div class="editor" style="background:var(--surface)">
     <div class="spread"><b>${i + 1}. ${esc(g.title)}</b><span><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span></div>
     <div class="grid2" style="margin-top:10px">
-      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${g.url ? `<a class="small" href="${esc(g.url)}" target="_blank" rel="noopener">${esc(THIRD_PARTY[g.url] || hostOf(g.url))}</a>` : ''}</div>
+      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}</div>
       <div><div class="small muted">AI 原句</div>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
     </div>
     <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c).join('，')}</p>
@@ -1503,7 +1598,7 @@ let S = makeDefaultState();
 const UI = { page: 'overview', scope: 'real', q: 'q_de_04', editQ: null, qFilter: 'all', exp: 'EXP-01', newExp: false,
   liveBusy: {}, liveCtl: null, sample: undefined, downloads: undefined, saveWhere: '本机浏览器', resetArm: false,
   srcFilter: 'all', srcOpen: null, impOpen: false, impText: '', impBusy: false, impCtl: null, importResult: null,
-  reasonBrand: null, reasonsBusy: null, workerUrl: localStorage.getItem('echorank-worker-url') || '', workerToken: localStorage.getItem('echorank-worker-token') || '', reviewer: localStorage.getItem('echorank-reviewer') || '你',
+  reasonBrand: null, reasonsBusy: null, workerUrl: localStorage.getItem('echorank-worker-url') || '', workerToken: localStorage.getItem('echorank-worker-token') || '', reviewer: localStorage.getItem('echorank-reviewer') || '你', anonPreview: localStorage.getItem('echorank-anon-preview') === '1',
   analyze: { product: '', url: '', category: 'AI 会议记录工具', competitors: '', engines: ['deepseek', 'kimi', 'qwen', 'doubao_api'], followups: true, repeats: 1, busy: null, log: [], stop: false } };
 
 function migrate(x) {
@@ -1562,9 +1657,9 @@ function flash(msg) {
 
 const Q = id => S.querySet.queries.find(q => q.id === id);
 const ENG = id => S.engines.find(e => e.id === id);
-function effectivePreset() { const p = PRESETS[S.preset]; return p && S.truth.entity_name === p.truth.entity_name ? S.preset : 'custom'; }
+function effectivePreset() { const p = PRESETS[S.preset]; return p && S.truth.entity_name === (anonActive(S.preset) ? ANON_NAME : p.truth.entity_name) ? S.preset : 'custom'; }
 const presetBatches = () => effectivePreset() === 'custom' ? [] : (PRESETS[S.preset] || {}).batches || [];
-const realRuns = () => REAL_RUNS.filter(r => presetBatches().includes(r.batch)).concat(S.importedRuns.filter(r => !REAL_IDS.has(r.run_id)), S.liveRuns).filter(r => Q(r.query_id));
+const realRuns = () => REAL_RUNS.filter(r => presetBatches().includes(r.batch)).map(viewRun).concat(S.importedRuns.filter(r => !REAL_IDS.has(r.run_id)), S.liveRuns).filter(r => Q(r.query_id));
 const allRuns = () => SAMPLE_RUNS.concat(realRuns());
 function scopeRuns(scope = UI.scope) { return scope === 'sample' ? SAMPLE_RUNS : scope === 'real' ? realRuns() : allRuns(); }
 const truthReady = () => S.truth.status === 'APPROVED';
@@ -1728,6 +1823,10 @@ const REGRESSION_CASES = [
   { id: 'O-04', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A主要用于芳香护理，而竞品B说可以治疗失眠。', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '竞品的说法，不算' },
   { id: 'O-05', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油能缓解焦虑症状，还能提高免疫力。', focus: [], before: '新规则', expect: e => e.issues.some(i => i.type === 'overclaim'), want: '合规风险' },
   { id: 'O-06', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油真的能治疗失眠吗？', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '问句，不算' },
+  { id: 'A-01', found: '公开版匿名 v5.2', anon: true, truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的薰衣草精油可以治疗失眠，详见 https://brand-a.example/oils 。', focus: [], before: '新规则',
+    expect: e => e.issues.some(i => i.type === 'overclaim') && !/品牌A|brand-a/i.test(e._text), want: '替换品牌名和官网链接后，合规风险照样识别，原文里不再出现真实品牌' },
+  { id: 'A-02', found: '公开版匿名 v5.2', anon: true, truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A主要用于芳香护理，而竞品B说可以治疗失眠。', focus: [], before: '新规则',
+    expect: e => !e.issues.some(i => i.type === 'overclaim') && e.mentioned, want: '替换后竞品归属不变，不误判' },
   { id: 'G-01', found: '防回退', text: 'NovaNote 专业版每人每月 99 元。', focus: [], before: '—',
     expect: e => e.priceOk && e.verifiable, want: '当前价格说对' },
   { id: 'G-02', found: '防回退', text: 'NovaNote 支持私有化部署，适合大企业。', focus: [], before: '—',
@@ -1737,7 +1836,11 @@ const REGRESSION_CASES = [
 ];
 function runRegression() {
   return REGRESSION_CASES.map(c => {
-    const e = evaluate({ run_id: c.id, status: 'SUCCESS', raw: c.text, query_id: '_test' }, { truth: c.truth || DEFAULT_TRUTH, competitors: c.comps || (c.truth ? TENCENT_COMPETITORS : DEFAULT_COMPETITORS), focus: c.focus });
+    let truth = c.truth || DEFAULT_TRUTH, text = c.text;
+    // 匿名用例：事实底账和回答原文用同一个替换规则，结果应与真实版一致
+    if (c.anon) { const f = makeMasker({ ...truth, official_domains: ['brand-a.example'] }); truth = maskDeep(truth, f); text = f(text); }
+    const e = evaluate({ run_id: c.id, status: 'SUCCESS', raw: text, query_id: '_test' }, { truth, competitors: c.comps || (c.truth ? TENCENT_COMPETITORS : DEFAULT_COMPETITORS), focus: c.focus });
+    e._text = text;
     let pass = false; try { pass = !!c.expect(e); } catch (err) {}
     return { ...c, pass, got: e.verifiable ? '说对且有依据' : e.issues.map(i => i.label).join('、') || (e.goods.length ? '说对（' + e.goods.map(g => g.text).join('、') + '）' : '未涉及') };
   });
@@ -2108,7 +2211,8 @@ function renderSide() {
     <div class="brand"><span class="logo">E</span><span>EchoRank<small>AI 回答事实审计</small></span></div>
     <div class="pcard">
       <div class="pname"><span class="pava">${initials}</span><span>${esc(T.entity_name)}<div class="small muted" style="font-weight:400">${isFictional() ? '虚构探针品牌' : esc(T.category)}</div></span></div>
-      <select class="inp sel sm" data-preset style="margin-top:8px" aria-label="演示产品">${Object.entries(PRESETS).map(([k, p]) => `<option value="${k}" ${effectivePreset() === k ? 'selected' : ''}>${esc(p.name)}</option>`).join('')}<option value="custom" ${effectivePreset() === 'custom' ? 'selected' : ''}>自定义：${esc(S.truth.entity_name)}</option></select>
+      <select class="inp sel sm" data-preset style="margin-top:8px" aria-label="演示产品">${Object.entries(PRESETS).map(([k, p]) => `<option value="${k}" ${effectivePreset() === k ? 'selected' : ''}>${esc(presetLabel(k))}</option>`).join('')}<option value="custom" ${effectivePreset() === 'custom' ? 'selected' : ''}>自定义：${esc(S.truth.entity_name)}</option></select>
+      ${PRESETS[effectivePreset()] && PRESETS[effectivePreset()].anonymize && isLocalView() ? `<label class="small muted" style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" data-anon="1" ${UI.anonPreview ? 'checked' : ''}>按公开版预览（匿名）</label>` : ''}
       ${effectivePreset() === 'custom' ? '<div class="small muted" style="margin-top:6px">这是你用「分析一个产品」创建的自定义产品。选上面的预设可以回到演示数据。</div>' : ''}
       <div class="pmeta">
         <span class="tag ${truthReady() ? 'ok' : 'warn'}">事实 v${T.version}${truthReady() ? '' : ' 草稿'}</span>
@@ -2134,7 +2238,7 @@ function blockedByTruth() {
 function scopeSwitch() {
   const n = { sample: SAMPLE_RUNS.length, real: realRuns().length, all: allRuns().length };
   const ep = effectivePreset();
-  const opts = isFictional() ? [['real', '真实实验'], ['sample', '方法演示样本']] : ep === 'tencent' || ep === 'custom' ? [['real', '真实数据']] : [['sample', '样本批次'], ['real', '真实数据'], ['all', '全部']];
+  const opts = isFictional() ? [['real', '真实实验'], ['sample', '方法演示样本']] : ep !== 'novanote' ? [['real', '真实数据']] : [['sample', '样本批次'], ['real', '真实数据'], ['all', '全部']];
   if (ep !== 'novanote') UI.scope = 'real';
   return `<div class="seg" role="group" aria-label="数据范围">
     ${opts.map(([k, v]) => `<button data-act="scope" data-scope="${k}" aria-pressed="${UI.scope === k}">${v}（${n[k]}）</button>`).join('')}
@@ -2358,7 +2462,7 @@ function factCard({ list, kind, i, x }) {
     <div class="row" style="margin-top:8px">
       ${ok ? `<span class="small muted">由${esc(x.reviewed_by || '—')}于 ${esc(x.reviewed_at || '—')} 确认</span><button class="btn sm" data-act="fact-unconfirm" data-list="${list}" data-i="${i}">撤回确认</button>`
         : `<button class="btn sm ${q ? 'primary' : ''}" data-act="fact-confirm" data-list="${list}" data-i="${i}" ${q ? '' : 'disabled title="没有原文引语，不能确认"'}>我已看过原文，确认</button>${q ? '' : '<span class="small muted">先填入官网原文，才能确认。</span>'}`}
-      ${x.evidence_url ? `<a class="small" href="${esc(x.evidence_url)}" target="_blank" rel="noopener">打开原文</a>` : ''}
+      ${extLink(x.evidence_url, '打开原文', 'small')}
     </div>
   </div>`;
 }
@@ -2442,7 +2546,7 @@ function page_queries() {
   <header class="ph"><h1>用户提问</h1>
     <p class="lede">这里管理的是用户真实会问 AI 的问题，不是搜索关键词。冻结后的问题集才能用于前后对比。</p></header>
   <div class="editor"><div class="spread"><div><b>生成直销问题集</b><div class="small muted">按品牌可信、功效、安全、价格与购买、售后与加入五组，生成 30 条问题，导出后用采集脚本运行：python3 collect.py --queries queries_品牌.json --repeats 2</div></div></div>
-    <div class="row" style="margin-top:10px"><input class="inp sm" id="dq-brand" placeholder="品牌名，例如：多特瑞" style="max-width:240px"><button class="btn sm primary" data-act="dq-export">导出问题集</button></div></div>
+    <div class="row" style="margin-top:10px"><input class="inp sm" id="dq-brand" placeholder="品牌名，例如：某品牌" style="max-width:240px"><button class="btn sm primary" data-act="dq-export">导出问题集</button></div></div>
   <div class="state ${S.querySet.frozen ? 'ok' : ''}">
     <h4>问题集 v${S.querySet.version}　${S.querySet.frozen ? '已冻结' : '草稿'}</h4>
     <p>${S.querySet.frozen ? `冻结于 ${esc(S.querySet.frozen_at)}。修改任何问题都会生成新版本，旧版本的运行结果不能再直接对比。` : '草稿中的问题可以随意修改。准备好后冻结，之后的运行都记在这个版本下。'}</p>
@@ -2519,7 +2623,7 @@ function respBlock(run) {
     <dt>提及</dt><dd>${e.mentioned ? `提到了，排第 ${e.rank} 位${e.recommended ? '，算进入候选' : ''}` : '没有提到'}</dd>
     <dt>定位</dt><dd>${{ aligned: '<span class="tag ok">一致</span>', deviation: '<span class="tag bad">偏差</span>', unknown: '<span class="muted">未涉及</span>' }[e.positioning]}</dd>
     <dt>说对的</dt><dd>${e.goods.map(g => `<span class="tag ok">${esc(g.text)}</span>`).join('') || '<span class="muted">无</span>'}</dd>
-    <dt>问题</dt><dd>${e.issues.map(i => { const f = factFor(i.claim); return `<div style="margin-bottom:6px"><span class="tag ${i.type === 'omission' || i.type === 'unverified' ? 'warn' : 'bad'}">${i.label}</span> ${esc(i.text)}${f && f.url ? `<div class="small muted">依据：<a href="${esc(f.url)}" target="_blank" rel="noopener">${esc(hostOf(f.url))}</a>${f.from ? '，' + esc(f.from) + ' 起' : ''}</div>` : ''}${linksHtml(i)}</div>`; }).join('') || '<span class="muted">无</span>'}</dd>
+    <dt>问题</dt><dd>${e.issues.map(i => { const f = factFor(i.claim); return `<div style="margin-bottom:6px"><span class="tag ${i.type === 'omission' || i.type === 'unverified' ? 'warn' : 'bad'}">${i.label}</span> ${esc(i.text)}${f && f.url ? `<div class="small muted">依据：${extLink(f.url, hostOf(f.url))}${f.from ? '，' + esc(f.from) + ' 起' : ''}</div>` : ''}${linksHtml(i)}</div>`; }).join('') || '<span class="muted">无</span>'}</dd>
     <dt>引用</dt><dd>${e.citations.length ? e.citations.map(c => { const st = srcTag(c.url); return `<div class="small"><span class="tag">${c.kind}</span>${st !== 'normal' && st !== 'official' ? `<span class="tag ${STATUS_TAG[st]}">${STATUS_LABEL[st]}</span>` : ''} <button class="linkbtn small" data-act="open-source" data-url="${esc(c.url)}">${esc(c.url)}</button></div>`; }).join('') : '<span class="muted">没有引用</span>'}</dd>
     <dt>结论</dt><dd>${e.verifiable ? '<span class="tag acc">说对且有依据</span>' : '<span class="muted">不计入可验证覆盖</span>'}</dd>
   </dl>
@@ -3061,6 +3165,7 @@ document.addEventListener('change', e => {
   if (el.dataset.task) { S.learnDone[el.dataset.task] = el.checked; commit(); return; }
   if (el.dataset.preset !== undefined) { if (el.value !== 'custom') { applyPreset(el.value); commit(`切换演示产品：${PRESETS[el.value].name}`); go('overview'); } return; }
   if (el.dataset.reasonBrand !== undefined) { UI.reasonBrand = el.value; render(); return; }
+  if (el.dataset.anon) { UI.anonPreview = el.checked; try { localStorage.setItem('echorank-anon-preview', el.checked ? '1' : ''); } catch (err) {} applyPreset(S.preset); commit(el.checked ? '按公开版（匿名）预览' : '回到真实版'); return; }
   if (el.dataset.reviewer) { UI.reviewer = el.value.trim() || '你'; try { localStorage.setItem('echorank-reviewer', UI.reviewer); } catch (err) {} return; }
   if (el.dataset.worker) { if (el.dataset.worker === 'url') { UI.workerUrl = el.value.trim(); localStorage.setItem('echorank-worker-url', UI.workerUrl); } else { UI.workerToken = el.value.trim(); localStorage.setItem('echorank-worker-token', UI.workerToken); } render(); return; }
   if (el.dataset.probeLabel !== undefined) { const id = el.dataset.probeLabel; S.probeLabels = S.probeLabels || {}; if (el.value) S.probeLabels[id] = el.value; else delete S.probeLabels[id]; commit(`复核 ${id}：${el.value ? PROBE_CLASS[el.value] : '恢复初标'}`); return; }
@@ -3105,6 +3210,8 @@ window.addEventListener('hashchange', () => { const p = location.hash.slice(1); 
 (function boot() {
   const local = Store.loadLocal();
   if (local) S = local;
+  // 匿名预设：保存的是真实版而当前应显示公开版（或反过来）时，重新载入预设
+  { const p = PRESETS[S.preset]; if (p && p.anonymize && [p.truth.entity_name, ANON_NAME].includes(S.truth.entity_name) && effectivePreset() === 'custom') applyPreset(S.preset); }
   UI.scope = realRuns().length ? 'real' : 'sample';
   const p = location.hash.slice(1);
   if (PAGES[p]) UI.page = p;
