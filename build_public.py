@@ -104,6 +104,9 @@ def build(html):
     a = re.escape(ANON)
     out, n = re.subn(a + r'(?:\s*[（(]\s*' + a + r'(?:\s*[，,、/／或]\s*' + a + r')*\s*[）)])+', ANON, out)
     bump('重复括号合并', n)
+    # 汉字紧跟“品牌 A”时补一个空格（中英文之间留空，页面运行时的 dedupeAnon 同样处理）
+    out, n = re.subn(a + r'(?=[\u4e00-\u9fa5])', ANON + ' ', out)
+    bump('品牌名后补空格', n)
 
     # 5. 公开版开关：隐藏「分析一个产品」等自助入口（to B 交付，不做 SaaS 自助）
     out, n = re.subn(r'^const PUBLIC_BUILD = false;', 'const PUBLIC_BUILD = true;', out, count=1, flags=re.M)
