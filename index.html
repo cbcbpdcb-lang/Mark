@@ -1651,9 +1651,10 @@ const DIRECT_TEMPLATES = [
   ['售后与加入', 'Decision', ['{品牌}买了能退吗？', '{品牌}退货要多久？', '加入{品牌}要交钱吗？', '成为{品牌}会员有什么要求？', '做{品牌}的经销商能赚钱吗？', '{品牌}有什么缺点？']]
 ];
 const GROUP_CODE = { '品牌可信': 'bt', '功效': 'ef', '安全': 'sf', '价格与购买': 'pr', '售后与加入': 'jo' };
+function spaceAfterBrand(s, brand) { return /[A-Za-z0-9]$/.test(brand) ? s.replace(new RegExp(escRx(brand) + '(?=[\u4e00-\u9fa5])', 'g'), brand + ' ') : s }
 function directQueries(brand) {
   const out = [];
-  DIRECT_TEMPLATES.forEach(([group, stage, list]) => list.forEach((t, i) => out.push({ id: `q_${GROUP_CODE[group]}_${String(i + 1).padStart(2, '0')}`, stage, group, branded: true, focus: [], text: t.replace(/\{品牌\}/g, brand), rev: 1 })));
+  DIRECT_TEMPLATES.forEach(([group, stage, list]) => list.forEach((t, i) => out.push({ id: `q_${GROUP_CODE[group]}_${String(i + 1).padStart(2, '0')}`, stage, group, branded: true, focus: [], text: spaceAfterBrand(t.replace(/\{品牌\}/g, brand), brand), rev: 1 })));
   return out;
 }
 function exportDirectQueries() {
