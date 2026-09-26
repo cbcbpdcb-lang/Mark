@@ -1547,7 +1547,7 @@ function gapPublic(runs, fr) {
   <div class="scroll"><table class="tbl gtab">
     <thead><tr><th>官方口径</th><th class="num">一致</th>${shown.some(f => f.badN) ? '<th class="num">说错</th>' : ''}${shown.some(f => f.missN) ? '<th class="num">该说没说</th>' : ''}<th>各模型</th><th aria-hidden="true"></th></tr></thead>
     <tbody>${shown.map(f => { const q = quote(f); const cols = 3 + (shown.some(x => x.badN) ? 1 : 0) + (shown.some(x => x.missN) ? 1 : 0) + 1; return `<tr class="rxh" data-act="gap-toggle" tabindex="0" aria-expanded="false">
-      <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${esc(f.kind === '能力' ? (factEntry(f.key) || {}).cat || '' : '不应出现的说法')}　${f.n < 10 ? '样本少，仅供参考' : `偏差 ${pct(f.dev, f.n)}，可能范围 ${wilsonText(f.dev, f.n)}`}</div></td>
+      <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${esc(f.kind === '能力' ? (factEntry(f.key) || {}).cat || '' : '不应出现的说法')}　${f.n < 10 ? '样本少，仅供参考' : `说错 ${pct(f.badN, f.n)}，可能范围 ${wilsonText(f.badN, f.n)}`}</div></td>
       <td class="num">${f.okN}</td>${shown.some(x => x.badN) ? `<td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td>` : ''}${shown.some(x => x.missN) ? `<td class="num">${f.missN}</td>` : ''}
       <td>${strip(f)}</td><td class="chevc"><span class="chev"></span></td></tr>
       <tr class="rxb"><td colspan="${cols}"><div class="rxw"><div><div class="cmp">
