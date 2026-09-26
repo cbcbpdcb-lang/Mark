@@ -1,6 +1,7 @@
 // 监测脚本共用的函数：读配置、找链接、判定说对 / 说错 / 未提及、写 CSV。
 // 只用 Node 自带模块，不需要安装依赖。
 
+import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 
 export const SITE_HOST = 'echorank.markjcai.com';
@@ -159,4 +160,27 @@ function cell(v) {
 // 带 BOM，Excel 直接打开不乱码
 export function toCSV(header, rows) {
   return '﻿' + [header, ...rows].map(r => r.map(cell).join(',')).join('\r\n') + '\r\n';
+}
+
+// ---------- 网络 ----------
+
+// Node 自带的 fetch 不读 HTTPS_PROXY。在需要走代理的环境里（比如云端容器），带上 NODE_USE_ENV_PROXY=1 重新启动当前脚本
+export function relaunchWithProxy() {
+  if (!(process.env.HTTPS_PROXY || process.env.https_proxy) || process.env.NODE_USE_ENV_PROXY) return;
+  const r = spawnSync(process.execPath, process.argv.slice(1), { stdio: 'inherit', env: { ...process.env, NODE_USE_ENV_PROXY: '1', NODE_NO_WARNINGS: '1' } });
+  process.exit(r.status ?? 1);
+}
+
+// 不带密钥访问接口地址的根路径，有 HTTP 响应就说明没被网络拦住
+export async function probe(url, ms = 15_000) {
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), ms);
+  try {
+    const res = await fetch(new URL(url).origin + '/', { signal: ctrl.signal });
+    return `可以连通（HTTP ${res.status}）`;
+  } catch (e) {
+    return `连不上（${e.name === 'AbortError' ? `${ms / 1000} 秒没有响应` : String(e.cause?.code || e.cause?.message || e.message).replace(/[。.]+$/, '')}），可能被网络策略拦住了`;
+  } finally {
+    clearTimeout(timer);
+  }
 }

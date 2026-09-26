@@ -32,6 +32,8 @@
 检查（生成和 --check 都会做，任意一项不通过就失败，不写文件）：
   - 名单上的每一项都不能再出现
   - 两个页面全文搜 BANNED 里的词（大小写敏感），出现任意一个就失败
+  - experiments/ 不发布：实验数据（问题集、知识库、标准段落、采集结果，含真实品牌名）只留在私有仓库。
+    dist/ 只能有上面两个文件，来源都不能在 experiments/ 里；dist/ 里多出任何别的文件也算失败
 
 用法：
   python3 build_public.py            # 生成 dist/
@@ -51,6 +53,8 @@ SITE = ROOT / 'site' / 'index.html'
 OUT_DIR = ROOT / 'dist'
 OUT_SITE = OUT_DIR / 'index.html'
 OUT_APP = OUT_DIR / 'app' / 'index.html'
+EXCLUDED = ROOT / 'experiments'
+PUBLISHED = {OUT_SITE: SITE, OUT_APP: SRC}   # dist/ 里的全部文件和各自的来源
 
 ANON = '品牌 A'
 MASK_OFFICIAL = '官方页面（已核对）'
@@ -201,6 +205,16 @@ def banned_in(text):
     return [w for w in BANNED if w in text]
 
 
+def publish_problems():
+    """experiments/ 不能进 dist/：发布文件的来源不在 experiments/ 里，dist/ 里也没有别的文件"""
+    probs = [f'{out.relative_to(ROOT)} 的来源 {src.relative_to(ROOT)} 在 experiments/ 里'
+             for out, src in PUBLISHED.items() if src.resolve().is_relative_to(EXCLUDED.resolve())]
+    if OUT_DIR.exists():
+        probs += [f'dist/ 里多了 {p.relative_to(ROOT)}（不是本脚本生成的）'
+                  for p in sorted(OUT_DIR.rglob('*')) if p.is_file() and p not in PUBLISHED]
+    return probs
+
+
 def main():
     check_only = '--check' in sys.argv
     html = SRC.read_text(encoding='utf-8')
@@ -220,9 +234,14 @@ def main():
         if hit:
             print(f'\n{name} 里出现了不能公开的词：', '、'.join(hit))
             bad = True
+    probs = publish_problems()
+    if probs:
+        print('\n发布范围有问题：', '；'.join(probs))
+        bad = True
     if bad:
         sys.exit(1)
     print('\n检查通过：名单上的信息都已替换，官网和产品页全文没有不能公开的词。')
+    print('发布范围：dist/ 只有 index.html 和 app/index.html，来源是 site/index.html 和 index.html；experiments/ 不发布。')
     if check_only:
         return
     OUT_APP.parent.mkdir(parents=True, exist_ok=True)

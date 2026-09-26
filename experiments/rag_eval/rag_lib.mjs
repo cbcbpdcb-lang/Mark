@@ -8,17 +8,45 @@ export function norm(s) {
     .toLowerCase();
 }
 
-// 官网原文按句读切成 8 个字以上的片段，任一片段出现在检索段落里就算这条口径被召回
-export function quoteFragments(quote) {
-  return String(quote || '')
-    .split(/[。；;！？!?\n，,]+/)
-    .map(norm)
-    .filter(f => f.length >= 8);
+// ---------- 标准段落（gold_sources.json，实验计划附录 D） ----------
+
+// "B1-B15" → B1…B15
+export function expandIds(list) {
+  const out = new Set();
+  for (const item of list || []) {
+    const m = String(item).match(/^([A-Z]+)(\d+)-(?:[A-Z]+)?(\d+)$/);
+    if (!m) { out.add(String(item)); continue; }
+    for (let i = Number(m[2]); i <= Number(m[3]); i++) out.add(m[1] + i);
+  }
+  return out;
 }
 
-function matchSpec(spec, res, quotes) {
+// 一个应用能检索到的标准段落编号；gold_sources.json 里没写这个应用时不做限制
+export function kbOf(gold, app) {
+  if (!gold.kb || !(app in gold.kb)) return undefined;
+  return gold.kb[app] === null ? null : expandIds(gold.kb[app]);
+}
+
+// 空白题：只有 K 开头的补充段落，没有 B 开头的官网段落
+export const isBlank = entry => {
+  const ids = (entry.gold || []).filter(g => typeof g === 'string');
+  return ids.length > 0 && !ids.some(id => id.startsWith('B'));
+};
+
+// 这道题在这个应用里的标准段落：字符串是段落编号，只保留应用知识库里有的；对象是手写的 segment_id / document_name / contains
+export function visibleGold(entry = {}, kb) {
+  if (kb === null) return [];
+  return (entry.gold || []).filter(g => typeof g !== 'string' || !kb || kb.has(g));
+}
+
+// 应用的知识库里没有这道题的标准段落时期望拒答；不接知识库的应用（A0）只在所有应用都没有标准段落的题上期望拒答
+export function expectsRefusal(entry = {}, kb) {
+  return (kb === null ? entry.gold || [] : visibleGold(entry, kb)).length === 0;
+}
+
+function matchSpec(spec, res) {
+  if (typeof spec === 'string') return new RegExp(`[\\[【]${spec}[\\]】]`).test(String(res.content || ''));
   const content = norm(res.content);
-  if (spec.claim) return (quotes[spec.claim] || []).some(f => content.includes(f));
   let any = false;
   if (spec.segment_id) { if (res.segment_id !== spec.segment_id) return false; any = true; }
   if (spec.document_name) { if (!String(res.document_name || '').includes(spec.document_name)) return false; any = true; }
@@ -26,20 +54,14 @@ function matchSpec(spec, res, quotes) {
   return any;
 }
 
-// 一道题的标准段落：claims 里每条口径 + gold 里手写的段落
-export function goldSpecs(entry = {}) {
-  return [...(entry.claims || []).map(claim => ({ claim })), ...(entry.gold || [])];
-}
-
 export function topK(resources, k) {
   return [...(resources || [])].sort((a, b) => (a.position ?? 1e9) - (b.position ?? 1e9)).slice(0, k);
 }
 
 // 前 k 段里有没有标准段落。没有标准段落或者没有检索记录时返回 null（不参与召回率）
-export function recallHit(run, entry, quotes, k = 4) {
-  const specs = goldSpecs(entry);
-  if (!specs.length || !hasRetrieval(run)) return null;
-  return topK(run.retriever_resources, k).some(res => specs.some(s => matchSpec(s, res, quotes)));
+export function recallHit(run, specs, k = 4) {
+  if (!specs?.length || !hasRetrieval(run)) return null;
+  return topK(run.retriever_resources, k).some(res => specs.some(s => matchSpec(s, res)));
 }
 
 // 应用打开了“引用和归属”才会返回 retriever_resources；旧文件没有这个标记时按有没有数组判断

@@ -9,15 +9,19 @@
 //
 // 选项：--only kimi,qwen   只跑这几家       --limit 3   只跑前 3 题
 //       --repeats 2        每题问几次       --out 路径  另存文件      --force  覆盖已有文件
+//       --import manual/豆包_YYYY-MM-DD.json  导入网页版手动记录的回答（channel 记为 WEB_MANUAL），不调用接口
 
 import { existsSync, mkdirSync, renameSync, rmSync, writeFileSync } from 'node:fs';
-import { dirname, join, relative } from 'node:path';
+import { basename, dirname, join, relative } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from 'node:util';
-import { citesSite, extractLinks, mentionsBrand, readJSON, todayCN } from './lib.mjs';
+import { citesSite, extractLinks, mentionsBrand, probe, readJSON, relaunchWithProxy, todayCN } from './lib.mjs';
 import { authFailed, getProviders, retryable } from './providers.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+
+relaunchWithProxy();
+
 const PAUSE_MS = Number(process.env.DOGFOOD_PAUSE_MS ?? 1000);
 const RETRY_WAIT_MS = Number(process.env.DOGFOOD_RETRY_WAIT_MS ?? 5000);
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -31,6 +35,7 @@ const { values: args } = parseArgs({
     questions: { type: 'string', default: join(HERE, 'questions.json') },
     out: { type: 'string' },
     force: { type: 'boolean', default: false },
+    import: { type: 'string' },
   },
 });
 
@@ -40,6 +45,11 @@ const repeats = Math.max(1, Number(args.repeats) || 2);
 const date = todayCN();
 const out = args.out || join(HERE, 'results', `${date}.json`);
 const show = p => relative(process.cwd(), p) || p;
+
+if (args.import) {
+  importManual(args.import);
+  process.exit(0);
+}
 
 let providers = getProviders();
 if (args.only) {
@@ -61,7 +71,13 @@ for (const p of providers) {
 }
 console.log(`计划调用 ${ready.length * questions.length * repeats} 次，结果写到 ${show(out)}`);
 
-if (args['dry-run']) process.exit(0);
+// --dry-run 顺便看网络：不带密钥访问各家接口地址，有 HTTP 响应就说明没被网络拦住
+if (args['dry-run']) {
+  console.log('\n网络检查（不带密钥）：');
+  const states = await Promise.all(providers.map(p => probe(p.baseUrl)));
+  providers.forEach((p, i) => console.log(`  ${p.label}（${new URL(p.baseUrl).host}）：${states[i]}`));
+  process.exit(0);
+}
 
 if (!ready.length) {
   console.error(`
@@ -100,7 +116,7 @@ async function ask(p, q, attempt) {
   const started = new Date();
   const base = {
     date, started_at: started.toISOString(), model: p.id, model_version: null, search: p.search, search_used: null,
-    question_id: q.id, question: q.text, attempt, status: 'ok', answer: '',
+    question_id: q.id, question: q.text, attempt, channel: 'API', status: 'ok', answer: '',
     mentions_echorank: false, cites_site: false, links: [], sources: [], latency_ms: null, usage: null, error: null,
   };
   if (p.stopped) return { ...base, status: 'error', error: p.stopped };
@@ -170,3 +186,56 @@ for (const p of ready) {
 for (const s of skipped) console.log(`${s.model}：跳过，${s.reason}`);
 console.log(`共 ${doc.records.length} 条记录，已写入 ${show(out)}。下一步：node experiments/dogfood/score.mjs`);
 if (doc.records.some(r => r.status !== 'ok')) process.exitCode = 2;
+
+// ---------- 导入网页版手动记录 ----------
+// 文件是记录数组，或 { records: [...] }；每条至少有 question_id、attempt、answer，其余字段和接口记录相同。
+// 日期取记录里的 date，没有就取文件名里的 YYYY-MM-DD。合并进当天的 results 文件：同一模型之前导入的手动记录先删掉再写，可以重复导入
+function importManual(path) {
+  const raw = readJSON(path);
+  const list = Array.isArray(raw) ? raw : raw.records || [];
+  const fileDate = (basename(path).match(/\d{4}-\d{2}-\d{2}/) || [])[0];
+  const qById = new Map(qdoc.questions.map(q => [q.id, q]));
+  const problems = [];
+  const recs = list.map((r, i) => {
+    const q = qById.get(r.question_id);
+    if (!q) problems.push(`第 ${i + 1} 条：问题编号 ${r.question_id} 不在问题集 ${qdoc.version} 里`);
+    if (!r.attempt) problems.push(`第 ${i + 1} 条：缺少 attempt（第几次调用）`);
+    const answer = String(r.answer ?? '');
+    const links = extractLinks(answer, r.links || r.sources || []);
+    return {
+      date: r.date || fileDate || todayCN(), started_at: r.started_at || null, model: r.model || 'doubao',
+      model_version: r.model_version || '网页版', search: r.search || '网页版（手动记录）', search_used: r.search_used ?? null,
+      question_id: r.question_id, question: q?.text || r.question || '', attempt: Number(r.attempt), channel: 'WEB_MANUAL',
+      status: answer ? 'ok' : 'error', answer, mentions_echorank: mentionsBrand(answer), cites_site: citesSite(links),
+      links, sources: r.sources || [], latency_ms: null, usage: null, error: answer ? null : '手动记录里没有回答原文',
+    };
+  });
+  if (!recs.length) problems.push('文件里没有记录');
+  if (problems.length) {
+    console.error(`${show(path)} 不能导入：\n  ${problems.join('\n  ')}`);
+    process.exit(1);
+  }
+  const day = recs[0].date;
+  const target = args.out || join(HERE, 'results', `${day}.json`);
+  const models = [...new Set(recs.map(r => r.model))];
+  const doc = existsSync(target) ? readJSON(target) : {
+    created_at: new Date().toISOString(), date: day, questions_version: qdoc.version, repeats: 2, models: [], skipped: [], records: [],
+  };
+  if (doc.questions_version && doc.questions_version !== qdoc.version) {
+    console.error(`${show(target)} 用的是问题集 ${doc.questions_version}，现在是 ${qdoc.version}，不能合并。`);
+    process.exit(1);
+  }
+  doc.records = doc.records.filter(r => !(models.includes(r.model) && r.channel === 'WEB_MANUAL')).concat(recs);
+  doc.skipped = (doc.skipped || []).filter(s => !models.includes(s.model));
+  doc.models = (doc.models || []).filter(m => !models.includes(m.model)).concat(models.map(m => ({
+    model: m, label: m === 'doubao' ? '豆包' : m, requested_model: '网页版', search: '网页版（手动记录）', endpoint: 'WEB_MANUAL',
+  })));
+  mkdirSync(dirname(target), { recursive: true });
+  writeFileSync(target, JSON.stringify(doc, null, 2) + '\n');
+  const want = qdoc.questions.length * 2;
+  for (const m of models) {
+    const n = recs.filter(r => r.model === m).length;
+    console.log(`${m}：导入 ${n} 条手动记录${n === want ? '' : `（一轮应有 ${want} 条）`}，提到 EchoRank ${recs.filter(r => r.model === m && r.mentions_echorank).length}，引用官网 ${recs.filter(r => r.model === m && r.cites_site).length}`);
+  }
+  console.log(`已合并进 ${show(target)}。下一步：node experiments/dogfood/score.mjs`);
+}

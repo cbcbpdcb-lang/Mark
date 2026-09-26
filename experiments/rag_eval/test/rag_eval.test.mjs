@@ -9,7 +9,7 @@ import { join } from 'node:path';
 import { after, before, describe, test } from 'node:test';
 import { promisify } from 'node:util';
 import { HERE, INTERNAL_PAGE, REPO, launch, loadChromium, openApp } from '../browser.mjs';
-import { autoAttribution, isRefusal, norm, quoteFragments, recallHit, specifics, unsupportedSpecifics } from '../rag_lib.mjs';
+import { autoAttribution, expandIds, expectsRefusal, isBlank, isRefusal, kbOf, norm, recallHit, specifics, unsupportedSpecifics, visibleGold } from '../rag_lib.mjs';
 
 const exec = promisify(execFile);
 const KEYS = { DIFY_KEY_A0: 'app-fake-a0-123456', DIFY_KEY_B: 'app-fake-b-123456', DIFY_KEY_C1: 'app-fake-c1-123456', DIFY_KEY_C2: 'app-fake-c2-123456' };
@@ -36,19 +36,49 @@ describe('rag_lib', () => {
   test('归一化：空格和全角半角括号不区分', () => {
     assert.equal(norm('有限责任公司（港澳台 法人独资）'), norm('有限责任公司(港澳台法人独资)'));
   });
-  test('官网原文切成 8 个字以上的片段', () => {
-    assert.deepEqual(quoteFragments(REFUND_QUOTE), ['仓库收到退回产品', '审核确认不影响二次销售', '一般在5个工作日内原路退回支付账户', '退货后该订单所获回馈点数将扣回']);
+  test('标准段落按应用的知识库过滤；空白题和应拒答题的判定', () => {
+    const gold = JSON.parse(readFileSync(join(HERE, 'gold_sources.json'), 'utf-8'));
+    assert.equal(gold.version, 'final-1');
+    assert.equal(expandIds(['B1-B15', 'K1-K17']).size, 32);
+    const [A0, B, C1, C2] = ['A0', 'B', 'C1', 'C2'].map(a => kbOf(gold, a));
+    assert.equal(A0, null);
+    const q = gold.questions;
+    assert.deepEqual(visibleGold(q.q_bt_06, B), ['B12']);
+    assert.deepEqual(visibleGold(q.q_bt_06, C1), ['B12', 'K6', 'K17']);
+    assert.deepEqual(visibleGold(q.q_bt_06, C2), ['B12', 'K6', 'K17', 'K18']);
+    assert.deepEqual(visibleGold(q.q_bt_06, A0), []);
+    // 空白题：只有 K 段落
+    const blanks = Object.keys(q).filter(id => isBlank(q[id]));
+    assert.deepEqual(blanks, ['q_bt_01', 'q_bt_02', 'q_bt_05', 'q_ef_02', 'q_ef_03', 'q_ef_04', 'q_ef_05', 'q_ef_06', 'q_sf_02', 'q_sf_03', 'q_sf_06', 'q_pr_01', 'q_jo_05']);
+    // 应拒答：B 组在空白题和“无”题上；C1 看不到 K18、K19，所以 q_bt_05 也该拒答；A0 只在“无”题上
+    const refuse = kb => Object.keys(q).filter(id => expectsRefusal(q[id], kb));
+    const none = ['q_sf_04', 'q_sf_05', 'q_pr_04', 'q_pr_06', 'q_jo_06'];
+    assert.deepEqual(refuse(B).sort(), [...blanks, ...none].sort());
+    assert.deepEqual(refuse(C1).sort(), ['q_bt_05', ...none].sort());
+    assert.deepEqual(refuse(C2), none);
+    assert.deepEqual(refuse(A0), none);
   });
-  test('召回：只看前 4 段；口径原文或手写 gold 命中都算', () => {
-    const quotes = { cap_refund: quoteFragments(REFUND_QUOTE) };
+  const KB = join(HERE, 'kb');
+  test('知识库文件和标准段落对得上：每个编号都在对应应用的知识库里', existsSync(join(KB, 'kb_B.md')) ? {} : { skip: '还没有 kb/ 里的知识库文件' }, () => {
+    const gold = JSON.parse(readFileSync(join(HERE, 'gold_sources.json'), 'utf-8'));
+    const ids = f => [...readFileSync(join(KB, f), 'utf-8').matchAll(/^\[([BK]\d+)\]/gm)].map(m => m[1]);
+    const B = ids('kb_B.md'), C1 = [...B, ...ids('kb_C1_add.md')], C2 = [...C1, ...ids('kb_C2_add.md')];
+    assert.deepEqual([...kbOf(gold, 'B')], B);
+    assert.deepEqual([...kbOf(gold, 'C1')], C1);
+    assert.deepEqual([...kbOf(gold, 'C2')], C2);
+    for (const [q, e] of Object.entries(gold.questions)) for (const id of e.gold) assert.ok(C2.includes(id), `${q} 的 ${id} 不在知识库里`);
+  });
+  test('召回：只看前 4 段；段落编号 [B8] 或手写 gold 命中都算', () => {
     const seg = (position, content, extra = {}) => ({ position, content, ...extra });
     const other = [1, 2, 3, 4].map(i => seg(i, '无关段落 ' + i));
-    assert.equal(recallHit({ retriever_resources: [seg(1, '……一般在 5 个工作日内原路退回支付账户……')] }, { claims: ['cap_refund'] }, quotes), true);
-    assert.equal(recallHit({ retriever_resources: [...other, seg(5, REFUND_QUOTE)] }, { claims: ['cap_refund'] }, quotes), false);
-    assert.equal(recallHit({ retriever_resources: [seg(1, 'x', { segment_id: 's9' })] }, { gold: [{ segment_id: 's9' }] }, quotes), true);
-    assert.equal(recallHit({ retriever_resources: [seg(1, 'x', { document_name: 'FAQ.md' })] }, { gold: [{ document_name: 'FAQ', contains: 'y' }] }, quotes), false);
-    assert.equal(recallHit({ retriever_resources: [] }, { claims: [] }, quotes), null);          // 没有标准段落
-    assert.equal(recallHit({ has_retriever_resources: false, retriever_resources: [] }, { claims: ['cap_refund'] }, quotes), null);   // 没有检索记录
+    assert.equal(recallHit({ retriever_resources: [seg(1, '[B8] ' + REFUND_QUOTE)] }, ['B8'], 4), true);
+    assert.equal(recallHit({ retriever_resources: [seg(1, '【B8】退款')] }, ['B8'], 4), true);
+    assert.equal(recallHit({ retriever_resources: [seg(1, '[B80] 别的')] }, ['B8'], 4), false);
+    assert.equal(recallHit({ retriever_resources: [...other, seg(5, '[B8] ' + REFUND_QUOTE)] }, ['B8'], 4), false);
+    assert.equal(recallHit({ retriever_resources: [seg(1, 'x', { segment_id: 's9' })] }, [{ segment_id: 's9' }], 4), true);
+    assert.equal(recallHit({ retriever_resources: [seg(1, 'x', { document_name: 'FAQ.md' })] }, [{ document_name: 'FAQ', contains: 'y' }], 4), false);
+    assert.equal(recallHit({ retriever_resources: [] }, [], 4), null);          // 没有标准段落
+    assert.equal(recallHit({ has_retriever_resources: false, retriever_resources: [] }, ['B8'], 4), null);   // 没有检索记录
   });
   test('具体事实：价格、证照号、日期、电话、折扣、期限、点数', () => {
     const kinds = specifics('售价 ¥299，备案编号 YB13101060018558，2014年5月28日成立，客服 400-920-9191，享 7.5 折，7-15 个工作日退款，首单 125 点数').map(s => s.kind);
@@ -73,25 +103,27 @@ describe('rag_lib', () => {
 });
 
 // 模拟 Dify：按密钥认应用，按问题给回答和检索段落
+const TAGGED = '[B8] ' + REFUND_QUOTE;
+const K15 = '[K15] 孕妇、哺乳期女性和儿童使用精油前，请先咨询医生。';
 const SCRIPT = {
   A0: {
     q1: ['多特瑞退货后，一般 7-15 个工作日到账。', [{ position: 1, document_name: '公司介绍', segment_id: 'a1', content: '公司成立于2014年。' }]],
-    q2: ['<think>想一想</think>多特瑞精油可以内服。', []],
+    q2: ['<think>想一想</think>这款精油孕妇可以放心使用。', []],
   },
   B: {
-    q1: ['多特瑞退货一般 5 个工作日内原路退款，这条规则 2019 年起执行。', [1, 2, 3, 4].map(i => ({ position: i, document_name: '无关' + i, content: '无关段落' + i })).concat([{ position: 5, document_name: '帮助中心', content: REFUND_QUOTE }])],
-    q2: ['抱歉，官网资料没有说明多特瑞精油能否内服，建议咨询客服。', []],
+    q1: ['多特瑞退货一般 5 个工作日内原路退款，这条规则 2019 年起执行。', [1, 2, 3, 4].map(i => ({ position: i, document_name: '无关' + i, content: '无关段落' + i })).concat([{ position: 5, document_name: '帮助中心', content: TAGGED }])],
+    q2: ['抱歉，官网资料没有说明孕妇能否使用，建议咨询医生。', []],
   },
   C1: {
-    q1: ['多特瑞的退款规则：仓库收到退回产品，审核确认不影响二次销售，一般在5个工作日内原路退回支付账户。', [{ position: 1, document_name: '帮助中心', content: REFUND_QUOTE }]],
-    q2: ['根据补充口径，多特瑞精油不建议内服。', [{ position: 1, document_name: '补充口径', content: '补充口径：芳香用精油不建议内服。' }]],
+    q1: ['多特瑞的退款规则：仓库收到退回产品，审核确认不影响二次销售，一般在5个工作日内原路退回支付账户。', [{ position: 1, document_name: '帮助中心', content: TAGGED }]],
+    q2: ['根据补充材料，孕妇和儿童使用前应先咨询医生。', [{ position: 1, document_name: '补充材料', content: K15 }]],
   },
   C2: {
-    q1: ['多特瑞退货后会退款。', [{ position: 1, document_name: '帮助中心', content: REFUND_QUOTE }]],
-    q2: ['抱歉，官网资料没有说明多特瑞精油能否内服。', [{ position: 1, document_name: '补充口径', content: '补充口径：芳香用精油不建议内服。' }]],
+    q1: ['多特瑞退货后会退款。', [{ position: 1, document_name: '帮助中心', content: TAGGED }]],
+    q2: ['抱歉，官网资料没有说明孕妇能否使用。', [{ position: 1, document_name: '补充材料', content: K15 }]],
   },
 };
-const QUESTIONS = { query_set_version: 1, source: 'test', queries: [{ id: 'q_jo_02', text: 'q1' }, { id: 'q_sf_01', text: 'q2' }] };
+const QUESTIONS = { query_set_version: 1, source: 'test', queries: [{ id: 'q_jo_02', text: 'q1' }, { id: 'q_sf_02', text: 'q2' }] };
 
 describe('run.mjs', () => {
   let server, base, dir, calls = 0;
@@ -144,12 +176,12 @@ describe('run.mjs', () => {
       for (const f of ['run_id', 'engine', 'query_id', 'repeat', 'status', 'raw', 'started_at', 'model', 'latency_ms', 'input_tokens', 'output_tokens']) assert.ok(f in run, f);
       assert.equal(run.status, 'SUCCESS');
     }
-    const a0 = doc.runs.find(x => x.app === 'A0' && x.query_id === 'q_sf_01');
-    assert.equal(a0.raw, '多特瑞精油可以内服。');   // <think> 去掉，单独存
+    const a0 = doc.runs.find(x => x.app === 'A0' && x.query_id === 'q_sf_02');
+    assert.equal(a0.raw, '这款精油孕妇可以放心使用。');   // <think> 去掉，单独存
     assert.equal(a0.think, '<think>想一想</think>');
     const b = doc.runs.find(x => x.app === 'B' && x.query_id === 'q_jo_02');
     assert.equal(b.retriever_resources.length, 5);
-    assert.equal(b.retriever_resources[4].content, REFUND_QUOTE);
+    assert.equal(b.retriever_resources[4].content, TAGGED);
     assert.equal(b.engine, 'dify_b');
     copyFileSync(out, join(dir, 'keep.json'));
   });
@@ -165,23 +197,23 @@ describe('run.mjs', () => {
   });
 
   test('score.mjs：各项指标、失败归因和对比图', needBrowser, async () => {
-    const gold = JSON.parse(readFileSync(join(HERE, 'gold_sources.json'), 'utf-8'));
-    gold.questions.q_sf_01.gold = [{ contains: '不建议内服' }];
-    writeFileSync(join(dir, 'gold.json'), JSON.stringify(gold));
-    const r = await runScript('score.mjs', [join(dir, 'keep.json'), '--gold', join(dir, 'gold.json'), '--out-dir', dir], cleanEnv());
+    // 用仓库里的定稿标准段落：q_jo_02 是 B8、K3，q_sf_02（空白题）是 K15
+    const r = await runScript('score.mjs', [join(dir, 'keep.json'), '--out-dir', dir], cleanEnv());
     assert.equal(r.code, 0, r.stderr);
     const rows = readFileSync(join(dir, 'summary.csv'), 'utf-8').replace(/^﻿/, '').trim().split('\r\n').map(l => l.split(','));
     const h = rows[0];
     const get = (app, col) => rows.find(x => x[0] === app)[h.indexOf(col)];
-    // A0：退款说成 7–15 个工作日 → 待确认，数字不在检索段落里 → 编造；内服题既没依据也没拒答
+    // A0：不接知识库。退款说成 7–15 个工作日 → 待确认，数字不在检索段落里 → 编造；空白题没依据；这两题都不在 A0 的应拒答范围
     assert.equal(get('A0', '待确认'), '2');
     assert.equal(get('A0', '编造'), '2');
+    assert.equal(get('A0', '空白题回答'), '2');
     assert.equal(get('A0', '空白题有依据'), '0');
-    assert.equal(get('A0', '恰当拒答'), '0');
-    assert.equal(get('A0', '前 4 段召回'), '0');
-    // B：说对 5 个工作日，但标准段落排在第 5 段，前 4 段没召回；“2019 年”编造；内服题恰当拒答
+    assert.equal(get('A0', '应拒答的回答'), '0');
+    assert.equal(get('A0', '有标准段落的回答'), '0');
+    // B：说对 5 个工作日，但 B8 排在第 5 段，前 4 段没召回；“2019 年”编造；空白题知识库里没有 K15，恰当拒答
     assert.equal(get('B', '关键事实说对'), '2');
     assert.equal(get('B', '编造'), '2');
+    assert.equal(get('B', '应拒答的回答'), '2');
     assert.equal(get('B', '恰当拒答'), '2');
     assert.equal(get('B', '前 4 段召回'), '0');
     // C1：两题都对
@@ -190,20 +222,24 @@ describe('run.mjs', () => {
     assert.equal(get('C1', '编造'), '0');
     assert.equal(get('C1', '前 4 段召回'), '4');
     assert.equal(get('C1', `检索召回率（前 4 段）%`), '100');
-    // C2：召回了却没说对；检索到补充口径却拒答
+    // C2：召回了却没说对；检索到 K15 却拒答
     assert.equal(get('C2', '关键事实说对'), '0');
     assert.equal(get('C2', '恰当拒答'), '0');
     assert.equal(get('C2', '空白题有依据'), '0');
 
-    const fails = readFileSync(join(dir, 'failures.csv'), 'utf-8').replace(/^﻿/, '').trim().split('\r\n').slice(1).map(l => l.split(','));
+    const [headerF, ...fails] = readFileSync(join(dir, 'failures.csv'), 'utf-8').replace(/^﻿/, '').trim().split('\r\n').map(l => l.split(','));
+    const col = name => headerF.indexOf(name);
     const f = (app, q) => fails.filter(x => x[0] === app && x[1] === q);
     assert.equal(f('C1', 'q_jo_02').length, 0);
-    assert.match(f('A0', 'q_jo_02')[0][4], /待确认.*编造/);
-    assert.equal(f('A0', 'q_jo_02')[0][7], '检索没召回');
-    assert.equal(f('B', 'q_jo_02')[0][7], '检索没召回');
-    assert.equal(f('C2', 'q_jo_02')[0][4], '没说对官方口径');
-    assert.equal(f('C2', 'q_jo_02')[0][7], '召回但生成错');
-    assert.equal(f('C2', 'q_sf_01')[0][4], '空白题不当回答');
+    assert.match(f('A0', 'q_jo_02')[0][col('问题类型')], /待确认.*编造/);
+    assert.equal(f('A0', 'q_jo_02')[0][col('归因（脚本预判）')], '');
+    assert.equal(f('B', 'q_jo_02')[0][col('标准段落和期望')], 'B8 K3');
+    assert.equal(f('B', 'q_jo_02')[0][col('归因（脚本预判）')], '检索没召回');
+    assert.equal(f('B', 'q_sf_02').length, 0);
+    assert.equal(f('C2', 'q_jo_02')[0][col('问题类型')], '没说对官方口径');
+    assert.equal(f('C2', 'q_jo_02')[0][col('归因（脚本预判）')], '召回但生成错');
+    assert.equal(f('C2', 'q_sf_02')[0][col('问题类型')], '空白题没有依据回答');
+    assert.equal(f('A0', 'q_sf_02')[0][col('问题类型')], '空白题没有依据回答');
     const png = readFileSync(join(dir, 'compare.png'));
     assert.equal(png.subarray(1, 4).toString(), 'PNG');
   });

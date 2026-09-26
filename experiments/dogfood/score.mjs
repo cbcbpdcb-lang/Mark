@@ -5,7 +5,7 @@
 //   node experiments/dogfood/score.mjs a.json b.json    只算指定文件
 //
 // 输出（都在 experiments/dogfood/ 下，Excel 可直接打开）：
-//   summary.csv       每次采集 × 每个模型：提到、引用官网、说对 / 说错 / 未提及，和上一次比的变化
+//   summary.csv       每次采集 × 每个模型：提到、引用官网、说对 / 说错 / 未提及、说对的事实数，距基线天数，和上一次比的变化
 //   by_question.csv   每道题在每次采集里说对几次，对照 FAQ 逐条看
 //   details.csv       每条回答的判定和依据句
 //
@@ -50,20 +50,24 @@ const summary = [];
 const details = [];
 const perQuestion = new Map(); // qid -> Map(round -> {right, n})
 const rounds = [];
+const dayOf = (doc, round) => Date.parse((doc.date || round).slice(0, 10) + 'T00:00:00Z');
+let baseDay = null;
 
 files.forEach((file, i) => {
   const doc = readJSON(file);
   const round = basename(file, '.json');
   const label = i === 0 ? '基线' : `第 ${i} 次复测`;
   rounds.push(round);
+  if (i === 0) baseDay = dayOf(doc, round);
+  const days = Number.isNaN(dayOf(doc, round) - baseDay) ? '' : Math.round((dayOf(doc, round) - baseDay) / 86400000);
   const searchOf = new Map((doc.models || []).map(m => [m.model, m.search]));
   const scored = doc.records.map(r => {
     const q = qById.get(r.question_id);
     const v = r.status === 'ok' ? verdictFor(r, q, compiled) : null;
     details.push([
-      round, r.model, r.model_version || '', r.question_id, r.question || q?.text || '', r.attempt, r.status === 'ok' ? '成功' : '失败',
+      round, r.model, r.channel || 'API', r.model_version || '', r.question_id, r.question || q?.text || '', r.attempt, r.status === 'ok' ? '成功' : '失败',
       v ? (v.mentioned ? '是' : '否') : '', r.status === 'ok' ? (r.cites_site ? '是' : '否') : '', v ? v.verdict : '',
-      v ? v.ownRight.map(x => x.claim_id).join(' ') : '', v ? v.wrong.map(x => x.claim_id).join(' ') : '',
+      v ? v.ownRight.map(x => x.claim_id).join(' ') : '', v ? v.right.map(x => x.claim_id).join(' ') : '', v ? v.wrong.map(x => x.claim_id).join(' ') : '',
       v ? v.wrong.map(x => x.sentence).join(' | ') : '', (r.links || []).join(' '), r.error || '',
     ]);
     if (v) {
@@ -88,14 +92,15 @@ files.forEach((file, i) => {
     const wrong = count(x => x.v.verdict === '说错');
     const [lo, hi] = wilson(right, n);
     summary.push({
-      round, label, model, search, n, failed: rows.length - n,
+      round, label, days, model, search, n, failed: rows.length - n,
       mentioned: count(x => x.v.mentioned), cited: count(x => x.r.cites_site),
       right, wrong, none: n - right - wrong, keyRight: count(x => x.v.keyRight),
+      facts: ok.reduce((sum, x) => sum + x.v.right.length, 0),
       ci: n ? `${Math.round(lo * 100)}–${Math.round(hi * 100)}%` : '',
     });
   }
   for (const s of doc.skipped || []) {
-    summary.push({ round, label, model: s.model, search: '', n: 0, failed: 0, mentioned: 0, cited: 0, right: 0, wrong: 0, none: 0, keyRight: 0, ci: '', skipped: s.reason });
+    summary.push({ round, label, days, model: s.model, search: '', n: 0, failed: 0, mentioned: 0, cited: 0, right: 0, wrong: 0, none: 0, keyRight: 0, facts: 0, ci: '', skipped: s.reason });
   }
 });
 
@@ -107,9 +112,9 @@ const summaryRows = summary.map(s => {
   const delta = rate != null && prev != null ? rate - prev : '';
   if (rate != null) last.set(s.model, rate);
   return [
-    s.label, s.round, s.model, s.search, s.n, s.failed,
+    s.label, s.round, s.days, s.model, s.search, s.n, s.failed,
     s.mentioned, s.n ? pct(s.mentioned, s.n) : '', s.cited, s.n ? pct(s.cited, s.n) : '',
-    s.right, rate ?? '', s.ci, s.wrong, s.none, s.keyRight,
+    s.right, rate ?? '', s.ci, s.wrong, s.none, s.facts, s.keyRight,
     delta === '' ? '' : (delta > 0 ? '+' : '') + delta, s.skipped || '',
   ];
 });
@@ -121,8 +126,8 @@ const write = (name, header, rows) => {
 };
 
 const f1 = write('summary.csv', [
-  '轮次', '采集', '模型', '联网方式', '有效回答', '失败', '提到 EchoRank', '提到率 %', '引用官网', '引用率 %',
-  '说对', '说对率 %', '说对率 95% 区间', '说错', '未提及', '说对关键事实', '说对率较上次（百分点）', '说明',
+  '轮次', '采集', '距基线天数', '模型', '联网方式', '有效回答', '失败', '提到 EchoRank', '提到率 %', '引用官网', '引用率 %',
+  '说对', '说对率 %', '说对率 95% 区间', '说错', '未提及', '说对的事实数', '说对关键事实', '说对率较上次（百分点）', '说明',
 ], summaryRows);
 
 const f2 = write('by_question.csv', ['问题编号', '问题', '对应事实键', ...rounds.flatMap(r => [`${r} 说对`, `${r} 说错`, `${r} 有效`])],
@@ -132,8 +137,8 @@ const f2 = write('by_question.csv', ['问题编号', '问题', '对应事实键'
   })]));
 
 const f3 = write('details.csv', [
-  '采集', '模型', '模型版本', '问题编号', '问题', '第几次', '状态', '提到 EchoRank', '引用官网', '结论',
-  '说对的事实键', '说错的事实键', '说错原句', '链接', '错误信息',
+  '采集', '模型', '渠道', '模型版本', '问题编号', '问题', '第几次', '状态', '提到 EchoRank', '引用官网', '结论',
+  '本题说对的事实键', '说对的全部事实键', '说错的事实键', '说错原句', '链接', '错误信息',
 ], details);
 
 console.log('采集        模型       有效  提到  引用官网  说对  说错  未提及  说对率');

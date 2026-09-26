@@ -11,8 +11,10 @@
 import { existsSync, mkdirSync, renameSync, writeFileSync } from 'node:fs';
 import { dirname, join, relative } from 'node:path';
 import { parseArgs } from 'node:util';
-import { readJSON, todayCN } from '../dogfood/lib.mjs';
+import { probe, readJSON, relaunchWithProxy, todayCN } from '../dogfood/lib.mjs';
 import { HERE } from './browser.mjs';
+
+relaunchWithProxy();
 
 const APPS = ['A0', 'B', 'C1', 'C2'];
 const TIMEOUT_MS = 180_000;
@@ -64,7 +66,10 @@ const skipped = apps.filter(a => a.skip).map(a => ({ app: a.id, reason: a.skip }
 console.log(`问题集：${queries.length} 题 × 每题 ${repeats} 次；Dify 地址：${baseUrl || '（没有设置 DIFY_BASE_URL）'}`);
 for (const a of apps) console.log(`  ${a.id}：${a.skip ? '跳过，' + a.skip : `密钥 ${a.keyName} 已设置`}`);
 console.log(`计划调用 ${ready.length * queries.length * repeats} 次，结果写到 ${show(out)}`);
-if (args['dry-run']) process.exit(0);
+if (args['dry-run']) {
+  if (baseUrl) console.log(`网络检查（不带密钥）：${new URL(baseUrl).host}：${await probe(baseUrl)}`);
+  process.exit(0);
+}
 
 if (!baseUrl || !ready.length) {
   console.error(`
