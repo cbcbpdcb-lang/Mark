@@ -6,3 +6,4 @@ __pycache__/
 
 # 采集中途的临时文件
 *.partial
+node_modules/

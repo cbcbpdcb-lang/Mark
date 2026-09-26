@@ -1,0 +1,224 @@
+{
+  "version": "draft-1",
+  "status": "草稿：按事实底账起草，等实验计划原文和知识库分段核对后替换",
+  "top_k": 4,
+  "how_to_match": "一段检索结果算命中标准段落：claims 里任一条口径的官网原文（source_quote，按句读切成 8 个字以上的片段）有一段出现在这段检索内容里；或者命中 gold 里写的任一条（segment_id 相等 / document_name 包含 / contains 出现在内容里，同一条里写了几个字段就都要满足）。空格和全角半角括号不区分。",
+  "questions": {
+    "q_bt_01": {
+      "blank": false,
+      "claims": [
+        "cap_entity"
+      ],
+      "gold": []
+    },
+    "q_bt_02": {
+      "blank": true,
+      "topic": "直销经营许可",
+      "claims": [],
+      "gold": []
+    },
+    "q_bt_03": {
+      "blank": false,
+      "claims": [
+        "cap_entity",
+        "cap_food_license",
+        "cap_contact"
+      ],
+      "gold": []
+    },
+    "q_bt_04": {
+      "blank": false,
+      "claims": [
+        "cap_entity"
+      ],
+      "gold": []
+    },
+    "q_bt_05": {
+      "blank": false,
+      "claims": [
+        "cap_entity"
+      ],
+      "gold": []
+    },
+    "q_bt_06": {
+      "blank": false,
+      "claims": [
+        "cap_join",
+        "cap_sponsor"
+      ],
+      "gold": []
+    },
+    "q_ef_01": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_ef_02": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_ef_03": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_ef_04": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_ef_05": {
+      "blank": true,
+      "topic": "是否说明“不能代替药物”",
+      "claims": [],
+      "gold": []
+    },
+    "q_ef_06": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_sf_01": {
+      "blank": true,
+      "topic": "能否内服",
+      "claims": [],
+      "gold": []
+    },
+    "q_sf_02": {
+      "blank": true,
+      "topic": "孕妇和儿童能否使用",
+      "claims": [],
+      "gold": []
+    },
+    "q_sf_03": {
+      "blank": true,
+      "topic": "孕妇和儿童能否使用",
+      "claims": [],
+      "gold": []
+    },
+    "q_sf_04": {
+      "blank": false,
+      "claims": [],
+      "gold": []
+    },
+    "q_sf_05": {
+      "blank": false,
+      "claims": [
+        "cap_product_claim"
+      ],
+      "gold": []
+    },
+    "q_sf_06": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_support"
+      ],
+      "gold": []
+    },
+    "q_pr_01": {
+      "blank": false,
+      "claims": [
+        "cap_discount",
+        "cap_retail"
+      ],
+      "gold": []
+    },
+    "q_pr_02": {
+      "blank": false,
+      "claims": [
+        "cap_return",
+        "cap_retail"
+      ],
+      "gold": []
+    },
+    "q_pr_03": {
+      "blank": false,
+      "claims": [
+        "cap_cptg"
+      ],
+      "gold": []
+    },
+    "q_pr_04": {
+      "blank": false,
+      "claims": [
+        "cap_cptg",
+        "cap_discount"
+      ],
+      "gold": []
+    },
+    "q_pr_05": {
+      "blank": false,
+      "claims": [
+        "cap_return"
+      ],
+      "gold": []
+    },
+    "q_pr_06": {
+      "blank": false,
+      "claims": [
+        "cap_cptg"
+      ],
+      "gold": []
+    },
+    "q_jo_01": {
+      "blank": false,
+      "claims": [
+        "cap_return",
+        "cap_exchange"
+      ],
+      "gold": []
+    },
+    "q_jo_02": {
+      "blank": false,
+      "claims": [
+        "cap_refund"
+      ],
+      "gold": []
+    },
+    "q_jo_03": {
+      "blank": true,
+      "topic": "加入是否收费",
+      "claims": [
+        "cap_join",
+        "cap_starter"
+      ],
+      "gold": []
+    },
+    "q_jo_04": {
+      "blank": false,
+      "claims": [
+        "cap_join",
+        "cap_sponsor"
+      ],
+      "gold": []
+    },
+    "q_jo_05": {
+      "blank": true,
+      "topic": "经销商制度与收入说明",
+      "claims": [],
+      "gold": []
+    },
+    "q_jo_06": {
+      "blank": false,
+      "claims": [],
+      "gold": []
+    }
+  }
+}
