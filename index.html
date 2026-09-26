@@ -441,6 +441,92 @@ code{border-radius:5px}
 @media (hover:none){.frow .ed{opacity:1}}
 .frow.editing td{background:var(--accent-soft)!important}
 .fx>td{padding:8px 0 14px!important} .fx .cand{margin:0}
+/* ---------- v5.9 公开版交互走查修正 ---------- */
+.kpis[hidden],.hero[hidden],.rb[hidden]{display:none!important}
+.hero.comp{display:grid;gap:14px}
+.cbar{display:flex;height:44px;border-radius:14px;overflow:hidden;gap:3px;background:var(--bg)}
+.cseg{all:unset;position:relative;cursor:default;display:flex;align-items:center;padding-inline:14px;font-size:14px;font-weight:600;color:#fff;min-width:6px;transition:filter .2s}
+.cseg span{white-space:nowrap;overflow:hidden}
+.cseg.a{background:var(--accent)}.cseg.b{background:var(--rule);color:var(--muted)}.cseg.c{background:var(--bad)}
+.cbar:hover .cseg{filter:saturate(.5) opacity(.55)}.cbar .cseg:hover,.cbar .cseg:focus-visible{filter:none}
+.cseg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.clg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.clg .lg{padding:12px 14px;border-radius:14px;background:var(--bg);transition:background .25s,box-shadow .25s}
+.clg .lg.on{background:var(--surface);box-shadow:0 0 0 1.5px var(--accent)}
+.clg .lg b{font-size:22px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:block}
+.clg .lg b small{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
+.clg .lg span{color:var(--muted);font-size:13px;display:block;line-height:1.5}
+.clg i,.glg i,.qleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.clg i.a,.glg i.a{background:var(--accent)}.clg i.b{background:var(--rule)}.clg i.c,.glg i.c{background:var(--bad)}.glg i.m{background:var(--warn)}
+/* 隐藏信息：灰色斜纹小块 */
+.red{display:inline-block;width:3.2em;height:.95em;border-radius:4px;background:repeating-linear-gradient(135deg,var(--rule) 0 4px,var(--rule-soft) 4px 8px);vertical-align:-1px;cursor:help}
+/* 口径对照：每模型一段色条，整行点开 */
+.glg{display:flex;gap:16px;flex-wrap:wrap;margin:0 0 10px}
+.gtab tr.rxh{cursor:pointer;transition:background .2s}
+.gtab tr.rxh:hover td{background:var(--bg)}
+.gtab tr.rxh:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.gtab tr.rxh.open td{border-bottom-color:transparent}
+.mstrip{display:flex;gap:12px}
+.mdl{display:grid;justify-items:center;gap:4px;font-size:11.5px;color:var(--muted);white-space:nowrap}
+.mb{display:flex;width:44px;height:14px;border-radius:4px;overflow:hidden;gap:1px;background:var(--rule-soft)}
+.mb i{display:block;min-width:3px}.mb i.a{background:var(--accent)}.mb i.m{background:var(--warn)}.mb i.c{background:var(--bad)}
+.mb.empty{background:repeating-linear-gradient(135deg,var(--rule-soft) 0 3px,transparent 3px 6px)}
+.chevc{width:18px}.gtab .chev{display:block;width:9px;height:9px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(45deg);transition:transform .35s var(--sp);margin-top:4px}
+.gtab tr.rxh.open .chev{transform:rotate(-135deg);margin-top:9px}
+.gtab tr.rxb td{padding:0!important;border-bottom:1px solid var(--rule-soft)}
+.gtab tr.rxb:not(.open) td{border-bottom:0}
+.rxw{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--sp)}
+.gtab tr.rxb.open .rxw{grid-template-rows:1fr}
+.rxw>div{overflow:hidden}
+.rxw .cmp{padding:0 12px 14px}
+.rxw .cmp>div{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:13.5px}
+.rxw .cmp small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+/* 用户提问：整行可点 */
+.tbl tr.rowlink{cursor:pointer}
+.tbl tr.rowlink td{transition:background .2s}
+.tbl tr.rowlink:hover td{background:var(--bg)}
+.tbl tr.rowlink:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.tbl tr.rowlink .go{color:var(--accent);font-size:12.5px;opacity:0;transition:opacity .2s}
+.tbl tr.rowlink:hover .go,.tbl tr.rowlink:focus-visible .go{opacity:1}
+@media (hover:none){.tbl tr.rowlink .go{opacity:1}}
+.btn .cnt{font-variant-numeric:tabular-nums;opacity:.7;margin-left:2px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+/* 回答记录：句子标色、依据小卡、两次回答切换、问题列表图例 */
+.resp .txt mark.cl{cursor:help;border-radius:4px;padding:0 1px;-webkit-box-decoration-break:clone;box-decoration-break:clone;transition:box-shadow .2s;color:inherit}
+.resp .txt mark.cl.ok{background:var(--accent-soft)}
+.resp .txt mark.cl.dv{background:var(--warn-soft);box-shadow:inset 0 -1.5px 0 var(--warn)}
+.resp .txt mark.cl.er{background:var(--bad-soft);box-shadow:inset 0 -1.5px 0 var(--bad)}
+.resp .txt mark.cl:hover,.resp .txt mark.cl:focus-visible{outline:none;box-shadow:0 0 0 1.5px var(--accent)}
+.resp .txt mark.cl mark.k-brand{background:transparent;font-weight:600}
+.tip.ev{padding:10px 12px;border-radius:12px;font-size:12.5px;line-height:1.6;width:280px}
+.tip.ev .v{display:inline-flex;gap:6px;align-items:center;font-weight:600;margin-bottom:3px}
+.tip.ev .v::before{content:"";width:7px;height:7px;border-radius:50%;background:#fff}
+.tip.ev .v.ok::before{background:#6f9bff}.tip.ev .v.dv::before{background:#d6b88a}.tip.ev .v.er::before{background:#e0a08e}
+.tip.ev small{display:block;opacity:.62;margin-top:4px;font-size:11.5px}
+.tip .red{background:repeating-linear-gradient(135deg,rgba(128,128,140,.55) 0 4px,rgba(128,128,140,.25) 4px 8px)}
+.seg2{margin-left:auto;display:inline-flex;background:var(--surface-2);border-radius:9px;padding:2px}
+.seg2 button{all:unset;cursor:pointer;font-size:12px;padding:3px 10px;border-radius:7px;color:var(--muted);transition:background .25s,color .25s}
+.seg2 button[aria-pressed="true"]{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg2 button:focus-visible{outline:2px solid var(--accent)}
+.resp.pubcard .eval .tag{white-space:normal;max-width:100%;border-radius:8px;line-height:1.5;padding:3px 8px}
+.resp.pubcard .vrow{margin:0 16px 8px;display:flex;gap:6px;flex-wrap:wrap}
+.resp.pubcard .rb{display:flex;flex-direction:column;flex:1}
+.resp.pubcard .rb.open .txt{max-height:none}
+.resp.pubcard.timeout{background:var(--surface)}
+.qleg{display:flex;flex-wrap:wrap;gap:6px 12px;padding:0 10px 12px;line-height:1.5}
+.qleg i{width:7px;height:7px;border-radius:2px;vertical-align:0}
+.qleg i.v{background:var(--accent)}.qleg i.m{background:var(--warn)}.qleg i.f{background:var(--bad)}.qleg i.n{background:var(--rule)}.qleg i.t{box-shadow:inset 0 0 0 1px var(--faint)}
+.qleg .faint{flex-basis:100%}
+.qlist .dots i[data-tip]{cursor:help}
+/* 口径抽屉 */
+.flist{display:grid;gap:2px}
+.fli{all:unset;cursor:pointer;display:block;padding:8px 10px;border-radius:9px;font-size:13.5px;line-height:1.5;transition:background .2s}
+.fli:hover{background:var(--bg)}.fli:focus-visible{outline:2px solid var(--accent)}
+.factd small{display:block;color:var(--muted);font-size:12px;margin-bottom:4px}
+.factd blockquote{margin:0 0 12px;padding:12px 14px;background:var(--bg);border-radius:12px;font-size:14px;line-height:1.7}
+.factd dl{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 10px;margin:0}
+.factd dt{color:var(--muted)}.factd dd{margin:0}
+@media (max-width:860px){.clg{grid-template-columns:1fr}.mstrip{gap:8px}.mb{width:34px}}
 /* 欢迎页 */
 .wel{position:fixed;inset:0;z-index:70;background:rgba(11,11,15,.28);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .35s}
 .wel.on{opacity:1;pointer-events:auto}
@@ -936,7 +1022,7 @@ function probePanel(run) {
   return `<div class="eval"><dl>
     <dt>标注</dt><dd><span class="tag ${PROBE_TAG[lab.cls]}">${PROBE_CLASS[lab.cls]}</span><span class="small muted">${esc(lab.by)}</span>${lab.note ? `<div class="small muted">${esc(lab.note)}</div>` : ''}</dd>
     <dt>规则判断</dt><dd><span class="tag ${PROBE_TAG[rule]}">${PROBE_CLASS[rule]}</span>${rule !== lab.cls ? '<span class="small" style="color:var(--warn)">与标注不一致</span>' : ''}</dd>
-    <dt>断言句</dt><dd class="small">${asserts.length ? asserts.slice(0, 2).map(a => `“${esc(a.slice(0, 80))}”`).join('<br>') : '<span class="muted">规则没有找到关于 NovaNote 的肯定断言</span>'}</dd>
+    <dt>断言句</dt><dd class="small">${asserts.length ? asserts.slice(0, 2).map(a => `“${esc(plainQ(a).slice(0, 80))}”`).join('<br>') : '<span class="muted">规则没有找到关于 NovaNote 的肯定断言</span>'}</dd>
   </dl>
   <div class="review"><span class="small muted">你的复核：</span>
     <select class="inp sel sm" style="max-width:180px" data-probe-label="${run.run_id}" aria-label="复核标注">
@@ -1027,6 +1113,8 @@ function applyPreset(key) {
    替换发生在数据层（事实底账、竞品、问题、回答原文一起换），所以评测结果和真实版一致，导出的 Markdown 也不会漏出品牌名。 */
 const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）', MASK_DOMAIN = '官方网站（已隐藏）', MASK_HIDDEN = '（已隐藏）';
 const isMaskedUrl = u => u === MASK_OFFICIAL || u === MASK_OTHER;
+const maskToken = k => MASK_HIDDEN + '\u200b'.repeat(k + 1) + '\u200c';   // 与 build_public.py 的 mask_token 同一规则
+const unmaskTokens = (s, to) => String(s).replace(/（已隐藏）\u200b+\u200c/g, to);
 /* 品牌名和别名都换成“品牌 A”之后，“品牌 A（品牌 A）”“品牌 A（品牌 A，品牌 A）”这类重复括号合并成一个 */
 const ANON_DUP_RE = new RegExp(escRx(ANON_NAME) + '(?:\\s*[（(]\\s*' + escRx(ANON_NAME) + '(?:\\s*[，,、/／或]\\s*' + escRx(ANON_NAME) + ')*\\s*[）)])+', 'g');
 const dedupeAnon = s => String(s).replace(ANON_DUP_RE, ANON_NAME);
@@ -1035,7 +1123,7 @@ const dedupeAnon = s => String(s).replace(ANON_DUP_RE, ANON_NAME);
    PUBLIC_BUILD 由 build_public.py 生成公开版时改为 true；本地勾选“按公开版预览”或部署到非本地域名时同样按公开版处理。 */
 const PUBLIC_BUILD = false;
 function isPublicView() { return PUBLIC_BUILD || !isLocalView() || !!UI.anonPreview; }
-const PUBLIC_HIDDEN_PAGES = ['analyze', 'import', 'evals', 'changelog', 'learn'];
+const PUBLIC_HIDDEN_PAGES = ['analyze', 'import', 'evals', 'changelog', 'learn', 'truth'];   // v5.9：事实底账不单列，作为依据从各页“官方原文”以抽屉打开
 /* ---------- 【改这里 25】公开版对客口径（v5.7）----------
    echorank.markjcai.com 是对客网站：迭代过程、版本号、内部术语不出现；没有数据的行、模块、页面整块隐藏。
    下面几个开关只在 isPublicView() 为真时生效，内部版保持原样。每次 render 重算一次隐藏页面。 */
@@ -1060,7 +1148,91 @@ function publicHiddenPages() {
 }
 const pageHidden = k => isPublicView() && publicHiddenPages().has(k);
 const pub = () => isPublicView();
-const plainQ = s => pub() ? String(s || '').replace(/[#*`]+/g, '').replace(/^\s*[-•]\s*/, '').trim() : String(s || '');
+const plainQ = s => pub() ? String(s || '').replace(/[#*`]+/g, '').replace(/^\s*(?:[-•]|\d+[.、)]|[（(]\d+[)）])\s*/, '').trim() : String(s || '');
+/* v5.9 公开版统一的“说错”口径：一条回答只要有一处说法和官方说明冲突（说反官方口径、与官方说明冲突或无依据、过期、错误归属、定位偏差、替品牌宣称疗效），就算说错一条。
+   “该说没说”和“无法核对的价格”不算说错。概览、体检报告、口径对照都用这一个数。 */
+const WRONG_TYPES = ['denied', 'unsupported', 'outdated', 'misattribution', 'deviation', 'overclaim'];
+const WRONG_NAME = { denied: '说反官方口径', unsupported: '与官方说明冲突', outdated: '过期', misattribution: '错误归属', deviation: '定位偏差', overclaim: '替品牌宣称疗效' };
+function isWrongRun(r, e) {
+  if (!e || !e.valid || !e.mentioned) return false;
+  const fo = finalOf(r, e); if (fo.corrected) return fo.final === 'wrong';
+  return e.issues.some(i => WRONG_TYPES.includes(i.type));
+}
+function wrongStat(evs) {
+  const out = { runs: new Set(), byType: {}, unver: new Set(), miss: new Set(), mentioned: 0 };
+  evs.forEach(x => {
+    if (!x.e.valid || !x.e.mentioned) return; out.mentioned++;
+    if (isWrongRun(x.r, x.e)) { out.runs.add(x.r.run_id); [...new Set(x.e.issues.filter(i => WRONG_TYPES.includes(i.type)).map(i => i.type))].forEach(t => { out.byType[t] = (out.byType[t] || 0) + 1; }); }
+    if (x.e.issues.some(i => i.type === 'unverified')) out.unver.add(x.r.run_id);
+    if (x.e.issues.some(i => i.type === 'omission')) out.miss.add(x.r.run_id);
+  });
+  out.n = out.runs.size;
+  out.typeText = WRONG_TYPES.filter(t => out.byType[t]).map(t => `${WRONG_NAME[t]} ${out.byType[t]}`).join('，');
+  return out;
+}
+const pubText = t => pub() ? String(t).replace(/事实库尚未录入价格/g, '官方没有公布价格').replace(/事实库里没有这个价格/g, '官方说明里没有这个价格').replace(/事实库/g, '官方说明') : t;
+/* 公开版：样本少于 10 条时不给区间 */
+const rangeText = (k, n) => pub() && n < 10 ? '样本少，仅供参考' : wilsonText(k, n);
+const infoText = (title, html) => `<span class="ip" tabindex="0" aria-label="${esc(title)}">i<span class="pop" role="tooltip"><b>${esc(title)}</b>${html}</span></span>`;
+/* 公开版：把“（已隐藏）”换成灰色斜纹小块，悬停提示“对外隐藏”。只处理文本节点，不碰属性 */
+function redactMarks(root) {
+  if (!pub() || !root) return;
+  const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, { acceptNode: n => n.nodeValue.includes(MASK_HIDDEN) && !/^(SCRIPT|STYLE|TEXTAREA)$/.test(n.parentNode.nodeName) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP });
+  const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(n => {
+    const frag = document.createDocumentFragment();
+    n.nodeValue.split(MASK_HIDDEN).forEach((s, i) => {
+      if (i) { const b = document.createElement('span'); b.className = 'red'; b.title = '对外隐藏'; b.setAttribute('aria-label', '对外隐藏'); frag.appendChild(b); }
+      if (s) frag.appendChild(document.createTextNode(s));
+    });
+    n.parentNode.replaceChild(frag, n);
+  });
+}
+/* 公开版“下载报告”：把报告文字装成 Word 文档（.docx 是一个 zip，这里用不压缩的方式手工打包，不依赖任何库） */
+function docxFromMarkdown(md) {
+  const X = s => String(s).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const run = (t, b) => `<w:r>${b ? '<w:rPr><w:b/></w:rPr>' : ''}<w:t xml:space="preserve">${X(t)}</w:t></w:r>`;
+  const runs = t => String(t).split(/(\*\*[^*]+\*\*)/).filter(Boolean).map(s => /^\*\*[^*]+\*\*$/.test(s) ? run(s.slice(2, -2), true) : run(s, false)).join('');
+  const para = (t, style, bullet) => `<w:p><w:pPr>${style ? `<w:pStyle w:val="${style}"/>` : ''}${bullet ? '<w:ind w:left="360" w:hanging="360"/>' : ''}</w:pPr>${bullet ? run('•\u00a0', false) : ''}${runs(t)}</w:p>`;
+  const cell = (t, head) => `<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr><w:p>${head ? run(t, true) : runs(t)}</w:p></w:tc>`;
+  const table = rows => `<w:tbl><w:tblPr><w:tblStyle w:val="TableGrid"/><w:tblW w:w="5000" w:type="pct"/><w:tblBorders>${['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map(s => `<w:${s} w:val="single" w:sz="4" w:space="0" w:color="C8C8C8"/>`).join('')}</w:tblBorders></w:tblPr><w:tblGrid>${(rows[0] || []).map(() => `<w:gridCol w:w="${Math.floor(9000 / Math.max(1, (rows[0] || []).length))}"/>`).join('')}</w:tblGrid>${rows.map((r, i) => `<w:tr>${r.map(c => cell(c, i === 0)).join('')}</w:tr>`).join('')}</w:tbl><w:p/>`;
+  const body = []; let tbl = null;
+  const flush = () => { if (tbl) { body.push(table(tbl)); tbl = null; } };
+  md.split('\n').forEach(line => {
+    const t = line.trim();
+    if (/^\|/.test(t)) { if (/^\|\s*-{2,}/.test(t) || /^\|(\s*:?-+:?\s*\|)+$/.test(t)) return; tbl = tbl || []; tbl.push(t.replace(/^\||\|$/g, '').split('|').map(s => s.trim())); return; }
+    flush();
+    if (!t) return;
+    const h = /^(#{1,3})\s+(.*)$/.exec(t); if (h) { body.push(para(h[2], 'Heading' + h[1].length)); return; }
+    const li = /^[-*]\s+(.*)$/.exec(t); if (li) { body.push(para(li[1], '', true)); return; }
+    body.push(para(t.replace(/^\d+\.\s+/, m => m), ''));
+  });
+  flush();
+  const doc = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body>${body.join('')}<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>`;
+  const styles = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:styles xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:docDefaults><w:rPrDefault><w:rPr><w:rFonts w:ascii="Calibri" w:hAnsi="Calibri" w:eastAsia="PingFang SC"/><w:sz w:val="21"/></w:rPr></w:rPrDefault><w:pPrDefault><w:pPr><w:spacing w:after="120" w:line="300" w:lineRule="auto"/></w:pPr></w:pPrDefault></w:docDefaults><w:style w:type="paragraph" w:default="1" w:styleId="Normal"><w:name w:val="Normal"/></w:style>${[1, 2, 3].map(n => `<w:style w:type="paragraph" w:styleId="Heading${n}"><w:name w:val="heading ${n}"/><w:basedOn w:val="Normal"/><w:pPr><w:keepNext/><w:spacing w:before="${[360, 300, 200][n - 1]}" w:after="120"/></w:pPr><w:rPr><w:b/><w:sz w:val="${[36, 28, 24][n - 1]}"/></w:rPr></w:style>`).join('')}<w:style w:type="table" w:styleId="TableGrid"><w:name w:val="Table Grid"/><w:tblPr><w:tblCellMar><w:left w:w="80" w:type="dxa"/><w:right w:w="80" w:type="dxa"/></w:tblCellMar></w:tblPr></w:style></w:styles>`;
+  const types = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/><Override PartName="/word/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.styles+xml"/></Types>`;
+  const rels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>`;
+  const docRels = `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`;
+  return zipStore([['[Content_Types].xml', types], ['_rels/.rels', rels], ['word/_rels/document.xml.rels', docRels], ['word/document.xml', doc], ['word/styles.xml', styles]]);
+}
+/* 不压缩的 zip 打包（store），返回 Blob */
+function zipStore(files) {
+  const enc = new TextEncoder();
+  const crcTable = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+  const crc32 = u8 => { let c = 0xFFFFFFFF; for (let i = 0; i < u8.length; i++) c = crcTable[(c ^ u8[i]) & 0xFF] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; };
+  const le = (n, w) => { const a = []; for (let i = 0; i < w; i++) a.push((n >>> (8 * i)) & 0xFF); return a; };
+  const parts = [], central = []; let off = 0;
+  files.forEach(([name, text]) => {
+    const nm = enc.encode(name), data = enc.encode(text), crc = crc32(data);
+    const head = new Uint8Array([0x50, 0x4B, 3, 4, ...le(20, 2), ...le(0x0800, 2), ...le(0, 2), ...le(0, 2), ...le(0, 2), ...le(crc, 4), ...le(data.length, 4), ...le(data.length, 4), ...le(nm.length, 2), ...le(0, 2)]);
+    parts.push(head, nm, data);
+    central.push(new Uint8Array([0x50, 0x4B, 1, 2, ...le(20, 2), ...le(20, 2), ...le(0x0800, 2), ...le(0, 2), ...le(0, 2), ...le(0, 2), ...le(crc, 4), ...le(data.length, 4), ...le(data.length, 4), ...le(nm.length, 2), ...le(0, 2), ...le(0, 2), ...le(0, 2), ...le(0, 2), ...le(0, 4), ...le(off, 4)]), nm);
+    off += head.length + nm.length + data.length;
+  });
+  const cdSize = central.reduce((s, u) => s + u.length, 0);
+  const end = new Uint8Array([0x50, 0x4B, 5, 6, ...le(0, 2), ...le(0, 2), ...le(files.length, 2), ...le(files.length, 2), ...le(cdSize, 4), ...le(off, 4), ...le(0, 2)]);
+  return new Blob([...parts, ...central, end], { type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+}
 /* 公开版概览开头的一句话：模型、问题数、回答数都取自当前数据 */
 function introSentence(runs) {
   const ok = runs.filter(r => r.status === 'SUCCESS');
@@ -1090,7 +1262,7 @@ function engAvatar(id, name) {
 /* 公开版：核心指标旁的小 i，悬停或键盘聚焦时弹出深色卡片，≤3 句话，附区间小图 */
 function infoPop(k, n, title) {
   const w = wilson(k, n);
-  if (!w) return `<span class="ip" tabindex="0" aria-label="${esc(title)}">i<span class="pop" role="tooltip"><b>${esc(title)}</b>回答还不够多，这个数字只能看方向。</span></span>`;
+  if (!w || n < 10) return `<span class="ip" tabindex="0" aria-label="${esc(title)}">i<span class="pop" role="tooltip"><b>${esc(title)}</b>样本少，仅供参考。</span></span>`;
   const lo = Math.round(w[0] * 100), hi = Math.round(w[1] * 100), p = Math.round(k / n * 100);
   return `<span class="ip" tabindex="0" aria-label="${esc(title)}">i<span class="pop" role="tooltip"><b>${esc(title)}</b>${n} 条回答算出 ${p}%。如果再问一轮，结果大概率落在 ${lo}%–${hi}% 之间。区间越窄，结论越可靠。<span class="bar"><i style="left:${lo}%;width:${Math.max(1, hi - lo)}%"></i><u style="left:${p}%"></u></span><span class="ax"><span>0%</span><span>${lo}–${hi}%</span><span>100%</span></span></span></span>`;
 }
@@ -1109,11 +1281,11 @@ function mdPublic(h) {
     closeList();
     let line = bold(raw.replace(/^((?:<[^>]+>)*)\s*\|/, '$1'));
     if (!sum && !/^\|/.test(plain)) {
-      // 第一句：在标签之外找到第一个句末标点，标注块（mark）不拆开
+      // 第一句：在标签之外找到第一个句末标点，标注块（mark）和加粗（b）都不拆开，否则会留下没闭合的标签，把下一张卡片的布局带乱
       let depth = 0, cut = -1;
       for (let i = 0; i < line.length; i++) {
         const ch = line[i];
-        if (ch === '<') { const j = line.indexOf('>', i); if (/^<\/?mark/.test(line.slice(i, j + 1))) depth += line[i + 1] === '/' ? -1 : 1; i = j; continue; }
+        if (ch === '<') { const j = line.indexOf('>', i); if (/^<\/?(?:mark|b)\b/.test(line.slice(i, j + 1))) depth += line[i + 1] === '/' ? -1 : 1; i = j; continue; }
         if (/[。！？!?]/.test(ch) && depth === 0) { cut = i + 1; break; }
       }
       if (cut > 0 && cut < line.length - 1) { sum = line.slice(0, cut); line = line.slice(cut); }
@@ -1137,7 +1309,11 @@ function makeMasker(t, extras = []) {
   const domains = (t.official_domains || []).map(d => d.replace(/^www\./, ''));
   const urlRe = /https?:\/\/[^\s"'<>（）()\[\]【】，。；、]+/g;
   const bareDom = domains.length ? new RegExp('(?<![\\w.-])(?:www\\.)?(?:' + domains.map(escRx).join('|') + ')(?![\\w-])', 'gi') : null;
-  const rules = extras.map(x => Array.isArray(x) ? [new RegExp(escRx(x[0]), 'gi'), x[1]] : [new RegExp(escRx(x), 'gi'), MASK_HIDDEN]).sort((a, b) => b[0].source.length - a[0].source.length);
+  // v5.9：每一项隐藏信息换成各自不同的占位（“（已隐藏）”后面跟一段看不见的编号）。以前所有项都换成同一个“（已隐藏）”，
+  // 口径正则里的占位会匹配到任何被隐藏的东西（食品备案号的口径会命中“CPTG”被隐藏的句子），公开版的判定因此和内部版对不上。
+  // 已经是占位的项（公开版源代码里 build_public.py 换过一遍）跳过，保证重复匿名不改变结果。
+  const rules = extras.map((x, k) => [x, k]).filter(([x]) => !String(Array.isArray(x) ? x[0] : x).includes(MASK_HIDDEN))
+    .map(([x, k]) => Array.isArray(x) ? [new RegExp(escRx(x[0]), 'gi'), x[1]] : [new RegExp(escRx(x), 'gi'), maskToken(k)]).sort((a, b) => b[0].source.length - a[0].source.length);
   const one = str => {
     let out = String(str).replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; });
     rules.forEach(([re, to]) => { out = out.replace(re, to); });   // 先于裸域名：邮箱这类含域名的整体先换掉
@@ -1245,7 +1421,8 @@ function todoCard(m) {
 }
 
 /* ---------- 案例页：给第一次来的人看的完整故事 ---------- */
-function page_case() {
+function page_case() { const h = page_case_inner(); return pub() ? h.replace(/事实底账/g, '官方口径') : h; }
+function page_case_inner() {
   if (effectivePreset() !== 'tencent') return `<header class="ph"><h1>案例：腾讯会议</h1></header><div class="state info"><h4>案例基于腾讯会议预设</h4><p>在左上角把演示产品切换为“腾讯会议（真实产品演示）”。</p></div>`;
   const qid = 'q_tm_02';
   const runs = realRuns().filter(r => r.query_id === qid && r.status === 'SUCCESS').sort((a, b) => (a.engine + a.repeat > b.engine + b.repeat ? 1 : -1));
@@ -1340,10 +1517,59 @@ const COPY_DEMO = {
     why: ['第一句直接回答“可以”，被单独引用时也不会断章取义', '新旧名称并列（元宝纪要 / 原 AI 纪要），覆盖用户和模型两种叫法', '把“元宝纪要”和“AI 小助手”分开说，针对的正是模型最常见的混淆', '写明版本号和适用版本，让说法可以被核对', '写明“限时”和核对日期，避免它过期后变成新的错误来源']
   }
 };
+/* v5.9 公开版口径对照：一个“说错”数字（与概览、报告同一口径）；每条口径一行，各模型一段小色条，整行点开对照官方原文与 AI 原句 */
+function gapPublic(runs, fr) {
+  const engName = id => (ENG(id) || { name: id }).name;
+  const evs = runs.filter(r => r.status === 'SUCCESS').map(r => ({ r, e: evaluate(r) }));
+  const W = wrongStat(evs);
+  const shown = fr.filter(f => f.n > 0).sort((a, b) => (b.badN - a.badN) || (b.missN - a.missN) || (b.n - a.n));
+  const quiet = fr.length - shown.length;
+  const engs = [...new Set(shown.flatMap(f => f.engines.map(x => x.e)))].sort((a, b) => S.engines.findIndex(e => e.id === a) - S.engines.findIndex(e => e.id === b));
+  const refOf = f => f.kind === '能力' ? f.key : f.key;
+  const strip = f => `<span class="mstrip" aria-hidden="true">${engs.map(id => {
+    const l = f.rows.filter(y => y.x.r.engine === id); if (!l.length) return `<span class="mdl"><span class="mb empty"></span>${esc(engName(id).replace(/（API）/, ''))}</span>`;
+    const ok = l.filter(y => y.s === 'ok').length, bad = l.filter(y => y.s === 'bad').length, miss = l.filter(y => y.s === 'miss').length;
+    return `<span class="mdl" data-tip="${esc(`${engName(id).replace(/（API）/, '')}：一致 ${ok}${bad ? `，说错 ${bad}` : ''}${miss ? `，该说没说 ${miss}` : ''}（共 ${l.length} 次）`)}"><span class="mb">${ok ? `<i class="a" style="flex-grow:${ok}"></i>` : ''}${miss ? `<i class="m" style="flex-grow:${miss}"></i>` : ''}${bad ? `<i class="c" style="flex-grow:${bad}"></i>` : ''}</span>${esc(engName(id).replace(/（API）/, ''))}</span>`;
+  }).join('')}</span>`;
+  const quote = f => { const y = f.rows.find(z => z.s === 'bad') || f.rows.find(z => z.s === 'miss') || f.rows.find(z => z.s === 'ok'); if (!y) return null;
+    const it = y.s === 'ok' ? y.x.e.goods.find(g => g.claim === f.key || g.claim === 'limit:' + f.key.replace(/^prohibited:/, '')) : y.x.e.issues.find(i => i.claim === f.key);
+    return { y, s: y.s, text: it && it.clause ? plainQ(String(it.clause)).slice(0, 160) : '' }; };
+  const SN = { ok: '一致', bad: '说错', miss: '该说没说' };
+  return `
+  <header class="ph"><h1>官方口径和 AI 回答差多少</h1>
+    <p class="lede">把官方确认的每一条口径，和各模型回答里的对应说法逐条比对：一致、说错，还是该说没说。点一行可以对照官方原文和 AI 原句。</p></header>
+  <div class="kpis">
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>说错的回答${infoPop(W.n, W.mentioned, '这个数字有多准？')}</div><div class="kv">${pct(W.n, W.mentioned)}<small>${W.n} / ${W.mentioned}</small></div><div class="ks">至少有一处和官方说明冲突${W.typeText ? `：${esc(W.typeText)}` : ''}。与概览、体检报告是同一个数。</div></div>
+    <div class="kpi"><div class="kt"><i></i>被 AI 提到的口径</div><div class="kv">${shown.length}<small>/ ${fr.length} 条</small></div><div class="ks">每条都附官方原文　${factBtn('all', '全部口径')}</div></div>
+  </div>
+  <h2>逐条口径</h2>
+  <div class="glg small muted"><span><i class="a"></i>一致</span>${shown.some(f => f.missN) ? '<span><i class="m"></i>该说没说</span>' : ''}${shown.some(f => f.badN) ? '<span><i class="c"></i>说错</span>' : ''}<span>每段色条是一个模型，悬停看次数</span></div>
+  <div class="scroll"><table class="tbl gtab">
+    <thead><tr><th>官方口径</th><th class="num">一致</th>${shown.some(f => f.badN) ? '<th class="num">说错</th>' : ''}${shown.some(f => f.missN) ? '<th class="num">该说没说</th>' : ''}<th>各模型</th><th aria-hidden="true"></th></tr></thead>
+    <tbody>${shown.map(f => { const q = quote(f); const cols = 3 + (shown.some(x => x.badN) ? 1 : 0) + (shown.some(x => x.missN) ? 1 : 0) + 1; return `<tr class="rxh" data-act="gap-toggle" tabindex="0" aria-expanded="false">
+      <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${esc(f.kind === '能力' ? (factEntry(f.key) || {}).cat || '' : '不应出现的说法')}　${f.n < 10 ? '样本少，仅供参考' : `偏差 ${pct(f.dev, f.n)}，可能范围 ${wilsonText(f.dev, f.n)}`}</div></td>
+      <td class="num">${f.okN}</td>${shown.some(x => x.badN) ? `<td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td>` : ''}${shown.some(x => x.missN) ? `<td class="num">${f.missN}</td>` : ''}
+      <td>${strip(f)}</td><td class="chevc"><span class="chev"></span></td></tr>
+      <tr class="rxb"><td colspan="${cols}"><div class="rxw"><div><div class="cmp">
+        <div><small>官方原文</small>${esc(((factEntry(f.key) || {}).x || {}).source_quote || f.statement)}<div>${factBtn(f.key, '看出处')}</div></div>
+        <div><small>${q ? `${esc(engName(q.y.x.r.engine).replace(/（API）/, ''))} 原句 · ${SN[q.s]}` : 'AI 原句'}</small>${q && q.text ? `“${esc(q.text)}”` : '<span class="muted">没有 AI 提到这一点</span>'}${q ? `<div><button class="linkbtn small" data-act="open-run" data-q="${q.y.x.r.query_id}">看整条回答 ›</button></div>` : ''}</div>
+      </div></div></div></td></tr>`; }).join('')}</tbody>
+  </table></div>
+  ${quiet ? `<p class="small muted" style="margin-top:10px">另有 ${quiet} 条口径，这一轮没有 AI 提到。</p>` : ''}
+  ${fr.some(f => f.dev > 0) ? `<h2>偏差背后的逻辑</h2>
+  <p class="prose muted">下面是对偏差原因的推断，依据是官方页面的结构和第三方稿件的说法，不是定论。</p>
+  ${fr.filter(f => f.dev > 0).sort((a, b) => (b.badN - a.badN) || (b.dev - a.dev)).map(f => `<div class="editor">
+    <div class="spread"><b>${esc(f.statement)}</b><span class="tag ${f.badN ? 'bad' : 'warn'}">${f.badN ? `说错 ${f.badN}` : `该说没说 ${f.missN}`} / ${f.n}</span></div>
+    <p style="margin-top:8px">${esc(f.cause || '暂无推断。常见原因有三类：官方页面没有一句可以直接引用的话；说法写在新闻稿里而不是功能页；第三方稿件里流传着旧说法。')}</p>
+    ${f.causeLinks.length ? `<p class="small muted">参考：${f.causeLinks.map(u => extLink(u, THIRD_PARTY[u] || hostOf(u))).join('、')}</p>` : ''}
+    <p class="small muted">验证方法：官方补一句可直接引用的说明后，用开启联网的渠道复测这条口径，看偏差是否下降。</p>
+  </div>`).join('')}` : ''}`;
+}
 function page_gap() {
   const runs = realRuns();
   if (isFictional()) return `<header class="ph"><h1>口径对照</h1></header><div class="state info"><h4>当前是${pub() ? '示例品牌' : '虚构探针产品'}</h4><p>口径对照需要真实产品的官网口径。在左上角切换到“腾讯会议（真实产品演示）”。</p></div>`;
   const fr = factRows(runs);
+  if (pub()) return gapPublic(runs, fr) + gapCopyDemo();
   const rel = fr.reduce((s, f) => s + f.n, 0), dev = fr.reduce((s, f) => s + f.dev, 0), bad = fr.reduce((s, f) => s + f.badN, 0);
   const engName = id => (ENG(id) || { name: id }).name;
   // 统计以“回答”为单位：同一条回答里的多条判断不独立，按判断次数算区间会偏乐观
@@ -1383,7 +1609,11 @@ function page_gap() {
     <div class="row" style="margin-top:6px">${COPY_DEMO[f.key] ? `<a class="btn sm primary" href="#copy-${f.key}">查看示例文案</a>` : `<button class="btn sm" disabled title="开通服务后可用">生成可引用的官方说明</button><span class="tag">开通服务后可用</span>`}</div>
   </div>`).join('') || '<p class="muted">没有发现偏差。</p>'}
 
-  <h2>示例：一条可以被直接引用的官方说明</h2>
+  ${gapCopyDemo()}`;
+}
+function gapCopyDemo() {
+  if (pub() && !Object.keys(COPY_DEMO).some(k => S.truth.capabilities.some(c => c.claim_id === k))) return '';
+  return `<h2>示例：一条可以被直接引用的官方说明</h2>
   ${Object.entries(COPY_DEMO).map(([k, c]) => `<div id="copy-${k}" class="editor" style="background:var(--surface)">
     <div class="small muted">针对口径：${esc((S.truth.capabilities.find(x => x.claim_id === k) || {}).statement || k)}</div>
     <h3 style="margin-top:8px">${esc(c.title)}</h3>
@@ -1630,7 +1860,13 @@ function reportData() {
   const retryNote = retriedNote(realRuns());
   const extras = {};
   evs.forEach(x => (x.e.extras || []).forEach(s => { const key = s.slice(0, 40); if (!extras[key]) extras[key] = { s, n: 0, engines: new Set() }; extras[key].n++; extras[key].engines.add(x.r.engine); }));
-  return { T, evs, list, qGroups, coverage, retryNote, unresolved: T.unresolved || [], nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
+  const W = wrongStat(evs);
+  if (pub()) {
+    // 公开版：分组汇总按统一的“说错”口径算
+    Object.values(byGroup).forEach(b => { b.dev = 0; });
+    evs.forEach(x => { const q = Q(x.r.query_id), name = q && groupOfQuery(q); if (name && W.runs.has(x.r.run_id)) byGroup[name].dev++; });
+  }
+  return { T, evs, list, qGroups, coverage, retryNote, W, unresolved: T.unresolved || [], nA: evs.length, dA: pub() ? W.n : withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
     extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length,
     // 口径确认状态：报告里逐条列出哪些口径已经过客户确认
     factStatus: FACT_LISTS.filter(f => f.list !== 'offers').flatMap(({ list, kind }) => (T[list] || []).map(x => ({ kind, title: factItemTitle(list, x), cat: catOf(list, x), reviewed: isConfirmed(x), client: isClientConfirmed(x), by: x.client_confirmed_by || '', at: x.client_confirmed_at || '', inEval: list !== 'capabilities' || x.status === 'VERIFIED' }))),
@@ -1640,15 +1876,21 @@ function reportMarkdown(d) {
   const engName = id => (ENG(id) || { name: id }).name;
   const L = [];
   L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条${pub() ? (d.clientOk ? `（客户确认 ${d.clientOk} 条）` : '') : `（客户已确认 ${d.clientOk} 条）`}　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(e => engName(e) + engineNote(d.coverage, e)).join('、')}`, '');
-  L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
-  if (d.qGroups.length) {
+  if (pub()) L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条说错（${pct(d.dA, d.nA)}）：至少有一处和官方说明冲突${d.W.typeText ? `（${d.W.typeText}）` : ''}。${d.W.unver.size ? `另有 ${d.W.unver.size} 条说了官方没公布的价格，无法核对，不算说错。` : ''}${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : ''}`, '', '“说错”的定义：一条回答里只要有一处说法和官方说明冲突，就算说错一条；该说没说、无法核对的价格不算说错。', '');
+  else L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
+  if (d.qGroups.length && pub()) {
+    const bad = d.qGroups.filter(g => g.dev || g.over), fine = d.qGroups.filter(g => !(g.dev || g.over));
+    L.push('## 按问题分组', '');
+    if (bad.length) { L.push('| 分组 | 回答 | 说错 | 比例 |', '| --- | ---: | ---: | --- |'); bad.forEach(g => L.push(`| ${g.name} | ${g.n} | ${g.dev} | ${pct(g.dev, g.n)}${g.n < 10 ? '（样本少，仅供参考）' : `（可能范围 ${wilsonText(g.dev, g.n)}）`} |`)); L.push(''); }
+    if (fine.length) L.push(`${fine.map(g => g.name).join('、')} ${fine.length} 类问题里，没有发现说错的回答。`, '');
+  } else if (d.qGroups.length) {
     L.push('## 按问题分组汇总', '', '同一组问题的回答合在一起统计，样本比单条发现大，区间更窄。', '', '| 分组 | 问题数 | 提到品牌的回答 | 至少一处不一致 | 比例（95% 区间） | 可信度 | 合规风险 |', '| --- | ---: | ---: | ---: | --- | --- | ---: |');
     d.qGroups.forEach(g => L.push(`| ${g.name} | ${g.qids.size} | ${g.n} | ${g.dev} | ${pct(g.dev, g.n)}（${wilsonText(g.dev, g.n)}） | ${cred(g.dev, g.n, false).label} | ${g.over} |`));
     L.push('');
   }
-  L.push('## 采集完整性', '', `每题每个模型应有 ${d.coverage.repeats} 次回答。${d.coverage.complete ? '本批数据完整。' : `本批缺 ${d.coverage.missing} 条，缺数据的模型在分模型数字旁有注明。`}`, '', `| 模型 | ${d.coverage.groups.join(' | ')} | 合计 |`, `| --- | ${d.coverage.groups.map(() => '---:').join(' | ')} | ---: |`);
-  d.coverage.engines.forEach(e => L.push(`| ${engName(e)} | ${d.coverage.groups.map(g => { const c = d.coverage.cells[e][g]; return c.missing ? `**${c.ok}/${c.expected}（缺 ${c.missing}）**` : `${c.ok}/${c.expected}`; }).join(' | ')} | ${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected} |`));
-  L.push('');
+  if (!(pub() && d.coverage.complete)) L.push('## 采集完整性', '', `每题每个模型应有 ${d.coverage.repeats} 次回答。${d.coverage.complete ? '本批数据完整。' : `本批缺 ${d.coverage.missing} 条，缺数据的模型在分模型数字旁有注明。`}`, '', `| 模型 | ${d.coverage.groups.join(' | ')} | 合计 |`, `| --- | ${d.coverage.groups.map(() => '---:').join(' | ')} | ---: |`);
+  if (!(pub() && d.coverage.complete)) { d.coverage.engines.forEach(e => L.push(`| ${engName(e)} | ${d.coverage.groups.map(g => { const c = d.coverage.cells[e][g]; return c.missing ? `**${c.ok}/${c.expected}（缺 ${c.missing}）**` : `${c.ok}/${c.expected}`; }).join(' | ')} | ${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected} |`));
+  L.push(''); }
   L.push('## 最需要关注的三条', '');
   d.list.slice(0, 3).forEach((g, i) => L.push(`${i + 1}. 【${TYPE_NAME[g.type] || g.label}】${g.title}（${g.k} / ${g.n} 条回答）`));
   L.push('', '## 逐条发现', '');
@@ -1683,6 +1925,18 @@ function reportMarkdown(d) {
   L.push('## 方法与局限', '', '- 口径只来自官方页面，每条附原文或链接；标注“待复核”的口径需要品牌方确认。', '- 标注“客户已确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考，待客户确认后生效。', ...(d.retryNote ? [`- ${d.retryNote}`] : []), '- 统计以回答为单位，区间为 Wilson 95% 区间；样本少时区间很宽，只能看方向。', '- 采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。', '- 判定由规则完成，所有发现都应对照原文复核。合规风险识别用的疗效词表是规则 v1，尚未经懂广告法的人审核；只在归属给品牌的小句里找疗效词，否定、转述争议、问句、竞品的说法不算。', '- 本报告只列出问题和修改方向，不包含代写或代发内容。');
   return L.join('\n');
 }
+/* v5.9 公开版：分组表只列有说错的分组，其余合成一句 */
+function reportGroupsPublic(d) {
+  if (!d.qGroups.length) return '';
+  const bad = d.qGroups.filter(g => g.dev || g.over), fine = d.qGroups.filter(g => !(g.dev || g.over));
+  const fineText = fine.length ? `${fine.map(g => g.name).join('、')} ${fine.length} 类问题里，没有发现说错的回答。` : '';
+  if (!bad.length) return `<h2>按问题分组</h2><p class="prose">${esc(d.qGroups.map(g => g.name).join('、'))} ${d.qGroups.length} 类问题里，都没有发现说错的回答。</p>`;
+  return `<h2>按问题分组</h2>
+  <div class="scroll"><table class="tbl"><thead><tr><th>有说错的分组</th><th class="num">回答</th><th class="num">说错</th><th>比例</th>${d.over ? '<th class="num">替品牌宣称疗效</th>' : ''}</tr></thead><tbody>
+    ${bad.map(g => `<tr><td>${esc(g.name)}</td><td class="num">${g.n}</td><td class="num">${g.dev}</td><td>${pct(g.dev, g.n)}　<span class="small muted">${g.n < 10 ? '样本少，仅供参考' : '可能范围 ' + wilsonText(g.dev, g.n)}</span></td>${d.over ? `<td class="num">${g.over}</td>` : ''}</tr>`).join('')}
+  </tbody></table></div>
+  ${fineText ? `<p class="small muted" style="margin-top:10px">${esc(fineText)}</p>` : ''}`;
+}
 function page_report() {
   if (isFictional()) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>当前是${pub() ? '示例品牌' : '虚构探针产品'}</h4><p>体检报告需要真实产品的官网口径。在左上角切换到真实产品。</p></div>`;
   const d = reportData();
@@ -1692,24 +1946,25 @@ function page_report() {
   <header class="ph"><h1>${esc(d.T.entity_name)}：官网口径体检报告</h1>
     <p class="lede">检查口径 ${d.facts} 条${pub() ? (d.clientOk ? `（客户确认 ${d.clientOk} 条）` : '') : `（客户已确认 ${d.clientOk} 条）`}，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
   <div class="kpis">
-    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答${pub() ? infoPop(d.dA, d.nA, '这个数字有多准？') : hq('提到品牌的回答里，至少有一处说法和官网口径不一致的比例。')}</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div>${axis(d.dA, d.nA)}<div class="ks">${pub() ? `提到品牌的回答里，至少有一处和官网说法不一致　${credTag(cred(d.dA, d.nA, false))}` : `95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}`}</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>${pub() ? '说错的回答' : '与官网不一致的回答'}${pub() ? infoPop(d.dA, d.nA, '这个数字有多准？') : hq('提到品牌的回答里，至少有一处说法和官网口径不一致的比例。')}</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div>${axis(d.dA, d.nA)}<div class="ks">${pub() ? `至少有一处和官方说明冲突${d.W.typeText ? `：${esc(d.W.typeText)}` : ''}` : `95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}`}</div></div>
+    ${pub() && d.W.unver.size ? `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>无法核对的价格</div><div class="kv">${d.W.unver.size}<small>条回答</small></div><div class="ks">说了官方没公布的价格，不算说错，也不算说对</div></div>` : ''}
     ${pub() && !d.over ? '' : `<div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险${hq('AI 替品牌宣称疗效的回答数。由规则识别，每条都应对照原文复核。')}</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>`}
     ${pub() && !d.list.length ? '' : `<div class="kpi"><div class="kt"><i></i>发现</div><div class="kv">${d.list.length}<small>类</small></div><div class="ks">先按严重度，再按出现次数排序</div></div>`}
     ${pub() && !(d.unresolved.length + d.extras.length) ? '' : `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>建议补充的口径</div><div class="kv">${d.unresolved.length + d.extras.length}</div><div class="ks">官网没说清，模型各说各话</div></div>`}
   </div>
-  <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。</p><button class="btn primary" data-act="report-md">导出 Markdown</button></div></div>
+  <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${pub() ? `${d.nA} 条提到${esc(d.T.entity_name)}的回答里，${d.dA} 条说错：至少有一处和官方说明冲突。` : `${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。`}</p>${pub() ? '<button class="btn primary" data-act="report-doc">下载报告</button>' : '<button class="btn primary" data-act="report-md">导出 Markdown</button>'}</div></div>
 
-  ${d.qGroups.length ? `<h2>按问题分组汇总</h2>
+  ${pub() ? reportGroupsPublic(d) : d.qGroups.length ? `<h2>按问题分组汇总</h2>
   <p class="prose muted">同一组问题的回答合在一起统计。分组的样本比单条发现大，区间更窄，适合先看哪一类问题最容易出错；单条发现的样本小，多数只能看方向。</p>
   <div class="scroll"><table class="tbl"><thead><tr><th>分组</th><th class="num">问题</th><th class="num">回答</th><th class="num">至少一处不一致</th><th>${pub() ? '比例与可能范围' : '比例与 95% 区间'}</th><th>可信度</th>${pub() && !d.over ? '' : '<th class="num">合规风险</th>'}</tr></thead><tbody>
     ${d.qGroups.map(g => `<tr><td>${esc(g.name)}</td><td class="num">${g.qids.size}</td><td class="num">${g.n}</td><td class="num">${g.dev}</td><td>${pct(g.dev, g.n)}　<span class="small muted">${wilsonText(g.dev, g.n)}</span></td><td>${credTag(cred(g.dev, g.n, false))}</td>${pub() && !d.over ? '' : `<td class="num">${g.over}</td>`}</tr>`).join('')}
   </tbody></table></div>` : ''}
 
-  <h2>采集完整性</h2>
+  ${pub() && d.coverage.complete ? '' : `<h2>采集完整性</h2>
   <p class="prose muted">模型 × 分组的成功次数。每题每个模型应有 ${d.coverage.repeats} 次回答；${d.coverage.complete ? '本批数据完整。' : `本批缺 ${d.coverage.missing} 条，缺数据的格子标红，分模型的数字旁也会注明。`}</p>
   <div class="scroll"><table class="tbl"><thead><tr><th>模型</th>${d.coverage.groups.map(g => `<th class="num">${esc(g)}</th>`).join('')}<th class="num">合计</th></tr></thead><tbody>
     ${d.coverage.engines.map(e => `<tr><td>${esc(engName(e))}</td>${d.coverage.groups.map(g => { const c = d.coverage.cells[e][g]; return `<td class="num">${c.missing ? `<span class="tag bad">${c.ok}/${c.expected}　缺 ${c.missing}</span>` : `${c.ok}/${c.expected}`}</td>`; }).join('')}<td class="num">${d.coverage.byEngine[e].missing ? `<span class="tag bad">${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected}</span>` : `${d.coverage.byEngine[e].ok}/${d.coverage.byEngine[e].expected}`}</td></tr>`).join('')}
-  </tbody></table></div>
+  </tbody></table></div>`}
 
   <h2>逐条发现</h2>
   <p class="prose muted">点一条展开官网口径、AI 原句和修改方向。先按严重度，再按出现次数排序。</p>
@@ -1717,10 +1972,10 @@ function page_report() {
     <button class="fh" data-act="fd-toggle" aria-expanded="${i === 0}"><span class="i">${String(i + 1).padStart(2, '0')}</span><b>${esc(g.title)}</b><span class="tags"><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span><span class="chev"></span></button>
     <div class="fb"><div><div class="fbi">
       <div class="cmp">
-        <div><small>官网口径${g.pending && !pub() ? '　<span class="tag warn">待复核</span>' : ''}${g.clientText ? (g.clientOk ? `　<span class="tag acc" title="${esc(g.clientText)}">${pub() ? '客户确认' : '客户已确认'}</span>` : (pub() ? '' : '　<span class="tag">未经客户确认</span>')) : ''}</small>${esc(g.official)}<div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div></div>
+        <div><small>${pub() ? '官方口径' : '官网口径'}${g.pending && !pub() ? '　<span class="tag warn">待复核</span>' : ''}${g.clientText ? (g.clientOk ? `　<span class="tag acc" title="${esc(g.clientText)}">${pub() ? '客户确认' : '客户已确认'}</span>` : (pub() ? '' : '　<span class="tag">未经客户确认</span>')) : ''}</small>${esc(g.official)}<div>${pub() && factEntry(g.claim) ? factBtn(g.claim) : `${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}`}</div></div>
         <div><small>AI 原句</small>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(plainQ(q.q))}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
       </div>
-      <p class="small muted" style="margin:0">出现比例 ${pct(g.k, g.n)}，${pub() ? '再问一轮大概率落在' : '95% 区间'} ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
+      <p class="small muted" style="margin:0">出现比例 ${pct(g.k, g.n)}，${pub() ? (g.n < 10 ? '' : '再问一轮大概率落在 ') + rangeText(g.k, g.n) : '95% 区间 ' + wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
       ${g.cause ? `<p class="small" style="margin:0">推断：${esc(g.cause.replace(/^推断：/, ''))}</p>` : ''}
       <p class="small" style="margin:0"><b>修改方向</b>　${esc((nextStep(g.type) || ['', '查看原文后决定'])[1])}</p>
     </div></div></div>
@@ -1744,14 +1999,14 @@ function page_report() {
     ${d.factStatus.map(f => `<tr><td class="wide">${esc(f.title)}${f.inEval ? '' : '<span class="small muted">　不参与评测</span>'}</td><td class="small">${esc(f.cat)}</td><td>${f.reviewed ? '<span class="tag ok">已确认</span>' : '<span class="tag warn">待复核</span>'}</td><td>${f.client ? esc(f.by) : '<span class="muted">未确认</span>'}</td><td class="small">${f.client ? esc(f.at) : '—'}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">无</td></tr>'}
   </tbody></table></div>`}
 
-  <h2>方法与局限</h2>
+  ${pub() ? `<p class="small muted" style="margin-top:28px">方法与局限${infoText('方法与局限', `<span style="display:block">口径只来自官方页面，每条附原文或来源。</span><span style="display:block">“说错”：一条回答里只要有一处和官方说明冲突，就算说错一条；该说没说、说了官方没公布的价格，不算说错。</span><span style="display:block">统计以回答为单位；样本少于 10 条时不给范围。</span><span style="display:block">采集为官方 API、未开联网，不代表各家 App 里的回答。判定由规则完成，每条发现都能回到原文核对。</span>`)}</p>` : `<h2>方法与局限</h2>
   <div class="prose"><ul>
     ${pub() ? `<li>口径只来自官方页面，每条附原文或链接。</li>${d.clientOk ? '<li>标注“客户确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考。</li>' : ''}` : `<li>口径只来自官方页面；标注“待复核”的口径需要品牌方确认。</li>
     <li>标注“客户已确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考，待客户确认后生效。</li>`}${d.retryNote ? `<li>${esc(d.retryNote)}</li>` : ''}
     <li>${pub() ? '统计以回答为单位；“可能范围”指再问一轮时结果大概率落在的区间（95% 置信区间）。' : '统计以回答为单位，区间为 Wilson 95% 区间。'}</li>
     <li>采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。</li>
     ${pub() ? '<li>判定由规则完成，所有发现都应对照原文复核。合规风险识别用的疗效词表尚未经懂广告法的人审核。</li>' : '<li>判定由规则完成，所有发现都应对照原文复核；可以在「大模型回答记录」里逐条纠正。合规风险识别用的疗效词表是规则 v2（v5.3 按 R3 抽检修过否定、正反问、转述、品牌用语四类误判），尚未经懂广告法的人审核。</li>'}
-  </ul></div>`;
+  </ul></div>`}`;
 }
 
 /* =========================================================
@@ -1866,7 +2121,7 @@ function page_reasons() {
     const card = (g, ci) => { const a = ACTION_MAP[g.cat], k = key(g); return `<div class="rc${ci === 2 ? ' done' : ''}">
       <q>${esc(plainQ(g.quotes[0].quote))}</q>
       <div class="f"><span class="tag ${g.polarity === '反面' ? 'bad' : ''}">${g.polarity}</span><span class="tag">${g.cat} ${g.catName}</span><span class="tag ${g.verifiability === '可核对事实' ? 'acc' : ''}">${g.verifiability}</span><span class="small muted">${g.runs.length} 次 · ${g.engines.length} 个模型</span></div>
-      <div class="small muted" style="margin-top:6px">第一步核实：${esc(a.verify)}<br>通道：${esc(a.lanes)}</div>
+      <div class="small muted" style="margin-top:6px">第一步核实：${esc(pub() ? a.verify.replace('事实底账', '官方说明') : a.verify)}<br>通道：${esc(a.lanes)}</div>
       <div class="small" style="margin-top:4px">${esc(a.action)}</div>
       <div class="f" style="margin-top:6px">${g.quotes.slice(0, 2).map(q => `<button class="linkbtn small" data-act="open-run" data-q="${(allRuns().find(r => r.run_id === q.run_id) || {}).query_id || ''}">${esc(engName(q.engine))}原文</button>`).join('')}${ci < 2 ? `<button class="go" data-act="act-next" data-key="${esc(k)}">${ci === 0 ? '开始核实 ›' : '标记完成 ›'}</button>` : `<button class="go" data-act="act-reset" data-key="${esc(k)}">退回待核实</button>`}</div>
     </div>`; };
@@ -1929,6 +2184,7 @@ async function extractReasonsAll() {
 
 /* ---------- 迭代日志 ---------- */
 const ITERATIONS = [
+  { v: 'v5.9', date: '2026-09-26', title: '公开版交互走查修正', trigger: '对客网站逐页走查：三个页面的“说错”数字对不上（2 / 7 / 2+2）；认知差异的例句和口径无关；回答记录说“悬停可以看判断依据”却没有标注；表格仍是给自己看的写法', changed: '只在 PUBLIC_BUILD 生效：统一“说错”定义（一条回答里只要有一处说反官方口径、与官方说明冲突、过期、错误归属、定位偏差或替品牌宣称疗效，就算说错一条；该说没说、无法核对的价格不算），概览、体检报告、口径对照引用同一个数；概览用三段构成条（说对且有依据 / 没有可核对的说法 / 说错）替代核心指标和两张 100% 卡片；报告按钮改为“下载报告”（Word），分组表只列有说错的分组，方法说明收进小 i；口径对照每模型一段色条、整行点开对照官方原文与 AI 原句，样本少于 10 条不给区间；用户提问只显示有问题的阶段、按钮带数量、整行可点；回答记录逐句标色（说对蓝、无法核对米、说错陶土），悬停或键盘聚焦弹出依据小卡，同一模型两次回答合成一张卡并可切换，问题列表加图例；认知差异例句按与口径原文的重合度挑选，找不到写“没有 AI 提到这一点”，全为 0 的列不显示、有说错的行排前；“（已隐藏）”换成灰色斜纹小块；事实底账不单列，从各页“官方原文”以右侧抽屉打开', why: '同一个问题在三个页面给出三个数，客户会怀疑整个评测；例句和口径对不上，看起来像评测出错', dropped: '把 5 条“价格未核实”算进说错（官方本来就没公布价格，AI 说的价格无从判断对错，不能叫说错）', evidence: '直销预设：概览、报告、口径对照都是 2 / 240；腾讯会议预设都是 3 / 72；内部版三个预设的数字与改动前一致，回归测试 44/44', lesson: '匿名占位也会参与判定：所有被隐藏的信息共用一个“（已隐藏）”时，口径正则里的占位会命中任何被隐藏的内容，公开版“食品经营备案”一条因此从 1 次说对变成 70 次。现在每项隐藏信息用各自的占位' },
   { v: 'v5.7', date: '2026-09-26', title: '公开版对客口径清理', trigger: 'echorank.markjcai.com 是对客网站：迭代过程、版本号、内部术语不该出现；没有数据的模块不该显示', changed: '只在 PUBLIC_BUILD（公开版）生效，内部版不变：“本次检查 · 批次”改成一句人话；侧栏版本标签、讲解模式、保存位置、数据导入 / 评测与边界 / 迭代日志 / 学习手册全部隐藏；事实底账改为只读展示，去掉“已确认”横幅和导入面板；核心指标旁加小 i（深色卡片 + 区间小图）替代“北极星”说法；计数为 0 的行、模块、页面整块隐藏（信源溯源 0 条时侧栏也不出现）；AI 回答卡改为字母头像 + 模型名 + 日期，回答按 Markdown 渲染，第一句做摘要，底部只显示非零计数；报告与 Markdown 导出去掉“待复核 / 已确认”内部状态。', kept: '规则、数据、评测结果不变；内部版所有编辑功能保持原样。' },
   { v: 'v5.6', date: '2026-09-26', title: 'to B 交付：客户确认字段、公开版隐藏自助入口', trigger: '产品定位调整为 to B 服务交付，不做 SaaS 自助：报告要能说清哪些口径客户认过；公开网站不该有自助采集入口', changed: '事实底账每条口径增加“客户确认人、确认日期”两个字段，可逐条填写或一键记为今日确认；报告页和 Markdown 导出新增“口径确认状态”表，逐条发现旁标“客户已确认 / 未经客户确认”；公开版（build_public.py 生成、或按公开版预览）不显示「分析一个产品」', why: '交付场景里裁判是客户认可的口径，不是我们自己录的口径；自助入口和 to B 定位冲突', dropped: '让客户确认自动开新版本（确认是状态，不是内容修改）；把入口整段删掉（内部仍用它做采集）', evidence: '事实底账页、体检报告页、dist/index.html 侧栏', lesson: '“谁确认了”要和“确认了什么”一样写进报告，客户才有依据签收' },
   { v: 'v1', date: '2026-09-23', title: '事实审计最小版', trigger: '交接文档要求做一个能判断“AI 说得对不对”的平台', changed: '产品事实库（带生效期）、冻结问题集、确定性评测五类错误、认知差异、内容实验与可比性检查、学习手册', why: '评测的正确答案必须由人确认，否则评测器在拿自己编的答案判别人', dropped: '综合分；LLM 评审（没有标注集之前不做）', evidence: '虚构产品 NovaNote 的 48 条样本回答', lesson: '先把闭环跑通，再谈真实数据' },
@@ -2634,7 +2890,7 @@ function suggestAction(r, issueCount) {
   if (r.status === 'stale' && r.cls.official) return '更新这个官方页面，并在页面上写明更新日期';
   if (r.status === 'stale') return '联系发布方更正；同时发布一页带日期的官方说明，供模型引用';
   if (r.status === 'official') return issueCount ? '官方页被引用但仍出错，检查页面表述是否清楚' : '保持更新';
-  return issueCount ? '核对这个页面的内容是否与事实库一致' : '—';
+  return issueCount ? (pub() ? '核对这个页面的内容是否与官方说明一致' : '核对这个页面的内容是否与事实库一致') : '—';
 }
 function sourceIndex(runs) {
   const map = {};
@@ -2928,7 +3184,7 @@ function runCellInfo(run) {
   if (run.status !== 'SUCCESS') return { cls: 't', tip: '未成功' };
   const e = evaluate(run);
   const fo = finalOf(run, e);
-  const cls = fo.pending ? 'm' : fo.v ? 'v' : (fo.corrected && fo.final === 'none') ? 'n' : e.mentioned ? 'm' : 'n';
+  const cls = fo.pending ? 'm' : fo.v ? 'v' : (fo.corrected && fo.final === 'none') ? 'n' : pub() && isWrongRun(run, e) ? 'f' : e.mentioned ? 'm' : 'n';
   const tip = fo.corrected ? '人工纠正为：' + FINAL_LABEL[fo.final] : e.verifiable ? '说对且有依据' : e.mentioned ? (e.issues.length ? '提到了，但有问题：' + e.issues.map(i => i.label).join('、') : '提到了，但没有可核对的说法') : '没有提到';
   return { cls, tip };
 }
@@ -2953,6 +3209,27 @@ function captureMixText(m) {
   return Object.entries(m.capture).map(([k, v]) => `${names[k] || k} ${v}`).join('，') || '—';
 }
 
+/* v5.9 公开版概览：一条三段构成条，把提到品牌的回答分成“说对且有依据 / 没有可核对的说法 / 说错”三类，三类加起来等于总数 */
+function overviewComp(m, W) {
+  const n = W.mentioned; if (!n) return '';
+  const ok = m.evs.filter(x => x.e.valid && x.e.mentioned && finalOf(x.r, x.e).v && !W.runs.has(x.r.run_id)).length;
+  const bad = W.n, mid = n - ok - bad;
+  const p = k => Math.round(k / n * 100);
+  const seg = (cls, k, label) => k ? `<button class="cseg ${cls}" style="flex-grow:${k}" data-k="${cls}" aria-label="${label} ${k} 条，${p(k)}%"><span>${p(k) >= 8 ? `${label} ${p(k)}%` : ''}</span></button>` : '';
+  const engN = new Set(m.evs.map(x => x.r.engine)).size;
+  const allMention = m.mention === m.n, stable = m.pairsN && m.stable === m.pairsN;
+  const one = [allMention ? `${engN} 个模型每次都提到了品牌` : `${m.mention} / ${m.n} 条回答提到了品牌`, m.pairsN ? (stable ? '同一问题问两次，结论都一致' : `同一问题问两次，${m.stable} / ${m.pairsN} 组结论一致`) : ''].filter(Boolean).join('，') + '。';
+  return `<div class="hero comp">
+    <div class="spread"><h3 style="margin:0">${n} 条提到品牌的回答，分成三类${infoPop(ok, n, '“说对且有依据”这个数字有多准？')}</h3></div>
+    <div class="cbar" role="group" aria-label="回答构成">${seg('a', ok, '说对且有依据')}${seg('b', mid, '没有可核对的说法')}${seg('c', bad, '说错')}</div>
+    <div class="clg">
+      <div class="lg" data-k="a"><b>${ok} 条<small>${p(ok)}%</small></b><span><i class="a"></i>说对且有依据：说法能在官方说明里找到</span></div>
+      <div class="lg" data-k="b"><b>${mid} 条<small>${p(mid)}%</small></b><span><i class="b"></i>没有可核对的说法：提到了品牌，但没说具体事实，或说的事实官方没写${W.unver.size ? `（其中 ${W.unver.size} 条说了官方没公布的价格）` : ''}</span></div>
+      <div class="lg" data-k="c"><b>${bad} 条<small>${p(bad)}%</small></b><span><i class="c"></i>说错：至少有一处和官方说明冲突${W.typeText ? `（${esc(W.typeText)}）` : ''}</span></div>
+    </div>
+    <p class="small muted" style="margin:12px 0 0">${esc(one)}</p>
+  </div>`;
+}
 function page_overview() {
   if (isFictional() && UI.scope !== 'sample') return page_probe();
   const runs = scopeRuns();
@@ -2971,21 +3248,24 @@ function page_overview() {
   const exp = S.experiments[0];
   const qs = S.querySet.queries;
   const unstableText = m.unstable.slice(0, 3).map(k => { const [qid, eid] = k.split('|'); const e = ENG(eid); return `${qid}（${e ? e.name : eid}）`; }).join('、');
-  return head + todoCard(m) + `
-  <div class="kpis">
+  const P0 = pub();
+  const W = P0 ? wrongStat(m.evs) : null;
+  return head + todoCard(m) + (P0 ? overviewComp(m, W) : '') + `
+  <div class="kpis"${P0 ? ' hidden' : ''}>
     <div class="kpi"><div class="kt"><i></i>说对且有依据${pub() ? infoPop(m.verifiable, m.n, '这个数字有多准？') : hq('提到产品的回答里，说法能在事实底账里找到依据的比例。行业里也叫“可验证认知覆盖率”。')}</div><div class="kv">${pct(m.verifiable, m.n)}<small>${m.verifiable} / ${m.n}</small></div>${axis(m.verifiable, m.n)}<div class="ks">${pub() ? `AI 提到品牌时，说法能在官方说明里找到依据　${credTag(cN)}` : `95% 区间 ${wilsonText(m.verifiable, m.n)}　${credTag(cN)}`}${m.corrected ? `<br>含人工纠正 ${m.corrected} 条` : ''}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--accent-2)"></i>提到了产品${hq('所有有效回答里，提到产品名字或别名的比例。')}</div><div class="kv">${pct(m.mention, m.n)}<small>${m.mention} / ${m.n}</small></div><div class="ks">${pub() && !m.nbN ? '所有回答里提到品牌的比例' : `非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}`}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>事实错误${hq(pub() ? '和官方说明冲突、说了已经过期的信息，或把别家的事安到品牌头上的次数。' : '与事实底账不一致的说法次数，按类型分开数。每一类都对应底账里的一条记录。')}</div><div class="kv">${m.unsupported + m.outdated + m.misattr + (m.denied || 0)}<small>次</small></div><div class="ks">${pub() ? ([['说反', m.denied || 0], ['冲突', m.unsupported], ['过期', m.outdated], ['错误归属', m.misattr], ['遗漏', m.omission]].filter(x => x[1]).map(x => `${x[0]} ${x[1]}`).join('，') || '没有发现事实错误') : `说反 ${m.denied || 0}，冲突 ${m.unsupported}，过期 ${m.outdated}，错误归属 ${m.misattr}，遗漏 ${m.omission}`}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>重复一致${hq('同一问题、同一模型问多次，结论是否一致。不一致的问题，结论不要只看一次。')}</div><div class="kv">${pct(m.stable, m.pairsN)}<small>${m.stable} / ${m.pairsN}</small></div><div class="ks">同一问题同一模型多次是否一致</div></div>
   </div>
-  <div class="hero"><p class="stmt">${m.n} ${pub() ? '条回答' : '次有效回答'}里，${m.verifiable} ${pub() ? '条' : '次'}把 ${esc(S.truth.entity_name)} 说对，而且说法能在${pub() ? '官方说明' : '产品事实'}里找到依据。</p>
+  <div class="hero"${P0 ? ' hidden' : ''}><p class="stmt">${m.n} ${pub() ? '条回答' : '次有效回答'}里，${m.verifiable} ${pub() ? '条' : '次'}把 ${esc(S.truth.entity_name)} 说对，而且说法能在${pub() ? '官方说明' : '产品事实'}里找到依据。</p>
   <p class="stmt-sub">${cN.more ? `要达到“结论可用”，大约还要 ${cN.more} 次有效回答。` : ''}${m.failed ? `另有 ${m.failed} 次运行未成功，未计入分母。` : ''}${m.mock ? '这一组是人工编写的方法演示样本。' : '全部为官方 API 结果，不代表 App 内表现。'}</p>
   <div class="row" style="margin-top:14px">${pageHidden('sources') ? '' : '<button class="btn primary" data-act="nav" data-page="sources">看错误从哪来</button>'}${pageHidden('diff') ? '' : `<button class="btn${pageHidden('sources') ? ' primary' : ''}" data-act="nav" data-page="diff">看认知差异</button>`}</div></div>
+  ${P0 ? `<div class="row" style="margin-top:14px">${W.n ? `<button class="btn primary" data-act="nav" data-page="report">看说错的回答</button>` : ''}${pageHidden('sources') ? '' : '<button class="btn" data-act="nav" data-page="sources">看错误从哪来</button>'}${pageHidden('diff') ? '' : '<button class="btn" data-act="nav" data-page="diff">看认知差异</button>'}<button class="btn" data-act="open-fact" data-fact="all">看官方口径</button></div>` : ''}
   ${note('v2 的切入点是“这个数字能不能信”。所以北极星旁边一定跟着区间、可信度等级和“还要跑多少次”。竞品普遍只给一个百分比，而营销人最大的疑虑恰恰是结果不稳定。')}
 
   <h2>逐条回答</h2>
   <div class="legend">
-    <span><i class="cell v"></i>说对且有依据</span><span><i class="cell m"></i>提到了，但有偏差或遗漏</span>
+    <span><i class="cell v"></i>说对且有依据</span>${pub() ? '<span><i class="cell m"></i>没有可核对的说法</span><span><i class="cell f"></i>说错</span>' : '<span><i class="cell m"></i>提到了，但有偏差或遗漏</span>'}
     <span><i class="cell n"></i>没有提到</span><span><i class="cell t"></i>运行未成功</span>
   </div>
   <div class="scroll"><table class="tbl matrix">
@@ -3000,11 +3280,12 @@ function page_overview() {
   ${(() => {
     const P = pub();
     const rows = [
-      [m.mention || m.nbRec, `<tr><td>可发现性</td><td class="num">提及 ${frac(m.mention, m.n)}${P && !m.nbN ? '' : `<br>非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}`}</td><td>${credTag(cred(m.mention, m.n, m.mock))}${P && !m.nbN ? '' : `<br>${credTag(cred(m.nbRec, m.nbN, false))}`}</td><td class="muted">${P && !m.nbN ? '提到品牌名字或别名的回答比例。' : '进入候选指在不含品牌名的问题里，被排在前两位推荐。'}</td></tr>`],
-      [m.aligned || m.deviation, `<tr><td>定位一致</td><td class="num">说对 ${frac(m.aligned, m.mentionedN)}<br>说偏 ${frac(m.deviation, m.mentionedN)}</td><td>${credTag(cred(m.aligned, m.mentionedN, m.mock))}</td><td class="muted">分母是提到产品的回答。</td></tr>`],
+      [P ? 0 : (m.mention || m.nbRec), `<tr><td>可发现性</td><td class="num">提及 ${frac(m.mention, m.n)}${P && !m.nbN ? '' : `<br>非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}`}</td><td>${credTag(cred(m.mention, m.n, m.mock))}${P && !m.nbN ? '' : `<br>${credTag(cred(m.nbRec, m.nbN, false))}`}</td><td class="muted">${P && !m.nbN ? '提到品牌名字或别名的回答比例。' : '进入候选指在不含品牌名的问题里，被排在前两位推荐。'}</td></tr>`],
+      [P ? 0 : (m.aligned || m.deviation), `<tr><td>定位一致</td><td class="num">说对 ${frac(m.aligned, m.mentionedN)}<br>说偏 ${frac(m.deviation, m.mentionedN)}</td><td>${credTag(cred(m.aligned, m.mentionedN, m.mock))}</td><td class="muted">分母是提到产品的回答。</td></tr>`],
+      P ? [1, `<tr><td>事实准确</td><td class="num">说错 ${frac(W.n, W.mentioned)}</td><td>${credTag(cred(W.mentioned - W.n, W.mentioned, m.mock))}</td><td class="muted">一条回答里只要有一处和官方说明冲突，就算说错一条。</td></tr>`] :
       [m.unsupported + m.outdated + m.misattr + m.omission, `<tr><td>事实准确</td><td class="num">${P ? ([['无依据', m.unsupported], ['过期', m.outdated], ['错误归属', m.misattr], ['遗漏', m.omission]].filter(x => x[1]).map(x => `${x[0]} ${x[1]}`).join('，')) : `无依据 ${m.unsupported}，过期 ${m.outdated}<br>错误归属 ${m.misattr}，遗漏 ${m.omission}`}</td><td>${credTag(cred(m.mentionedN - (m.unsupported + m.outdated + m.misattr), m.mentionedN, m.mock))}</td><td class="muted">${P ? '每一类都对应官方说明里的一条口径。' : '每一类都对应事实库里的一条记录。'}</td></tr>`],
       [m.official || m.withCite, `<tr><td>证据覆盖</td><td class="num">有官方引用 ${frac(m.official, m.n)}<br>有任何引用 ${frac(m.withCite, m.n)}</td><td>${credTag(cred(m.official, m.n, m.mock))}</td><td class="muted">引用次数多不代表权威${pageHidden('sources') ? '。' : '，见「信源」页。'}</td></tr>`],
-      [m.pairsN, `<tr><td>稳定性</td><td class="num">重复一致 ${frac(m.stable, m.pairsN)}</td><td>${credTag(cred(m.stable, m.pairsN, m.mock))}</td><td class="muted">同一问题、同一模型问多次，是否都提到（或都没提到）产品。</td></tr>`]
+      [P ? 0 : m.pairsN, `<tr><td>稳定性</td><td class="num">重复一致 ${frac(m.stable, m.pairsN)}</td><td>${credTag(cred(m.stable, m.pairsN, m.mock))}</td><td class="muted">同一问题、同一模型问多次，是否都提到（或都没提到）产品。</td></tr>`]
     ].filter(r => !P || r[0]);
     if (!rows.length) return '';
     return `<h2>${P ? (rows.length === 5 ? '五个维度' : '分项结果') : '五个维度'}</h2>
@@ -3018,17 +3299,17 @@ function page_overview() {
   <div class="scroll"><table class="tbl">
     <thead><tr><th>检查项</th><th>现状</th><th>说明</th></tr></thead>
     <tbody>
-      ${pub() ? (() => { const w = wilson(m.verifiable, m.n); return `<tr><td>样本量</td><td class="num">${m.n} 条回答${m.failed ? `，另有 ${m.failed} 次没有得到回答` : ''}</td><td class="muted">${w ? `再问一轮，“说对且有依据”大概率落在 ${Math.round(w[0] * 100)}%–${Math.round(w[1] * 100)}% 之间。` : '回答还不够多，只能看方向。'}${cN.more ? `再多问约 ${cN.more} 次，这个范围能收窄到 10 个百分点以内。` : '现在的样本已经够用。'}</td></tr>`; })()
+      ${pub() ? (() => { const w = wilson(m.verifiable, m.n); return `<tr><td>样本量</td><td class="num">${m.n} 条回答${m.failed ? `，另有 ${m.failed} 次没有得到回答` : ''}</td><td class="muted">${w && m.n >= 10 ? `再问一轮，“说对且有依据”大概率落在 ${Math.round(w[0] * 100)}%–${Math.round(w[1] * 100)}% 之间。` : '样本少，仅供参考。'}${cN.more ? `再多问约 ${cN.more} 次，这个范围能收窄到 10 个百分点以内。` : '现在的样本已经够用。'}</td></tr>`; })()
       : `<tr><td>样本量</td><td class="num">有效 ${m.n} 次，未成功 ${m.failed} 次</td><td class="muted">北极星区间半宽约 ${cN.half == null ? '—' : Math.round(cN.half)} 个百分点。${cN.more ? `再有约 ${cN.more} 次可降到 10 个百分点以内。` : '已经足够。'}</td></tr>`}
       <tr><td>采集方式</td><td>${esc(captureMixText(m))}</td><td class="muted">API 结果代表模型本身，App 人工导入代表当时当地用户看到的。${m.mock ? '当前含样本数据，只能用来演示方法。' : ''}</td></tr>
       ${pub() && !m.pairsN ? '' : `<tr><td>重复一致性</td><td class="num">${frac(m.stable, m.pairsN)} 组一致</td><td class="muted">${m.unstable.length ? `最不稳定：${esc(unstableText)}。这些问题的结论不要只看一次。` : '所有重复运行结论一致。'}</td></tr>`}
       ${pub() && !rs.n ? '' : `<tr><td>规则 vs 人工</td><td class="num">${rs.n ? `${frac(rs.agree, rs.n)} 条一致` : '还没有复核'}</td><td class="muted">${rs.n < 5 ? (pub() ? '至少复核 5 条，才能知道规则本身准不准。' : '至少复核 5 条，才能知道规则本身准不准。去「运行结果」逐条复核。') : rs.low ? '一致率低于 80%，所有可信度等级已降一级。' : '一致率不低于 80%。'}</td></tr>`}
-      ${pub() && !(m.traceStrong || m.traceWeak || m.traceNone) ? '' : `<tr><td>错误能否溯源</td><td class="num">强关联 ${m.traceStrong}，弱关联 ${m.traceWeak}，无法溯源 ${m.traceNone}</td><td class="muted">无法溯源的错误多半来自模型训练数据，只能靠补官方内容慢慢纠正。</td></tr>`}
+      ${pub() ? (() => { const wi = m.evs.filter(x => x.e.valid).flatMap(x => x.e.issues.filter(i => WRONG_TYPES.includes(i.type))); if (!wi.length) return ''; const st = wi.filter(i => i.trace === 'strong').length, wk = wi.filter(i => i.trace === 'weak').length, no = wi.filter(i => i.trace === 'none').length; return `<tr><td>说错能否溯源</td><td class="num">${[['同句引用', st], ['同回答引用', wk], ['没有引用', no]].filter(x => x[1]).map(x => `${x[0]} ${x[1]}`).join('，')}</td><td class="muted">${no === wi.length ? '说错的地方都没有引用任何页面，多半来自模型训练数据，只能靠补官方内容慢慢纠正。' : '有引用的，可以顺着引用页面去更正。'}</td></tr>`; })() : !(m.traceStrong || m.traceWeak || m.traceNone) ? '' : `<tr><td>错误能否溯源</td><td class="num">强关联 ${m.traceStrong}，弱关联 ${m.traceWeak}，无法溯源 ${m.traceNone}</td><td class="muted">无法溯源的错误多半来自模型训练数据，只能靠补官方内容慢慢纠正。</td></tr>`}
     </tbody>
   </table></div>
   ${note('“规则 vs 人工”这一行，是在给评测器本身打分。竞品都没公开自己的误判率，EchoRank 把它放在首页：你复核得越多，平台越知道自己该不该被信任。')}
 
-  ${pub() && !g.length ? '' : `<h2>最值得先处理的${['一', '两', '三'][Math.max(0, g.length - 1)] || '三'}处</h2>
+  ${pub() ? '' : `<h2>最值得先处理的${['一', '两', '三'][Math.max(0, g.length - 1)] || '三'}处</h2>
   <div class="scroll"><table class="tbl">
     <thead><tr><th>类型</th><th>发现</th><th class="num">次数</th><th>主要来源</th><th></th></tr></thead>
     <tbody>${g.map(x => {
@@ -3299,8 +3580,9 @@ function page_truth() {
 /* ---------- 问题库 ---------- */
 function page_queries() {
   const qs = S.querySet.queries;
-  const list = UI.qFilter === 'all' ? qs : qs.filter(q => q.stage === UI.qFilter);
   const counts = Object.keys(STAGES).map(s => [s, qs.filter(q => q.stage === s).length]);
+  if (pub() && UI.qFilter !== 'all' && !qs.some(q => q.stage === UI.qFilter)) UI.qFilter = 'all';
+  const list = UI.qFilter === 'all' ? qs : qs.filter(q => q.stage === UI.qFilter);
   const dupes = [];
   for (let i = 0; i < qs.length; i++) for (let j = i + 1; j < qs.length; j++) { const s = similarity(qs[i].text, qs[j].text); if (s >= 0.45) dupes.push([qs[i], qs[j], s]); }
   const gapsCov = counts.filter(([, n]) => n === 0).map(([s]) => STAGES[s]);
@@ -3326,26 +3608,27 @@ function page_queries() {
     ${S.querySet.frozen ? `<p class="small" style="color:var(--warn);margin-top:14px">问题集 v${S.querySet.version} 已冻结。保存后会生成 v${S.querySet.version + 1} 草稿。</p>` : ''}
     <div class="row" style="margin-top:14px"><button class="btn primary" data-act="q-save">${S.querySet.frozen ? `保存为 v${S.querySet.version + 1} 草稿` : '保存'}</button><button class="btn" data-act="q-cancel">取消</button></div>
   </div>` : ''}
-  <h2>覆盖情况</h2>
+  ${pub() ? '' : `<h2>覆盖情况</h2>
   <div class="scroll"><table class="tbl">
     <thead><tr>${counts.map(([s]) => `<th>${STAGES[s]}</th>`).join('')}<th>含品牌名</th><th>不含品牌名</th></tr></thead>
     <tbody><tr>${counts.map(([, n]) => `<td class="num">${n}</td>`).join('')}<td class="num">${qs.filter(q => q.branded).length}</td><td class="num">${qs.filter(q => !q.branded).length}</td></tr></tbody>
-  </table></div>
+  </table></div>`}
   ${gapsCov.length && !pub() ? `<p class="small muted" style="margin-top:10px">还没有覆盖：${gapsCov.join('、')}阶段。</p>` : ''}
   ${dupes.length && !pub() ? `<p class="small" style="color:var(--warn)">可能重复：${dupes.map(([a, b, s]) => `${a.id} 与 ${b.id}（相似度 ${Math.round(s * 100)}%）`).join('；')}</p>` : ''}
-  <h2>全部问题</h2>
+  <h2>${pub() ? `${qs.length} 个问题` : '全部问题'}</h2>
   <div class="row" style="margin-bottom:12px">
-    ${[['all', '全部']].concat(Object.entries(STAGES)).map(([k, v]) => `<button class="btn sm ${UI.qFilter === k ? 'primary' : ''}" data-act="q-filter" data-f="${k}">${v}</button>`).join('')}
+    ${pub() ? [['all', '全部', qs.length]].concat(counts.filter(([, n]) => n).map(([s, n]) => [s, STAGES[s], n])).map(([k, v, n]) => `<button class="btn sm ${UI.qFilter === k ? 'primary' : ''}" data-act="q-filter" data-f="${k}">${v} <span class="cnt">${n}</span></button>`).join('')
+      : [['all', '全部']].concat(Object.entries(STAGES)).map(([k, v]) => `<button class="btn sm ${UI.qFilter === k ? 'primary' : ''}" data-act="q-filter" data-f="${k}">${v}</button>`).join('')}
   </div>
   <div class="scroll"><table class="tbl">
-    ${(() => { const P = pub(), showFocus = !P || qs.some(q => q.focus.length); return `<thead><tr>${P ? '' : '<th>编号</th>'}<th>阶段</th><th>问题</th><th>品牌名</th>${showFocus ? '<th>关注能力</th>' : ''}<th></th></tr></thead>
-    <tbody>${list.map(q => `<tr>
+    ${(() => { const P = pub(), showFocus = !P || qs.some(q => q.focus.length), showBrand = !P || new Set(qs.map(q => !!q.branded)).size > 1; return `<thead><tr>${P ? '' : '<th>编号</th>'}<th>阶段</th><th>问题</th>${showBrand ? '<th>品牌名</th>' : ''}${showFocus ? '<th>关注能力</th>' : ''}<th>${P ? '<span class="sr">看回答</span>' : ''}</th></tr></thead>
+    <tbody>${list.map(q => `<tr${P ? ` class="rowlink" data-act="open-run" data-q="${q.id}" tabindex="0" role="link" aria-label="看回答：${esc(q.text)}"` : ''}>
       ${P ? '' : `<td class="small muted num">${q.id}${q.rev > 1 ? `<br><span class="tag warn">第 ${q.rev} 版</span>` : ''}</td>`}
       <td class="stage">${STAGES[q.stage] || q.stage}</td>
       <td class="wide">${esc(q.text)}</td>
-      <td class="small">${q.branded ? '含' : '不含'}</td>
+      ${showBrand ? `<td class="small">${q.branded ? '含' : '不含'}</td>` : ''}
       ${showFocus ? `<td class="small muted">${q.focus.map(capName).map(esc).join('<br>') || '—'}</td>` : ''}
-      <td style="white-space:nowrap">${P ? '' : `<button class="btn quiet sm" data-act="q-edit" data-id="${q.id}">修改</button>`}<button class="btn quiet sm" data-act="open-run" data-q="${q.id}">看回答</button>${P ? '' : `<button class="btn quiet sm danger" data-act="q-del" data-id="${q.id}">删除</button>`}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">这个阶段还没有问题。</td></tr>'}</tbody>`; })()}
+      <td style="white-space:nowrap">${P ? '<span class="go" aria-hidden="true">看回答 ›</span>' : `<button class="btn quiet sm" data-act="q-edit" data-id="${q.id}">修改</button><button class="btn quiet sm" data-act="open-run" data-q="${q.id}">看回答</button><button class="btn quiet sm danger" data-act="q-del" data-id="${q.id}">删除</button>`}</td></tr>`).join('') || '<tr><td colspan="6" class="muted">这个阶段还没有问题。</td></tr>'}</tbody>`; })()}
   </table></div>`;
 }
 
@@ -3368,12 +3651,91 @@ function renderText(e, raw) {
     return h + esc(p.d);
   }).join('');
 }
+/* v5.9 公开版：被核对的句子按判定标色（说对蓝、无法核对米、说错陶土），每句带依据：判定、官方口径原文、来源 */
+function evidenceOf(claim) {
+  const y = claim ? factEntry(claim) : null;
+  if (y) { const u = y.x.evidence_url, src = y.x.evidence_locator || (u && !isMaskedUrl(u) ? hostOf(u) : '官方页面'); return { f: y.x.source_quote || (y.list === 'prohibited_claims' ? y.x.note : factItemTitle(y.list, y.x)), s: [y.cat, src].filter(Boolean).join(' · '), ref: claim }; }
+  const f = factFor(claim); return { f: f ? f.text : '', s: '官方说明', ref: '' };
+}
+function renderTextPublic(e, raw) {
+  if (!e || !e.valid) return esc(raw);
+  const brandRe = rx('(' + S.truth.aliases.filter(Boolean).map(escRx).join('|') + ')');
+  const verdict = new Map();   // part index → { v, label, f, s }
+  e.issues.forEach(it => {
+    if (it.type === 'omission') return;   // 该说没说不是某一句的问题，不标在句子上
+    const wrong = WRONG_TYPES.includes(it.type);
+    const ev = evidenceOf(it.type === 'overclaim' ? '' : it.claim);
+    const f = it.type === 'overclaim' ? '官方没有宣称疗效，具体疗效是 AI 的延伸' : it.type === 'unverified' ? (pub() ? '官方说明里没有公布这个价格' : ev.f) : ev.f;
+    (it.idx || []).forEach(i => { const cur = verdict.get(i); if (!cur || (wrong && cur.v !== 'er')) verdict.set(i, { v: wrong ? 'er' : 'dv', label: wrong ? '说错 · ' + (WRONG_NAME[it.type] || it.label) : '无法核对', f, s: ev.s, ref: ev.ref }); });
+  });
+  e.parts.forEach((p, i) => {
+    if (verdict.has(i) || e.flags.get(i) !== 'ok') return;
+    const g = e.goods.find(g => g.clause && p.c.includes(g.clause)) || e.goods.find(g => g.clause && g.clause.includes(p.c.trim().slice(0, 12)));
+    const ev = g ? evidenceOf(g.claim.startsWith('limit:') ? 'prohibited:' + g.claim.slice(6) : g.claim) : { f: S.truth.positioning || '', s: '官方说明' };
+    verdict.set(i, { v: 'ok', label: g && g.limitAck ? '说对 · 正确说明了限制' : '说对', f: ev.f, s: ev.s, ref: ev.ref });
+  });
+  return e.parts.map((p, i) => {
+    let h = esc(p.c);
+    if (brandRe) h = h.replace(new RegExp(brandRe.source, 'gi'), m => `<mark class="k-brand">${m}</mark>`);
+    const v = verdict.get(i);
+    if (v && p.c.trim()) {
+      // 句首的 Markdown 标记（### 、- 、1. ）留在标注外面，标题和列表才能照常渲染
+      const m = /^(\s*(?:#{1,6}\s+|[-*•]\s+|\d+[.、]\s*)?)/.exec(h); const lead = m ? m[1] : '';
+      h = `${lead}<mark class="cl ${v.v}" tabindex="0" data-ev="${esc(JSON.stringify(v))}">${h.slice(lead.length)}</mark>`;
+    }
+    return h + esc(p.d);
+  }).join('');
+}
+function showEvTip(el) {
+  const t = $id('tip'); if (!t) return;
+  let v; try { v = JSON.parse(el.dataset.ev); } catch (e) { return; }
+  t.innerHTML = `<span class="v ${v.v}">${esc(v.label)}</span>${v.f ? `<div>官方口径：${esc(String(v.f).slice(0, 160))}${String(v.f).length > 160 ? '…' : ''}</div>` : ''}<small>来源：${esc(v.s || '官方说明')}</small>`;
+  redactMarks(t);
+  t.classList.add('wide', 'ev');
+  const r = el.getBoundingClientRect();
+  t.style.left = Math.min(window.innerWidth - 150, Math.max(150, r.left + Math.min(r.width, 280) / 2)) + 'px';
+  t.classList.add('on');
+  const h = t.offsetHeight; t.style.top = (r.bottom + 8 + h < window.innerHeight ? r.bottom + 8 : r.top - h - 8) + 'px';
+}
 function linksHtml(iss) {
   if (iss.trace === 'none') return '<div class="links">无法溯源：回答没有引用任何页面，可能来自模型训练数据。</div>';
   return `<div class="links">${iss.links.map(l => {
     const st = srcTag(l.url);
     return `<span style="margin-right:12px"><span class="tag ${l.strength === 'strong' ? 'acc' : ''}">${l.strength === 'strong' ? '同句引用' : '同回答引用'}</span><a data-act="open-source" data-url="${esc(l.url)}">${esc(hostOf(l.url))}</a>${st !== 'normal' ? ` <span class="tag ${STATUS_TAG[st]}">${STATUS_LABEL[st]}</span>` : ''}</span>`;
   }).join('')}</div>`;
+}
+/* v5.9 公开版回答卡：一个模型一张卡；同一模型问了多次时，右上角“第 1 次 / 第 2 次”切换 */
+function pubChips(run, e) {
+  if (!e) return '';
+  const fo = finalOf(run, e), chips = [];
+  if (e.mentioned) chips.push(`<span class="chip ok">提到 · 第 ${e.rank} 位</span>`); else chips.push('<span class="chip">没有提到</span>');
+  if (fo.corrected) chips.push(`<span class="chip">${esc(FINAL_LABEL[fo.final])}</span>`);
+  else if (isWrongRun(run, e)) chips.push('<span class="chip err">说错</span>');
+  else if (e.verifiable) chips.push('<span class="chip ok">说对且有依据</span>');
+  else if (e.mentioned) chips.push('<span class="chip">没有可核对的说法</span>');
+  return chips.join('');
+}
+function pubBody(run) {
+  if (run.status !== 'SUCCESS') return { chips: '', html: `<p class="small muted" style="margin:0 16px 14px">${run.status === 'REFUSED' ? '模型拒绝回答这条问题' : '这次没有得到回答'}，不计入统计。</p>` };
+  const q = Q(run.query_id), stale = q && q.rev !== run.query_rev;
+  const promptLine = run.turn > 1 && run.prompt ? `<p class="small muted" style="margin:0 16px 6px">追问：${esc(run.prompt)}</p>` : '';
+  const e = truthReady() ? evaluate(run) : null;
+  const wrongN = e ? e.issues.filter(i => WRONG_TYPES.includes(i.type)).length : 0;
+  const counts = e ? [['说对', e.goods.length], ['说错', wrongN], ['该说没说', e.issues.filter(i => i.type === 'omission').length], ['无法核对', e.issues.filter(i => i.type === 'unverified').length], ['引用', e.citations.length]].filter(x => x[1]) : [];
+  const detail = e && (e.goods.length || e.issues.length) ? `<div class="eval"><dl>
+      ${e.goods.length ? `<dt>说对的</dt><dd>${e.goods.map(g => `<span class="tag ok">${esc(g.limitAck ? `正确说明了限制：没有说成“${g.claim.replace(/^limit:/, '')}”` : g.text)}</span>`).join('')}</dd>` : ''}
+      ${e.issues.length ? `<dt>问题</dt><dd>${e.issues.map(i => { const wrong = WRONG_TYPES.includes(i.type); return `<div style="margin-bottom:6px"><span class="tag ${wrong ? 'bad' : 'warn'}">${wrong ? '说错' : i.type === 'omission' ? '该说没说' : '无法核对'}</span> ${esc(pubText(i.text))}${factEntry(i.claim) ? `<div>${factBtn(i.claim)}</div>` : ''}${i.links && i.links.length ? linksHtml(i) : ''}</div>`; }).join('')}</dd>` : ''}
+    </dl></div>` : '';
+  return { chips: pubChips(run, e), html: `${promptLine}${stale ? '<p class="small" style="color:var(--warn);margin:0 16px 6px">这条回答对应修改前的问题文本，不能和新版本直接比较。</p>' : ''}<div class="txt md">${mdPublic(renderTextPublic(e, run.raw))}</div><button class="more" data-act="card-more" hidden>展开全文</button>${detail}${counts.length ? `<div class="ft">${counts.map(x => `<span>${x[0]} <b>${x[1]}</b></span>`).join('')}</div>` : ''}` };
+}
+function pubCard(runs) {
+  const run0 = runs[0], eng = ENG(run0.engine) || { name: run0.engine };
+  const bodies = runs.map(pubBody);
+  const days = [...new Set(runs.map(r => dayText(r.started_at)))].join('、');
+  if (runs.length === 1) return `<div class="resp pubcard${run0.status !== 'SUCCESS' ? ' timeout' : ''}"><div class="hd">${engAvatar(run0.engine, eng.name)}<div><b>${esc(eng.name)}</b><small>${esc(days)}</small></div>${bodies[0].chips ? `<span class="verdict">${bodies[0].chips}</span>` : ''}</div>${bodies[0].html}</div>`;
+  return `<div class="resp pubcard multi"><div class="hd">${engAvatar(run0.engine, eng.name)}<div><b>${esc(eng.name)}</b><small>${esc(days)}</small></div>
+    <span class="seg2" role="group" aria-label="选择第几次回答">${runs.map((r, i) => `<button data-act="card-turn" data-i="${i}" aria-pressed="${i === 0}">第 ${i + 1} 次</button>`).join('')}</span></div>
+    ${bodies.map((b, i) => `<div class="rb" data-i="${i}"${i ? ' hidden' : ''}>${b.chips ? `<div class="verdict vrow">${b.chips}</div>` : ''}${b.html}</div>`).join('')}</div>`;
 }
 function respBlock(run) {
   const eng = ENG(run.engine) || { name: run.engine };
@@ -3382,7 +3744,7 @@ function respBlock(run) {
     : `<div class="meta"><span>${esc(run.run_id)}</span><span>${esc(CAPTURE_LABEL[run.capture] || run.capture)}</span><span>${CHANNEL_LABEL[run.channel] || ''}</span><span>${esc(run.model_version)}</span>${run.turn ? `<span>第 ${run.turn} 轮</span>` : ''}<span>搜索${run.search ? '开' : '关'}</span>${run.latency_ms ? `<span>${(run.latency_ms / 1000).toFixed(1)} 秒</span>` : ''}<span>${esc(run.started_at)}</span>${run.region ? `<span>${esc(run.region)}</span>` : ''}</div>`;
   if (run.status !== 'SUCCESS') {
     const label = { TIMEOUT: '运行超时', RATE_LIMITED: '被限流', NOT_GRANTED: '未授权', CANCELLED: '已停止', ERROR: '运行出错', REFUSED: '拒答' }[run.status] || run.status;
-    if (P) return `<div class="resp timeout">${meta.replace('<span class="verdict" data-verdict></span>', '')}<p class="small muted" style="margin:0">${run.status === 'REFUSED' ? '模型拒绝回答这条问题' : '这次没有得到回答'}，不计入统计。</p></div>`;
+    if (P) return pubCard([run]);
     return `<div class="resp timeout">${meta}<p><b>${label}</b></p><p class="small muted">不计入指标分母，批次成功率单独统计。重跑时记录为新的运行，不覆盖原记录。</p></div>`;
   }
   const q = Q(run.query_id);
@@ -3393,25 +3755,7 @@ function respBlock(run) {
   }
   const e = truthReady() ? evaluate(run) : null;
   const rv = S.reviews[run.run_id];
-  if (P) {
-    // 公开版回答卡：头部结论标签、Markdown 正文、底部只显示非零计数；有问题时逐条列出
-    const fo = e ? finalOf(run, e) : null;
-    const chips = [];
-    if (e) {
-      if (e.mentioned) chips.push(`<span class="chip ok">提到 · 第 ${e.rank} 位</span>`); else chips.push('<span class="chip">没有提到</span>');
-      if (fo && fo.corrected) chips.push(`<span class="chip">${esc(FINAL_LABEL[fo.final])}</span>`);
-      else if (e.verifiable) chips.push('<span class="chip ok">说对且有依据</span>');
-      else if (e.issues.some(i => i.type !== 'omission' && i.type !== 'unverified')) chips.push('<span class="chip err">有说错</span>');
-      else if (e.issues.length) chips.push('<span class="chip dev">有偏差</span>');
-    }
-    const head = meta.replace('<span class="verdict" data-verdict></span>', chips.length ? `<span class="verdict">${chips.join('')}</span>` : '');
-    const counts = e ? [['说对', e.goods.length], ['说错', e.issues.filter(i => i.type !== 'omission' && i.type !== 'unverified').length], ['该说没说', e.issues.filter(i => i.type === 'omission').length], ['无法核对', e.issues.filter(i => i.type === 'unverified').length], ['引用', e.citations.length]].filter(x => x[1]) : [];
-    const detail = e && (e.goods.length || e.issues.length) ? `<div class="eval"><dl>
-      ${e.goods.length ? `<dt>说对的</dt><dd>${e.goods.map(g => `<span class="tag ok">${esc(g.text)}</span>`).join('')}</dd>` : ''}
-      ${e.issues.length ? `<dt>问题</dt><dd>${e.issues.map(i => { const f = factFor(i.claim); return `<div style="margin-bottom:6px"><span class="tag ${i.type === 'omission' || i.type === 'unverified' ? 'warn' : 'bad'}">${i.label}</span> ${esc(i.text)}${f && f.url ? `<div class="small muted">官方说明：${extLink(f.url, hostOf(f.url))}${f.from ? '，' + esc(f.from) + ' 起' : ''}</div>` : ''}${i.links && i.links.length ? linksHtml(i) : ''}</div>`; }).join('')}</dd>` : ''}
-    </dl></div>` : '';
-    return `<div class="resp pubcard">${head}${promptLine}${stale ? '<p class="small" style="color:var(--warn)">这条回答对应修改前的问题文本，不能和新版本直接比较。</p>' : ''}<div class="txt md">${mdPublic(renderText(e, run.raw))}</div><button class="more" data-act="card-more" hidden>展开全文</button>${detail}${counts.length ? `<div class="ft">${counts.map(x => `<span>${x[0]} <b>${x[1]}</b></span>`).join('')}</div>` : ''}</div>`;
-  }
+  if (P) return pubCard([run]);
   const evHtml = !e ? `<div class="eval muted">产品事实未确认，暂不评测。</div>` : `<div class="eval"><dl>
     <dt>提及</dt><dd>${e.mentioned ? `提到了，排第 ${e.rank} 位${e.recommended ? '，算进入候选' : ''}` : '没有提到'}</dd>
     <dt>定位</dt><dd>${{ aligned: '<span class="tag ok">一致</span>', deviation: '<span class="tag bad">偏差</span>', unknown: '<span class="muted">未涉及</span>' }[e.positioning]}</dd>
@@ -3435,7 +3779,15 @@ function qDots(qid) {
   const runs = scopeRuns().filter(r => r.query_id === qid);
   if (!runs.length) return '';
   const engs = matrixEngines(runs);
-  return `<span class="dots" aria-hidden="true">${engs.map(e => runs.filter(r => r.engine === e.id).sort((a, b) => (a.started_at > b.started_at ? 1 : -1)).slice(-3).map(r => `<i class="${runCellInfo(r).cls}"></i>`).join('')).join('')}</span>`;
+  // 公开版：每个小块悬停显示“DeepSeek 第 1 次：说对”
+  return `<span class="dots"${pub() ? '' : ' aria-hidden="true"'}>${engs.map(e => runs.filter(r => r.engine === e.id).sort((a, b) => (a.started_at > b.started_at ? 1 : -1)).slice(-3).map((r, k) => { const c = runCellInfo(r); return `<i class="${c.cls}"${pub() ? ` data-tip="${esc(`${e.name.replace(/（API）/, '')} 第 ${k + 1} 次：${CELL_WORD[c.cls] || c.tip}`)}"` : ''}></i>`; }).join('')).join('')}</span>`;
+}
+const CELL_WORD = { v: '说对且有依据', f: '说错', m: '没有可核对的说法', n: '没有提到', t: '没有得到回答' };
+function qLegend() {
+  if (!pub() || !truthReady() || isFictional()) return '';
+  const runs = scopeRuns(); if (!runs.length) return '';
+  const seen = new Set(runs.map(r => runCellInfo(r).cls));
+  return `<div class="qleg small muted">${['v', 'm', 'f', 'n', 't'].filter(k => seen.has(k)).map(k => `<span><i class="${k}"></i>${CELL_WORD[k]}</span>`).join('')}<span class="faint">每个小块是一个模型的一次回答</span></div>`;
 }
 function page_runs() {
   const qs = S.querySet.queries;
@@ -3450,17 +3802,17 @@ function page_runs() {
   const sampleState = UI.sample === undefined ? 'checking' : UI.sample ? 'ok' : 'none';
   return `
   <header class="ph"><h1>大模型回答记录</h1>
-    <p class="lede">${pub() ? '同一个问题在不同模型上的回答并排对齐。被核对的句子直接标在原文上，悬停可以看判断依据。' : '同一个问题在不同模型上的回答并排对齐。每个错误下面都写着它能追溯到哪个页面：同句引用最可信，同回答引用次之。'}</p></header>
+    <p class="lede">${pub() ? '同一个问题在不同模型上的回答并排对齐。被核对的句子按判定标色：蓝色说对、米色无法核对、陶土色说错；悬停或用 Tab 键聚焦，可以看判定、官方口径原文和来源。' : '同一个问题在不同模型上的回答并排对齐。每个错误下面都写着它能追溯到哪个页面：同句引用最可信，同回答引用次之。'}</p></header>
   ${!truthReady() ? blockedByTruth() : ''}
   <h2>回答对比</h2>
   <div class="runs-layout">
-    <nav aria-label="问题列表"><ul class="qlist">${byStage.map(([s, arr]) => `<li class="grp">${STAGES[s]}</li>` + arr.map(x => `<li><button data-act="sel-q" data-q="${x.id}" aria-current="${x.id === UI.q}"><span class="qt">${esc(x.text)}</span>${qDots(x.id)}</button></li>`).join('')).join('')}</ul></nav>
+    <nav aria-label="问题列表">${qLegend()}<ul class="qlist">${byStage.map(([s, arr]) => `<li class="grp">${STAGES[s]}</li>` + arr.map(x => `<li><button data-act="sel-q" data-q="${x.id}" aria-current="${x.id === UI.q}"><span class="qt">${esc(x.text)}</span>${qDots(x.id)}</button></li>`).join('')).join('')}</ul></nav>
     <section>${q ? `
       <p class="small muted" style="margin:0 0 6px">${pub() ? '' : q.id + '，'}${STAGES[q.stage]}阶段，${q.branded ? '含品牌名' : '不含品牌名'}</p>
       <p class="qhead">${esc(q.text)}</p>
       ${missing.length && !pub() ? `<p class="small muted">${missing.map(e => e.name).join('、')}：这条问题还没有回答，可以用采集脚本或人工导入补上。</p>` : ''}
       <div class="cols">
-        ${cols.map(e => `<div class="col">${pub() ? '' : `<h3>${esc(e.name)}</h3><p class="small faint" style="margin:0">${CHANNEL_LABEL[e.channel]}，${runsFor(e.id).some(r => r.capture !== 'MOCK') ? '真实数据' : '样本数据'}</p>`}${runsFor(e.id).map(respBlock).join('') || '<div class="resp timeout"><p class="muted small">还没有回答。</p></div>'}</div>`).join('')}
+        ${cols.map(e => `<div class="col">${pub() ? '' : `<h3>${esc(e.name)}</h3><p class="small faint" style="margin:0">${CHANNEL_LABEL[e.channel]}，${runsFor(e.id).some(r => r.capture !== 'MOCK') ? '真实数据' : '样本数据'}</p>`}${pub() && !isFictional() && runsFor(e.id).length > 1 ? pubCard(runsFor(e.id)) : runsFor(e.id).map(respBlock).join('') || '<div class="resp timeout"><p class="muted small">还没有回答。</p></div>'}</div>`).join('')}
         ${pub() ? '' : `<div class="col"><h3>Claude 实时</h3><p class="small faint" style="margin:0">真实调用，每次问 2 遍</p>
           <div class="resp timeout">
             ${sampleState === 'checking' ? '<p class="small muted" style="margin:0">正在检查实时运行是否可用。</p>'
@@ -3494,23 +3846,38 @@ function diffRows(runs) {
   const T = S.truth;
   const rows = [];
   const count = pred => m.evs.filter(x => x.e.valid && pred(x.e));
-  const example = (list, fn) => { for (const x of list) { const it = fn(x.e); if (it) return { run: x.r, clause: it.clause }; } return null; };
+  // v5.9：例句必须和这条口径有关。公开版只取能被这条口径的识别说法命中、去掉格式符号后至少 8 个字的原句；找不到就不给例句
+  // 公开版在所有候选里挑和口径原文重合最多的一句（按两字词重合计分），带批评、投诉语气的句子降权，不拿来当“说对”的例句
+  const bigrams = s => { const t = String(s).replace(/[^\u4e00-\u9fa5A-Za-z0-9]/g, ''); const o = new Set(); for (let i = 0; i < t.length - 1; i++) o.add(t.slice(i, i + 2)); return o; };
+  const example = (list, fn, re, ctx) => {
+    if (!pub()) { for (const x of list) { const it = fn(x.e); if (it && it.clause) return { run: x.r, clause: it.clause }; } return null; }
+    const ref = bigrams(ctx || ''); let best = null, bestScore = -1e9;
+    for (const x of list) {
+      const it = fn(x.e); if (!it || !it.clause) continue;
+      const c = plainQ(String(it.clause)).replace(/^[：:，,\s]+/, '');
+      if (c.length < 8 || /\n/.test(c.trim()) || (re && !test(re, c))) continue;
+      const bg = bigrams(c); let hit = 0; bg.forEach(g => { if (ref.has(g)) hit++; });
+      const score = hit - (REPORTED_RX.test(c) || /欺诈|困难|投诉|诱导|传销|骗|坑/.test(c) ? 6 : 0) - Math.max(0, c.length - 60) / 30;
+      if (score > bestScore) { bestScore = score; best = { run: x.r, clause: c }; }
+    }
+    return best;
+  };
   { const right = count(e => e.positioning === 'aligned'), wrong = count(e => e.issues.some(i => i.type === 'deviation'));
     rows.push({ fact: `定位：${T.positioning}`, right: right.length, wrong: wrong.length, type: wrong.length ? '定位偏差' : '', ex: example(wrong, e => e.issues.find(i => i.type === 'deviation')) }); }
   T.capabilities.forEach(c => {
     const right = count(e => e.capsHit.includes(c.claim_id));
     const wrong = count(e => e.issues.some(i => i.type === 'omission' && i.claim === c.claim_id));
-    rows.push({ fact: c.statement, right: right.length, wrong: wrong.length, type: wrong.length ? '能力遗漏' : '', ex: example(wrong, e => e.issues.find(i => i.type === 'omission' && i.claim === c.claim_id)) || example(right, e => e.goods.find(g => g.claim === c.claim_id)) });
+    rows.push({ ref: c.claim_id, fact: c.statement, right: right.length, wrong: wrong.length, type: wrong.length ? '能力遗漏' : '', ex: (pub() ? null : example(wrong, e => e.issues.find(i => i.type === 'omission' && i.claim === c.claim_id))) || example(right, e => e.goods.find(g => g.claim === c.claim_id), c.match, c.statement + (c.source_quote || '')) });
   });
   T.offers.filter(o => (!o.valid_to || o.valid_to >= TODAY) && o.price > 0).forEach(o => {
     const right = count(e => e.goods.some(g => g.claim === 'offer:' + o.offer_id));
     const wrong = count(e => e.issues.some(i => i.type === 'outdated'));
-    rows.push({ fact: `${o.name} ${o.price} 元`, right: right.length, wrong: wrong.length, type: wrong.length ? '过期事实' : '', ex: example(wrong, e => e.issues.find(i => i.type === 'outdated')) });
+    rows.push({ ref: 'offer:' + o.offer_id, fact: `${o.name} ${o.price} 元`, right: right.length, wrong: wrong.length, type: wrong.length ? '过期事实' : '', ex: example(wrong, e => e.issues.find(i => i.type === 'outdated')) });
   });
   T.prohibited_claims.forEach(p => {
     const right = count(e => e.goods.some(g => g.claim === 'limit:' + p.text));
     const wrong = count(e => e.issues.some(i => i.claim === 'prohibited:' + p.text));
-    rows.push({ fact: `不应出现：${p.text}`, right: right.length, wrong: wrong.length, type: wrong.length ? '无依据能力' : '', ex: example(wrong, e => e.issues.find(i => i.claim === 'prohibited:' + p.text)) });
+    rows.push({ ref: 'prohibited:' + p.text, fact: `不应出现：${p.text}`, right: right.length, wrong: wrong.length, type: wrong.length ? (pub() ? '说错' : '无依据能力') : '', ex: example(wrong, e => e.issues.find(i => i.claim === 'prohibited:' + p.text), p.match, p.text + (p.note || '')) || example(right, e => e.goods.find(g => g.claim === 'limit:' + p.text), p.match, p.text) });
   });
   T.limitations.forEach(l => {
     const wrong = count(e => e.issues.some(i => i.claim === 'limitation:' + l.text));
@@ -3523,19 +3890,21 @@ function page_diff() {
   const probeMode = isFictional() && UI.scope !== 'sample';
   const runs = probeMode ? SAMPLE_RUNS : scopeRuns();
   const rows = diffRows(runs).filter(r => !pub() || r.right || r.wrong);
+  if (pub()) rows.sort((a, b) => (b.wrong - a.wrong) || ((b.right || 0) - (a.right || 0)));
+  const showWrong = !pub() || rows.some(r => r.wrong), showType = !pub() || rows.some(r => r.type), showRight = !pub() || rows.some(r => r.right);
   return `
   <header class="ph"><h1>认知差异</h1>
     <p class="lede">${pub() ? '左边是官方说明，右边是 AI 实际怎么说。只看差异，不写总结。' : '左边是你确认过的事实，右边是 AI 实际怎么说。只看差异，不写总结。'}</p></header>
   ${probeMode ? '<div class="state info"><h4>这里展示的是方法演示样本</h4><p>真实实验里的 NovaNote 是虚构品牌，没有可对照的事实，所以事实对照只在样本上演示。真实实验的结果见「总览」。</p></div>' : ''}
   ${note('“能力遗漏”和“说错”分开统计：漏说日文是信息没被检索到，属于内容覆盖问题；声称支持离线部署是编造，属于风险问题。两者的处理方式完全不同。')}
   <div class="scroll" style="margin-top:28px"><table class="tbl">
-    <thead><tr><th>${pub() ? '官方说明' : '事实库'}</th><th>AI 的说法（例句）</th><th class="num">说对</th><th class="num">偏差</th><th>类型</th></tr></thead>
+    <thead><tr><th>${pub() ? '官方说明' : '事实库'}</th><th>AI 的说法（例句）</th>${showRight ? '<th class="num">说对</th>' : ''}${showWrong ? `<th class="num">${pub() ? '说错' : '偏差'}</th>` : ''}${showType ? '<th>类型</th>' : ''}</tr></thead>
     <tbody>${rows.map(r => `<tr>
-      <td style="min-width:180px">${esc(r.fact)}</td>
-      <td class="wide">${r.ex ? `“${esc(plainQ(r.ex.clause).slice(0, 90))}”<br><button class="btn quiet sm" data-act="open-run" data-q="${r.ex.run.query_id}">${pub() ? '看原文' : esc(r.ex.run.run_id)}</button>` : '<span class="muted">没有相关回答</span>'}</td>
-      <td class="num">${r.right === null ? '—' : r.right}</td>
-      <td class="num" style="${r.wrong ? 'color:var(--bad)' : ''}">${r.wrong}</td>
-      <td>${r.type ? `<span class="tag ${r.type === '能力遗漏' ? 'warn' : 'bad'}">${r.type}</span>` : ''}</td></tr>`).join('')}</tbody>
+      <td style="min-width:180px">${esc(r.fact)}${pub() && r.ref ? `<div>${factBtn(r.ref)}</div>` : ''}</td>
+      <td class="wide">${r.ex ? `“${esc(plainQ(r.ex.clause).slice(0, 90))}”<br><button class="btn quiet sm" data-act="open-run" data-q="${r.ex.run.query_id}">${pub() ? '看原文' : esc(r.ex.run.run_id)}</button>` : `<span class="muted">${pub() ? '没有 AI 提到这一点' : '没有相关回答'}</span>`}</td>
+      ${showRight ? `<td class="num">${r.right === null ? '—' : r.right}</td>` : ''}
+      ${showWrong ? `<td class="num" style="${r.wrong ? 'color:var(--bad)' : ''}">${r.wrong}</td>` : ''}
+      ${showType ? `<td>${r.type ? `<span class="tag ${r.type === '能力遗漏' ? 'warn' : 'bad'}">${r.type}</span>` : ''}</td>` : ''}</tr>`).join('')}</tbody>
   </table></div>
   ${pageHidden('sources') ? '' : '<p class="small muted" style="margin-top:14px">每个错误追溯到了哪个页面，见 <button class="linkbtn" data-act="nav" data-page="sources">信源</button>。</p>'}`;
 }
@@ -3819,12 +4188,13 @@ function render() {
   const top = `<div class="topbar"><div class="crumb">${PAGE_TITLE[UI.page] || '概览'} <span>／ ${esc(S.truth.entity_name)}</span></div><div class="row">${['overview','runs','diff','sources'].includes(UI.page) ? scopeSwitch() : ''}</div></div>`;
   const sample = isFictional() ? `<div class="sample"><b>示例</b>${esc(S.truth.entity_name)} 是一个虚构品牌，用来演示方法；左上角可以切换到真实产品。<span class="sp"></span><button data-act="wel-open">这是什么？</button></div>` : '';
   document.getElementById('main').innerHTML = top + sample + cardify(body);
-  if (UI.drawerRun) renderDrawer();
+  if (UI.drawerRun) renderDrawer(); else if (UI.drawerFact) renderFactDrawer();
   markLongCards();
+  redactMarks(document.getElementById('main')); redactMarks(document.getElementById('side'));
 }
 /* 公开版回答卡：正文超过折叠高度时才显示“展开全文” */
 function markLongCards(root = document) {
-  root.querySelectorAll('.resp.pubcard:not(.open) .txt').forEach(t => { const b = t.parentNode.querySelector('.more'); if (b) b.hidden = !(t.scrollHeight > t.clientHeight + 4); });
+  root.querySelectorAll('.resp.pubcard .txt').forEach(t => { const box = t.parentNode; if (box.classList.contains('open')) return; const b = box.querySelector('.more'); if (b) b.hidden = !(t.scrollHeight > t.clientHeight + 4); });
 }
 function go(page) {
   if (!PAGES[page] || pageHidden(page)) page = 'overview';
@@ -3840,7 +4210,11 @@ function setPath(obj, path, value) { const keys = path.split('.'); let o = obj; 
 function parseVal(el) { const k = el.dataset.kind; if (k === 'list') return el.value.split(/[，,]/).map(s => s.trim()).filter(Boolean); if (k === 'num') return Number(el.value || 0); return el.value; }
 function markTruthDraft() { if (S.truth.status === 'APPROVED') S.truth.status = 'DRAFT'; }
 async function saveFile(name, data) {
-  if (!UI.downloads) return;
+  if (!UI.downloads) {
+    // 公开网站（不在 Claude 里打开）：直接用浏览器下载
+    try { const blob = data instanceof Blob ? data : new Blob([data], { type: 'text/plain;charset=utf-8' }); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 800); } catch (e) { flash('下载没有完成。'); }
+    return;
+  }
   try { await UI.downloads.save({ filename: name, data }); } catch (e) { if (e && e.code !== 'cancelled' && e.code !== 'declined') flash('保存没有完成。'); }
 }
 
@@ -3855,7 +4229,11 @@ document.addEventListener('click', e => {
     case 'open-run': UI.q = d.q; closeDrawer(); go('runs'); break;
     case 'peek-run': openDrawer(d.run, el); break;
     case 'drawer-close': closeDrawer(); break;
-    case 'card-more': { const c = el.closest('.resp'); const o = !c.classList.contains('open'); c.classList.toggle('open', o); el.textContent = o ? '收起' : '展开全文'; break; }
+    case 'card-more': { const c = el.closest('.rb') || el.closest('.resp'); const o = !c.classList.contains('open'); c.classList.toggle('open', o); el.textContent = o ? '收起' : '展开全文'; break; }
+    case 'card-turn': { const card = el.closest('.resp'); card.querySelectorAll('.seg2 button').forEach(b => b.setAttribute('aria-pressed', b === el)); card.querySelectorAll('.rb').forEach(b => { b.hidden = b.dataset.i !== d.i; }); markLongCards(card); break; }
+    case 'gap-toggle': { const tr = el.closest('tr'); const nx = tr.nextElementSibling; const o = !tr.classList.contains('open'); tr.classList.toggle('open', o); tr.setAttribute('aria-expanded', o); if (nx && nx.classList.contains('rxb')) nx.classList.toggle('open', o); break; }
+    case 'open-fact': openFactDrawer(d.fact, el); break;
+    case 'report-doc': { const d = reportData(); saveFile(`体检报告-${d.T.entity_name}-${TODAY}.docx`, docxFromMarkdown(unmaskTokens(reportMarkdown(d), '（对外隐藏）').split(MASK_HIDDEN).join('（对外隐藏）'))); break; }
     case 'fd-toggle': { const fd = el.closest('.fd'); const o = !fd.classList.contains('open'); fd.classList.toggle('open', o); el.setAttribute('aria-expanded', o); break; }
     case 'act-next': { S.actionState = S.actionState || {}; const v = Math.min(2, (S.actionState[d.key] || 0) + 1); S.actionState[d.key] = v; commit(`行动清单：${d.key.split('|')[1]} → ${['待核实', '进行中', '已完成'][v]}`); flash(v === 2 ? '已标记完成' : '已开始核实'); break; }
     case 'act-reset': { S.actionState = S.actionState || {}; delete S.actionState[d.key]; commit(); break; }
@@ -4064,13 +4442,16 @@ const $id = id => document.getElementById(id);
 function showTip(el, text) {
   const t = $id('tip'); if (!t || !text) return;
   const r = el.getBoundingClientRect();
-  t.textContent = text; t.classList.toggle('wide', el.classList.contains('hq') || text.length > 40);
+  t.classList.remove('ev'); t.textContent = text; t.classList.toggle('wide', el.classList.contains('hq') || text.length > 40); redactMarks(t);
   t.style.left = Math.min(window.innerWidth - 20, Math.max(20, r.left + r.width / 2)) + 'px';
   t.classList.add('on');
   const h = t.offsetHeight; t.style.top = (r.top - h - 8 > 4 ? r.top - h - 8 : r.bottom + 8) + 'px';
 }
 function hideTip() { const t = $id('tip'); if (t) t.classList.remove('on'); }
-document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, el.dataset.tip); });
+document.addEventListener('mouseover', e => { const cs = e.target.closest('.cseg'); document.querySelectorAll('.clg .lg').forEach(l => l.classList.toggle('on', !!cs && l.dataset.k === cs.dataset.k)); const ev = e.target.closest('[data-ev]'); if (ev) { showEvTip(ev); return; } const el = e.target.closest('[data-tip]'); if (el) showTip(el, el.dataset.tip); });
+document.addEventListener('mouseout', e => { if (e.target.closest('[data-ev]')) hideTip(); });
+document.addEventListener('focusin', e => { const ev = e.target.closest('[data-ev]'); if (ev) showEvTip(ev); });
+document.addEventListener('focusout', e => { if (e.target.closest('[data-ev]')) hideTip(); });
 document.addEventListener('mouseout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
 document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, el.dataset.tip); });
 document.addEventListener('focusout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
@@ -4083,10 +4464,46 @@ function openDrawer(runId, fromEl) {
   setTimeout(() => { const x = $id('drawer').querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 60);
 }
 function closeDrawer() {
-  if (!UI.drawerRun) return;
-  const from = UI.drawerFrom; UI.drawerRun = null; UI.drawerFrom = null;
+  if (!UI.drawerRun && !UI.drawerFact) return;
+  const from = UI.drawerFrom; UI.drawerRun = null; UI.drawerFact = null; UI.drawerFrom = null;
   $id('drawer').classList.remove('on'); $id('scrim').classList.remove('on'); $id('drawer').setAttribute('aria-hidden', 'true');
   if (from) { const el = document.querySelector(`[data-run="${CSS.escape(from)}"]`); if (el) el.focus({ preventScroll: true }); }
+}
+/* v5.9 公开版：口径抽屉。ref 可以是 'capabilities.3' 这种位置，也可以是评测里的 claim（cap_return / prohibited:… / offer:…），或 'all' */
+function factEntry(ref) {
+  const items = factItems(S.truth);
+  if (/^(capabilities|offers|prohibited_claims)\.\d+$/.test(ref)) { const [l, i] = ref.split('.'); return items.find(y => y.list === l && y.i === Number(i)) || null; }
+  return items.find(y => (y.list === 'capabilities' && y.x.claim_id === ref) || (y.list === 'prohibited_claims' && 'prohibited:' + y.x.text === ref) || (y.list === 'offers' && 'offer:' + y.x.offer_id === ref)) || null;
+}
+const factBtn = (ref, label = '官方原文') => factEntry(ref) ? `<button class="linkbtn small" data-act="open-fact" data-fact="${esc(ref)}">${label} ›</button>` : '';
+function openFactDrawer(ref, fromEl) {
+  UI.drawerRun = null; UI.drawerFact = ref; UI.drawerFrom = null;
+  hideTip(); renderFactDrawer();
+  $id('drawer').classList.add('on'); $id('scrim').classList.add('on'); $id('drawer').setAttribute('aria-hidden', 'false');
+  setTimeout(() => { const x = $id('drawer').querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 60);
+}
+function renderFactDrawer() {
+  const T = S.truth, items = factItems(T);
+  const x = $id('drawer'); if (!x) return;
+  const close = '<button class="x" data-act="drawer-close" aria-label="关闭">×</button>';
+  if (UI.drawerFact === 'all') {
+    const cats = FACT_CATEGORIES.concat(['未分类']).filter(cat => items.some(y => y.cat === cat));
+    $id('dh').innerHTML = `<div><span class="tag">官方说明</span><h3>全部口径 · ${items.length} 条</h3></div>${close}`;
+    $id('db').innerHTML = `<p class="small muted" style="margin:0 0 10px">评测时，“AI 说得对不对”全部以这些口径为准，每条附官方原文和来源。</p>${cats.map(cat => `<h3 style="font-size:13px;margin:14px 0 6px">${esc(cat)}</h3><div class="flist">${items.filter(y => y.cat === cat).map(y => `<button class="fli" data-act="open-fact" data-fact="${y.list}.${y.i}">${esc(factItemTitle(y.list, y.x))}</button>`).join('')}</div>`).join('')}`;
+  } else {
+    const y = factEntry(UI.drawerFact);
+    if (!y) { closeDrawer(); return; }
+    const f = y.x, date = f.checked_at || (y.list === 'offers' ? f.valid_from : '') || '';
+    $id('dh').innerHTML = `<div><span class="tag">${esc(y.kind)} · ${esc(y.cat)}</span><h3>${esc(factItemTitle(y.list, f))}</h3></div>${close}`;
+    $id('db').innerHTML = `<div class="factd">
+      ${y.list === 'prohibited_claims' && f.note ? `<p class="small" style="margin:0 0 10px">${esc(f.note)}</p>` : ''}
+      <small>官方原文</small>${f.source_quote ? `<blockquote>“${esc(f.source_quote)}”</blockquote>` : '<p class="muted small">这条口径没有逐字原文，依据的是官方页面的整理说明。</p>'}
+      ${f.source_note ? `<p class="small muted">${esc(f.source_note)}</p>` : ''}
+      <dl class="small"><dt>来源</dt><dd>${f.evidence_url ? extLink(f.evidence_url, '打开原文') : '<span class="muted">—</span>'}${f.evidence_locator ? `<span class="muted">　${esc(f.evidence_locator)}</span>` : ''}</dd>
+      ${date ? `<dt>核对日期</dt><dd>${esc(date)}</dd>` : ''}${f.valid_from ? `<dt>生效日</dt><dd>${esc(f.valid_from)}</dd>` : ''}${isClientConfirmed(f) ? `<dt>客户确认</dt><dd>${esc(clientConfirmText(f))}</dd>` : ''}</dl>
+      <div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn sm" data-act="open-fact" data-fact="all">查看全部 ${items.length} 条口径</button></div></div>`;
+  }
+  redactMarks(x);
 }
 function renderDrawer() {
   const run = allRuns().find(r => r.run_id === UI.drawerRun);
@@ -4096,7 +4513,7 @@ function renderDrawer() {
   const tagCls = { v: 'acc', m: 'warn', f: 'bad', n: '', t: '' }[info.cls] || '';
   $id('dh').innerHTML = `<div><span class="tag ${tagCls}">${esc(eng.name)} · ${esc(info.tip)}</span><h3>${esc(q ? q.text : run.query_id)}</h3></div><button class="x" data-act="drawer-close" aria-label="关闭">×</button>`;
   $id('db').innerHTML = respBlock(run) + `<div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn sm" data-act="open-run" data-q="${esc(run.query_id)}">在回答记录里打开</button></div>`;
-  markLongCards($id('db'));
+  markLongCards($id('db')); redactMarks($id('db')); redactMarks($id('dh'));
 }
 
 function copyText(txt) {
@@ -4124,13 +4541,14 @@ function spotRender() {
   SPOT.list = spotItems().filter(x => !q || x.t.toLowerCase().includes(q)).slice(0, 8);
   SPOT.i = Math.min(SPOT.i, Math.max(0, SPOT.list.length - 1));
   $id('sres').innerHTML = SPOT.list.map((x, i) => `<li class="${i === SPOT.i ? 'on' : ''}" data-si="${i}">${esc(x.t)}<small>${x.k}</small></li>`).join('') || '<li class="muted">没有结果</li>';
+  redactMarks($id('sres'));
 }
 function spotOpen() { hideTip(); $id('spot').classList.add('on'); $id('sin').value = ''; SPOT.i = 0; spotRender(); setTimeout(() => $id('sin').focus(), 30); }
 function spotClose() { const el = $id('spot'); if (el) el.classList.remove('on'); }
 function spotRun(x) {
   spotClose(); if (!x) return;
   if (x.q) { UI.q = x.q; go('runs'); }
-  else if (x.fact) { UI.factEdit = x.fact; go('truth'); }
+  else if (x.fact) { if (pub()) openFactDrawer(x.fact); else { UI.factEdit = x.fact; go('truth'); } }
   else if (x.url) { UI.srcOpen = x.url; UI.srcFilter = 'all'; go('sources'); }
   else go(x.page);
 }
@@ -4156,8 +4574,10 @@ function bindShell() {
     if (e.key !== 'Escape') return;
     if ($id('spot').classList.contains('on')) spotClose();
     else if ($id('wel').classList.contains('on')) welClose();
-    else if (UI.drawerRun) closeDrawer();
+    else if (UI.drawerRun || UI.drawerFact) closeDrawer();
   });
+  // 公开版：整行可点的表格行，回车等于点击
+  document.addEventListener('keydown', e => { if (e.key === 'Enter' && e.target.matches && e.target.matches('tr[data-act]')) { e.preventDefault(); e.target.click(); } });
   window.addEventListener('resize', moveNavHl);
 }
 
@@ -4174,7 +4594,7 @@ function bindShell() {
     const w = $id('wel');
     if (w) {
       w.querySelector('.steps').innerHTML = `
-    <div class="stp"><i>1</i><div><b>官方说明是唯一标准</b><span>「事实底账」里每条口径都附官方原文和来源，它就是评测的正确答案。</span></div></div>
+    <div class="stp"><i>1</i><div><b>官方说明是唯一标准</b><span>每条口径都附官方原文和来源，它就是评测的正确答案；各页点“官方原文”就能看到。</span></div></div>
     <div class="stp"><i>2</i><div><b>用同一批问题问各家模型</b><span>「大模型回答记录」里，同一个问题在不同模型上的回答并排对齐。</span></div></div>
     <div class="stp"><i>3</i><div><b>读体检报告</b><span>哪些说法和官网不一致，出现了多少次，先改哪一处。</span></div></div>
     <div class="stp"><i>4</i><div><b>改内容，再复测</b><span>改完官网后用同一批问题复测，看偏差有没有下降。</span></div></div>`;
