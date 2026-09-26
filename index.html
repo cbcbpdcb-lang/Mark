@@ -1042,8 +1042,8 @@ function brandPanel(run) {
    没有查到官方价格数字，所以付费档只记名称不记价格。
    ========================================================= */
 /* v6.0：公开版里腾讯会议显示为“产品 B（在线会议）”。替换名单只在这一行，build_public.py 和页面运行时（本地“按公开版预览”）共用；
-   case_sensitive：只换大写的 Tencent，预设键名和网址里的 tencent 不动。腾讯本身换成“B 公司”，腾讯文档、企业微信这类同集团产品换成通用叫法 */
-const TENCENT_PUBLIC = {"anon": "产品 B", "case_sensitive": true, "names": ["腾讯会议", "Tencent Meeting", "TencentMeeting"], "domains": ["meeting.tencent.com", "cloud.tencent.com", "main.qcloudimg.com", "qcloudimg.com", "voovmeeting.com", "tencent.com"], "extra": [["腾讯会议", "产品 B"], ["Tencent Meeting", "产品 B"], ["TencentMeeting", "产品 B"], ["Tencent会议", "产品 B"], ["VooV Meeting", "产品 B 国际版"], ["VooV", "产品 B 国际版"], ["元宝纪要", "B 纪要"], ["腾讯云语音识别", "云端语音识别"], ["腾讯云文档", "官方文档中心"], ["腾讯云ASR", "云端 ASR"], ["腾讯云", "云服务商"], ["腾讯文档", "在线文档"], ["腾讯轻联", "集成平台"], ["腾讯待办", "待办工具"], ["腾讯乐享", "知识库工具"], ["企业微信", "企业 IM"], ["腾讯", "B 公司"], ["Tencent", "B 公司"], "3.36.10", ["https://www.geekpm.com/archives/meeting-product", "外部页面（已隐藏）"], ["https://aigc21.com/sites/3049.html", "外部页面（已隐藏）"]]};
+   case_sensitive：只换大写的 Tencent；预设键名和网址用 product_b，代码里的 TENCENT_ 变量名和 tencent_meeting 在公开版换成 PRODUCT_B_ / product_b。腾讯本身换成“B 公司”，腾讯文档、企业微信这类同集团产品换成通用叫法 */
+const TENCENT_PUBLIC = {"anon": "产品 B", "case_sensitive": true, "names": ["腾讯会议", "Tencent Meeting", "TencentMeeting"], "domains": ["meeting.tencent.com", "cloud.tencent.com", "main.qcloudimg.com", "qcloudimg.com", "voovmeeting.com", "tencent.com"], "extra": [["腾讯会议", "产品 B"], ["Tencent Meeting", "产品 B"], ["TencentMeeting", "产品 B"], ["Tencent会议", "产品 B"], ["VooV Meeting", "产品 B 国际版"], ["VooV", "产品 B 国际版"], ["元宝纪要", "B 纪要"], ["腾讯云语音识别", "云端语音识别"], ["腾讯云文档", "官方文档中心"], ["腾讯云ASR", "云端 ASR"], ["腾讯云", "云服务商"], ["腾讯文档", "在线文档"], ["腾讯轻联", "集成平台"], ["腾讯待办", "待办工具"], ["腾讯乐享", "知识库工具"], ["企业微信", "企业 IM"], ["腾讯", "B 公司"], ["Tencent", "B 公司"], "3.36.10", ["https://www.geekpm.com/archives/meeting-product", "外部页面（已隐藏）"], ["https://aigc21.com/sites/3049.html", "外部页面（已隐藏）"], ["tencent_meeting", "product_b"], ["TENCENT_", "PRODUCT_B_"]]};
 const TENCENT_TRUTH = {
   product_id: 'tencent_meeting', entity_name: '腾讯会议', aliases: ['腾讯会议', 'Tencent Meeting', 'TencentMeeting'],
   category: '云视频会议与 AI 会议记录', positioning: '基于腾讯音视频通讯经验的云视频会议产品，覆盖会前会中会后的 AI 会议助手',
@@ -1096,7 +1096,7 @@ Object.assign(SOURCE_META, {
   'https://main.qcloudimg.com/raw/document/product/pdf/1095_35535_cn.pdf': { title: '腾讯会议 产品简介', publisher: '腾讯云', published: '', snippet: '' }
 });
 const PRESETS = {
-  tencent: { name: '腾讯会议（真实产品演示）', publicName: '产品 B（在线会议）', anonymize: true, anonName: TENCENT_PUBLIC.anon, mask_extra: TENCENT_PUBLIC.extra, mask_cs: TENCENT_PUBLIC.case_sensitive, batches: ['R2'], truth: TENCENT_TRUTH, competitors: TENCENT_COMPETITORS, queries: TENCENT_QUERIES, note: '事实来自官方页面；真实数据用同一批不含品牌名的问题；4 条品牌问题待采集。' },
+  product_b: { name: '腾讯会议（真实产品演示）', publicName: '产品 B（在线会议）', anonymize: true, anonName: TENCENT_PUBLIC.anon, mask_extra: TENCENT_PUBLIC.extra, mask_cs: TENCENT_PUBLIC.case_sensitive, batches: ['R2'], truth: TENCENT_TRUTH, competitors: TENCENT_COMPETITORS, queries: TENCENT_QUERIES, note: '事实来自官方页面；真实数据用同一批不含品牌名的问题；4 条品牌问题待采集。' },
   novanote: { name: 'NovaNote（虚构探针实验）', batches: ['R1'], truth: DEFAULT_TRUTH, competitors: DEFAULT_COMPETITORS, queries: DEFAULT_QUERIES, note: '虚构产品，用来测模型在没有依据时会不会编造。' }
 };
 function applyPreset(key) {
@@ -1107,7 +1107,7 @@ function applyPreset(key) {
   S.competitors = d.competitors;
   S.querySet = { version: 1, frozen: true, frozen_at: p.frozen_at || '2026-09-20 09:30', queries: d.queries };
   S.factImport = { source_url: '', origin: '', extracted_at: '', candidates: [] };
-  UI.scope = 'real'; UI.q = key === 'tencent' ? 'q_aw_01' : key === 'novanote' ? 'q_de_04' : (d.queries[0] || {}).id; UI.reasonBrand = null;
+  UI.scope = 'real'; UI.q = key === 'product_b' ? 'q_aw_01' : key === 'novanote' ? 'q_de_04' : (d.queries[0] || {}).id; UI.reasonBrand = null;
 }
 
 /* ---------- 【改这里 23】公开版匿名 ----------
@@ -1141,7 +1141,7 @@ function publicHiddenPages() {
     const probe = isFictional() && UI.scope !== 'sample';
     const runs = probe ? SAMPLE_RUNS : scopeRuns();
     if (!sourceIndex(runs).length) h.add('sources');
-    if (effectivePreset() !== 'tencent') h.add('case');
+    if (effectivePreset() !== 'product_b') h.add('case');
     if (!S.experiments.some(x => (x.target_queries || []).length && x.target_queries.every(id => Q(id)))) h.add('experiments');
     if (!isFictional()) {
       const ok = realRuns().filter(r => r.status === 'SUCCESS');
@@ -1346,7 +1346,7 @@ function presetData(key) {
   const f = maskerFor(key);
   return { truth: maskDeep(d.truth, f), competitors: d.competitors, queries: maskDeep(d.queries, f) };
 }
-const PUBLIC_PRESET_NAMES = { tencent: '产品 B（在线会议）', novanote: 'NovaNote（示例）', direct_a: '品牌 A（精油直销）' };
+const PUBLIC_PRESET_NAMES = { product_b: '产品 B（在线会议）', novanote: 'NovaNote（示例）', direct_a: '品牌 A（精油直销）' };
 const presetLabel = (key) => pub() && PUBLIC_PRESET_NAMES[key] ? PUBLIC_PRESET_NAMES[key] : anonActive(key) ? (PRESETS[key].publicName || anonNameOf(key)) : PRESETS[key].name;
 const _maskedRuns = new Map();
 function viewRun(r) {
@@ -1434,7 +1434,7 @@ function todoCard(m) {
 /* ---------- 案例页：给第一次来的人看的完整故事 ---------- */
 function page_case() { const h = page_case_inner(); return pub() ? h.replace(/事实底账/g, '官方口径') : h; }
 function page_case_inner() {
-  if (effectivePreset() !== 'tencent') return `<header class="ph"><h1>案例：腾讯会议</h1></header><div class="state info"><h4>案例基于腾讯会议预设</h4><p>在左上角把演示产品切换为“腾讯会议（真实产品演示）”。</p></div>`;
+  if (effectivePreset() !== 'product_b') return `<header class="ph"><h1>案例：腾讯会议</h1></header><div class="state info"><h4>案例基于腾讯会议预设</h4><p>在左上角把演示产品切换为“腾讯会议（真实产品演示）”。</p></div>`;
   const qid = 'q_tm_02';
   const runs = realRuns().filter(r => r.query_id === qid && r.status === 'SUCCESS').sort((a, b) => (a.engine + a.repeat > b.engine + b.repeat ? 1 : -1));
   const engName = id => (ENG(id) || { name: id }).name;
@@ -2196,7 +2196,7 @@ async function extractReasonsAll() {
 
 /* ---------- 迭代日志 ---------- */
 const ITERATIONS = [
-  { v: 'v6.0', date: '2026-09-26', title: '官网上线与案例匿名', trigger: '对客官网要放在 echorank.markjcai.com 首页，产品挪到 /app/；腾讯会议案例对外不能认出是腾讯；品牌 A 的成立年份、地址、注册资本、点数门槛、认证商标名仍能反推出真实品牌', changed: '只在 PUBLIC_BUILD 生效：build_public.py 把 site/index.html 复制成 dist/index.html，产品输出到 dist/app/index.html；产品支持 ?case=direct_a / ?case=tencent 打开指定案例（优先于浏览器里保存的案例），侧栏链到官网和“免费体检”；腾讯会议对外为“产品 B（在线会议）”，腾讯为“B 公司”，元宝纪要为“B 纪要”，腾讯文档、企业微信等换成通用叫法，版本号和第三方链接隐藏；品牌 A 的成立年份、营业期限、注册地址、注册资本、125 点数门槛、CPTG 全称、“总部位于美国”“美国公司”这类说法换成灰色斜纹块；--check 增加违禁词检查', why: '对客网站和产品同域上线，案例只保留和结论有关的内容', dropped: '', evidence: '判定规则和数据不变：公开版与内部版逐条回答的判定一致', lesson: '匿名替换在规则正则和回答原文上同时生效，所以只能按字面或用各自的占位替换，并逐条比对两版判定' },
+  { v: 'v6.0', date: '2026-09-26', title: '官网上线与案例匿名', trigger: '对客官网要放在 echorank.markjcai.com 首页，产品挪到 /app/；腾讯会议案例对外不能认出是腾讯；品牌 A 的成立年份、地址、注册资本、点数门槛、认证商标名仍能反推出真实品牌', changed: '只在 PUBLIC_BUILD 生效：build_public.py 把 site/index.html 复制成 dist/index.html，产品输出到 dist/app/index.html；产品支持 ?case=direct_a / ?case=product_b 打开指定案例（优先于浏览器里保存的案例），侧栏链到官网和“免费体检”；腾讯会议对外为“产品 B（在线会议）”，腾讯为“B 公司”，元宝纪要为“B 纪要”，腾讯文档、企业微信等换成通用叫法，版本号和第三方链接隐藏；品牌 A 的成立年份、营业期限、注册地址、注册资本、125 点数门槛、CPTG 全称、“总部位于美国”“美国公司”这类说法换成灰色斜纹块；--check 增加违禁词检查', why: '对客网站和产品同域上线，案例只保留和结论有关的内容', dropped: '', evidence: '判定规则和数据不变：公开版与内部版逐条回答的判定一致', lesson: '匿名替换在规则正则和回答原文上同时生效，所以只能按字面或用各自的占位替换，并逐条比对两版判定' },
   { v: 'v5.9', date: '2026-09-26', title: '公开版交互走查修正', trigger: '对客网站逐页走查：三个页面的“说错”数字对不上（2 / 7 / 2+2）；认知差异的例句和口径无关；回答记录说“悬停可以看判断依据”却没有标注；表格仍是给自己看的写法', changed: '只在 PUBLIC_BUILD 生效：统一“说错”定义（一条回答里只要有一处说反官方口径、与官方说明冲突、过期、错误归属、定位偏差或替品牌宣称疗效，就算说错一条；该说没说、无法核对的价格不算），概览、体检报告、口径对照引用同一个数；概览用三段构成条（说对且有依据 / 没有可核对的说法 / 说错）替代核心指标和两张 100% 卡片；报告按钮改为“下载报告”（Word），分组表只列有说错的分组，方法说明收进小 i；口径对照每模型一段色条、整行点开对照官方原文与 AI 原句，样本少于 10 条不给区间；用户提问只显示有问题的阶段、按钮带数量、整行可点；回答记录逐句标色（说对蓝、无法核对米、说错陶土），悬停或键盘聚焦弹出依据小卡，同一模型两次回答合成一张卡并可切换，问题列表加图例；认知差异例句按与口径原文的重合度挑选，找不到写“没有 AI 提到这一点”，全为 0 的列不显示、有说错的行排前；“（已隐藏）”换成灰色斜纹小块；事实底账不单列，从各页“官方原文”以右侧抽屉打开', why: '同一个问题在三个页面给出三个数，客户会怀疑整个评测；例句和口径对不上，看起来像评测出错', dropped: '把 5 条“价格未核实”算进说错（官方本来就没公布价格，AI 说的价格无从判断对错，不能叫说错）', evidence: '直销预设：概览、报告、口径对照都是 2 / 240；腾讯会议预设都是 3 / 72；内部版三个预设的数字与改动前一致，回归测试 44/44', lesson: '匿名占位也会参与判定：所有被隐藏的信息共用一个“（已隐藏）”时，口径正则里的占位会命中任何被隐藏的内容，公开版“食品经营备案”一条因此从 1 次说对变成 70 次。现在每项隐藏信息用各自的占位' },
   { v: 'v5.7', date: '2026-09-26', title: '公开版对客口径清理', trigger: 'echorank.markjcai.com 是对客网站：迭代过程、版本号、内部术语不该出现；没有数据的模块不该显示', changed: '只在 PUBLIC_BUILD（公开版）生效，内部版不变：“本次检查 · 批次”改成一句人话；侧栏版本标签、讲解模式、保存位置、数据导入 / 评测与边界 / 迭代日志 / 学习手册全部隐藏；事实底账改为只读展示，去掉“已确认”横幅和导入面板；核心指标旁加小 i（深色卡片 + 区间小图）替代“北极星”说法；计数为 0 的行、模块、页面整块隐藏（信源溯源 0 条时侧栏也不出现）；AI 回答卡改为字母头像 + 模型名 + 日期，回答按 Markdown 渲染，第一句做摘要，底部只显示非零计数；报告与 Markdown 导出去掉“待复核 / 已确认”内部状态。', kept: '规则、数据、评测结果不变；内部版所有编辑功能保持原样。' },
   { v: 'v5.6', date: '2026-09-26', title: 'to B 交付：客户确认字段、公开版隐藏自助入口', trigger: '产品定位调整为 to B 服务交付，不做 SaaS 自助：报告要能说清哪些口径客户认过；公开网站不该有自助采集入口', changed: '事实底账每条口径增加“客户确认人、确认日期”两个字段，可逐条填写或一键记为今日确认；报告页和 Markdown 导出新增“口径确认状态”表，逐条发现旁标“客户已确认 / 未经客户确认”；公开版（build_public.py 生成、或按公开版预览）不显示「分析一个产品」', why: '交付场景里裁判是客户认可的口径，不是我们自己录的口径；自助入口和 to B 定位冲突', dropped: '让客户确认自动开新版本（确认是状态，不是内容修改）；把入口整段删掉（内部仍用它做采集）', evidence: '事实底账页、体检报告页、dist/index.html 侧栏', lesson: '“谁确认了”要和“确认了什么”一样写进报告，客户才有依据签收' },
@@ -2389,7 +2389,7 @@ function makeDefaultState() {
       { at: '2026-09-20 09:30', msg: '冻结问题集 v1（12 条）' }
     ]
   };
-  st.preset = 'tencent';
+  st.preset = 'product_b';
   st.truth = clone(TENCENT_TRUTH); st.competitors = clone(TENCENT_COMPETITORS);
   st.querySet = { version: 1, frozen: true, frozen_at: '2026-09-20 09:30', queries: clone(TENCENT_QUERIES) };
   st.truthApproved = clone(st.truth);
@@ -2453,6 +2453,8 @@ function migrate(x) {
   const st = { ...makeDefaultState(), ...x };
   // 旧版本保存的状态里可能有“已确认”但没有原文引语的口径，读入时退回待复核
   [st.truth, st.truthApproved].forEach(t => t && guardReview(t));
+  // v6.0：产品 B 预设改了键名（网址 ?case=product_b）。旧状态里的预设键名已不存在时，读入时回到默认预设
+  if (st.preset !== 'custom' && !PRESETS[st.preset]) st.preset = makeDefaultState().preset;
   return st;
 }
 function splitState(st) {
@@ -2505,7 +2507,7 @@ function flash(msg) {
 const Q = id => S.querySet.queries.find(q => q.id === id);
 const ENG = id => S.engines.find(e => e.id === id);
 function effectivePreset() { const p = PRESETS[S.preset]; return p && S.truth.entity_name === (anonActive(S.preset) ? anonNameOf(S.preset) : p.truth.entity_name) ? S.preset : 'custom'; }
-// v6.0：网址指定的案例，/app/?case=direct_a、/app/?case=tencent
+// v6.0：网址指定的案例，/app/?case=direct_a、/app/?case=product_b（产品 B，内部是腾讯会议）
 function urlCase() { try { const k = new URLSearchParams(location.search).get('case'); return k && PRESETS[k] ? k : null; } catch (e) { return null; } }
 const presetBatches = () => effectivePreset() === 'custom' ? [] : (PRESETS[S.preset] || {}).batches || [];
 const realRuns = () => REAL_RUNS.filter(r => presetBatches().includes(r.batch)).map(viewRun).concat(S.importedRuns.filter(r => !REAL_IDS.has(r.run_id)), S.liveRuns).filter(r => Q(r.query_id));
@@ -3251,7 +3253,7 @@ function page_overview() {
   if (!truthReady()) return `<header class="ph"><h1>${esc(S.truth.entity_name)} 在 AI 回答里的样子</h1></header>${blockedByTruth()}`;
   const missingQ = S.querySet.queries.filter(q => !scopeRuns().some(r => r.query_id === q.id));
   const head = `<header class="ph"><h1>${esc(S.truth.entity_name)} 在 AI 回答里的样子</h1>
-    <p class="lede">${pub() ? introSentence(runs) : `同一批购买决策问题，在 DeepSeek、Kimi、千问、豆包上各问多次。每个数字旁边都写着它能不能信。${S.preset === 'tencent' ? '数据来自真实批次 R2（官方 API，未联网）。事实底账依据官方页面整理，待复核；付费档价格未录入。' : ''}`}</p></header>
+    <p class="lede">${pub() ? introSentence(runs) : `同一批购买决策问题，在 DeepSeek、Kimi、千问、豆包上各问多次。每个数字旁边都写着它能不能信。${S.preset === 'product_b' ? '数据来自真实批次 R2（官方 API，未联网）。事实底账依据官方页面整理，待复核；付费档价格未录入。' : ''}`}</p></header>
     ${missingQ.length && UI.scope !== 'sample' && !pub() ? `<div class="state info"><h4>${missingQ.length} 条问题还没有回答</h4><p>${missingQ.map(q => esc(q.text)).join('；')}。${isPublicView() ? '' : '用「分析一个产品」的采集服务，或'}在「数据导入」导出问题集后用脚本采集。</p></div>` : ''}`;
   if (!runs.length && pub()) return head + `<div class="state info"><h4>还没有回答数据</h4><p>采集完成后，这里会显示各模型的回答与核对结果。</p></div>`;
   if (!runs.length) return head + `<div class="state info"><h4>还没有真实数据</h4><p>去「数据导入」录入你在豆包、元宝里问到的回答，或导入采集脚本的结果；也可以在「运行结果」用 Claude 实时运行。</p><div class="row"><button class="btn primary" data-act="nav" data-page="import">去导入数据</button><button class="btn" data-act="scope" data-scope="sample">先看样本</button></div></div>`;

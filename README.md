@@ -58,9 +58,9 @@ python3 build_public.py --check   # 只检查不写文件
 ```
 
 - 官网源文件是 `site/index.html`，原样复制成 `dist/index.html`（网址 `/`）。
-- 产品在 `/app/`。`/app/?case=direct_a`、`/app/?case=tencent` 打开指定案例，`#report` 等锚点照常生效；网址里的案例优先于浏览器里保存的案例。
+- 产品在 `/app/`。`/app/?case=direct_a`、`/app/?case=product_b` 打开指定案例，`#report` 等锚点照常生效；网址里的案例优先于浏览器里保存的案例。
 - 替换名单在 `index.html` 的 `DIRECT_A_PUBLIC`（品牌 A）和 `TENCENT_PUBLIC`（产品 B，在线会议）两行。成立年份、注册地址和资本、证照号、点数门槛、认证商标名等换成灰色斜纹块。
-- 生成和 `--check` 都会全文搜 `build_public.py` 里的 `BANNED` 词表（如“腾讯”“Tencent”“元宝纪要”“125 个”“CPTG”“2014”“静安”），官网或产品页出现任意一个就失败。
+- 生成和 `--check` 都会全文搜 `build_public.py` 里的 `BANNED` 词表（如“腾讯”“Tencent”“tencent”“元宝纪要”“125 个”“CPTG”“2014”“静安”），官网或产品页出现任意一个就失败。
 - 公开版同时把 `PUBLIC_BUILD` 置为 true，不显示「分析一个产品」等自助入口（产品定位是 to B 服务交付，采集由服务方完成，客户只看报告）。
 - 页面运行时还有一层匿名（预设的 `anonymize`），本地打开显示真实版，侧栏可以勾选“按公开版预览”。
 

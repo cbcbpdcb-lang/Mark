@@ -13,7 +13,7 @@
   TENCENT_PUBLIC   产品 B（在线会议）
 每行的字段：
   anon            匿名名，默认“品牌 A”
-  case_sensitive  true 时大小写敏感（腾讯会议一行用它：只换大写的 Tencent，预设键名和网址里的 tencent 不动）
+  case_sensitive  true 时大小写敏感（腾讯会议一行用它：大写的 TENCENT_ 变量名和小写的 tencent_meeting 分别指定替换）
   names           品牌名和别名 → 匿名名
   domains         官网域名
   extra           额外可识别信息，三种写法：
@@ -58,9 +58,9 @@ MASK_OTHER = '外部页面（已隐藏）'
 MASK_DOMAIN = '官方网站（已隐藏）'
 MASK_HIDDEN = '（已隐藏）'
 
-# 公开版（官网和产品）全文不能出现的词，大小写敏感。预设键名 tencent（网址 ?case=tencent）是小写，不在其中
+# 公开版（官网和产品）全文不能出现的词，大小写敏感，所以大小写不同的写法分别列出。产品 B 的网址是 ?case=product_b
 BANNED = [
-    '腾讯', 'Tencent', 'VooV', '元宝纪要', '3.36.10',
+    '腾讯', 'Tencent', 'tencent', 'TENCENT', 'VooV', '元宝纪要', '3.36.10',
     '多特瑞', 'doTERRA', 'dōTERRA', 'DOTERRA', 'doterra',
     '125 个', '125产品点数', '125 产品点数', 'CPTG', 'Certified Pure', '认证纯正', '纯正理疗级', '纯正治疗级',
     '2014', '2008', '静安', '犹他', '8000 万', '美国公司', '美国的精油公司', '美国精油', '源自美国', '总部位于美国',
