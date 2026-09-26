@@ -424,6 +424,33 @@ footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
 @media (max-width:860px){.covers{grid-template-columns:minmax(0,340px);gap:28px}.rd-body{grid-template-columns:minmax(0,1fr);gap:18px;padding:20px 14px 90px}.rd-toc{position:static;display:flex;overflow-x:auto;gap:4px}.rd-toc a{white-space:nowrap;grid-template-columns:auto auto}.pg{padding:28px 22px}.kn,.qa,.meth{grid-template-columns:1fr}.gaps div{grid-template-columns:1fr;gap:4px}.rd-live{display:none}.endc{padding:30px 24px}}
 @media (prefers-reduced-motion:reduce){.cover,.flycv,.pg,.reader,.veil2{transition:none}.pg{opacity:1;transform:none}}
 
+
+.covers{grid-template-columns:repeat(3,minmax(0,320px));gap:32px}
+.lab{box-sizing:border-box;aspect-ratio:3/4;border-radius:16px;padding:26px 24px 22px;display:flex;flex-direction:column;text-align:left;background:linear-gradient(160deg,#eef3fe 0%,#f7f7f8 60%);box-shadow:0 0 0 1px rgba(31,95,224,.14),0 30px 60px -34px rgba(31,95,224,.45);transition:transform .7s cubic-bezier(.32,.72,0,1),box-shadow .5s}
+.lab:hover{transform:translateY(-6px);box-shadow:0 0 0 1px rgba(31,95,224,.24),0 44px 80px -34px rgba(31,95,224,.5)}
+.lab-top{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.04em;color:#1a4fc0;font-weight:600}
+.lab-top i{width:7px;height:7px;border-radius:50%;background:#1f5fe0;box-shadow:0 0 0 4px rgba(31,95,224,.15)}
+.lab h3{font-size:24px;line-height:1.25;letter-spacing:-.02em;margin:16px 0 6px;color:#0b0b0f}
+.lab p{font-size:13.5px;color:#5b5b66;margin:0 0 14px;line-height:1.6}
+.lab-seg{display:inline-flex;background:rgba(255,255,255,.8);border-radius:10px;padding:3px;gap:2px;box-shadow:0 0 0 1px rgba(16,16,24,.06);align-self:flex-start}
+.lab-seg button{all:unset;cursor:pointer;font-size:12.5px;padding:4px 12px;border-radius:8px;color:#5b5b66;transition:background .25s,color .25s}
+.lab-seg button[aria-pressed="true"]{background:#1f5fe0;color:#fff}
+.lab-seg button:focus-visible{outline:2px solid #1f5fe0;outline-offset:2px}
+.lab-list{margin-top:auto;display:grid;gap:2px}
+.lab-list a{display:grid;grid-template-columns:1fr auto 14px;gap:10px;align-items:center;padding:10px 12px;border-radius:12px;color:#0b0b0f;text-decoration:none;font-size:14px;background:rgba(255,255,255,.7);transition:background .2s,transform .35s cubic-bezier(.32,.72,0,1)}
+.lab-list a:hover{background:#fff;transform:translateX(3px)}
+.lab-list a:focus-visible{outline:2px solid #1f5fe0}
+.lab-list b{font-size:13px;color:#1a4fc0;font-weight:600;font-variant-numeric:tabular-nums}
+.lab-list svg{color:#9a9aa6}
+.rd-live{background:#1f5fe0;color:#fff!important;padding:7px 14px;border-radius:999px;font-weight:600;font-size:13px}
+.rd-live:hover{text-decoration:none!important;filter:brightness(1.08)}
+@media (max-width:1100px){.covers{grid-template-columns:repeat(2,minmax(0,320px))}.lab{grid-column:1/-1;aspect-ratio:auto;max-width:672px;width:100%;justify-self:center}}
+@media (max-width:860px){.covers{grid-template-columns:minmax(0,340px)}.lab{grid-column:auto;max-width:none}.rd-live{display:inline-block!important;padding:6px 12px}}
+/* 阅读器只有一列：列宽不随顶栏内容撑开，窄屏时标题省略、“查看完整分析”按钮留在屏幕内 */
+.reader{grid-template-columns:minmax(0,1fr)}
+@media (max-width:560px){.rd-bar{gap:10px;padding-left:16px;padding-right:16px}.rd-prog{min-width:16px}}
+/* 手机宽度放不下顶部导航的六个链接（会被挤成竖排），只留“提交品牌” */
+@media (max-width:860px){nav ul{display:none}nav .pill{margin-left:auto}}
 </style>
 </head>
 <body>
@@ -517,8 +544,20 @@ footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
         <span class="cv-foot">2026 年 9 月 · 12 个问题 · DeepSeek、Kimi、千问、豆包</span>
         <span class="cv-open">打开报告 <i>›</i></span>
       </button>
+      <div class="lab rv d3" id="lab">
+        <span class="lab-top"><i></i>完整分析过程</span>
+        <h3>结论是怎么来的，<br>每一步都能看。</h3>
+        <p>用户提问、每个 AI 的原话、逐句判定、官网原文，全部公开可查。</p>
+        <span class="lab-seg" role="group" aria-label="选择案例"><button aria-pressed="true" data-c="a">品牌 A</button><button aria-pressed="false" data-c="b">产品 B</button></span>
+        <div class="lab-list">
+          <a data-h="queries"><span>用户提问</span><b data-n="q">30 个</b><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></a>
+          <a data-h="runs"><span>大模型回答记录</span><b data-n="r">240 条</b><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></a>
+          <a data-h="gap"><span>逐条口径对照</span><b data-n="g">16 条</b><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></a>
+          <a data-h="report"><span>完整体检报告</span><b>全文</b><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3l5 5-5 5"/></svg></a>
+        </div>
+      </div>
     </div>
-    <p class="cases-note rv">两份报告均已匿名处理。每份报告都附一个在线核对页，每个数字都能点回 AI 的原话和官网原文。</p>
+    <p class="cases-note rv">两份报告均已匿名处理。</p>
   </div></section>
 
   <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="rd-title" hidden>
@@ -526,7 +565,7 @@ footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
       <button class="rd-x" id="rd-x" aria-label="关闭报告"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
       <span class="rd-t" id="rd-title"></span>
       <span class="rd-prog"><i id="rd-prog"></i></span>
-      <a class="rd-live" id="rd-live" href="/app/" rel="noopener">在线核对全部证据 ↗</a>
+      <a class="rd-live" id="rd-live" href="/app/" rel="noopener">查看完整分析 ↗</a>
     </div>
     <div class="rd-body">
       <nav class="rd-toc" id="rd-toc" aria-label="章节"></nav>
@@ -638,7 +677,7 @@ footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   function build(k){
     var c=R[k]; document.getElementById('rd-title').textContent=c.title; document.getElementById('rd-live').href=c.live;
     toc.innerHTML=c.ch.map(function(x,i){return '<a href="#rd'+i+'" data-i="'+i+'"><span>0'+(i+1)+'</span>'+x[0]+'</a>'}).join('');
-    doc.innerHTML=c.ch.map(function(x,i){return '<section class="pg" id="rd'+i+'">'+x[1]+'</section>'}).join('')+'<section class="endc pg" id="rdend"><h3>想要你品牌的这份报告？</h3><p>把产品名和官网给我们，一周内交付。首次体检免费。</p><div class="row"><button class="pri" id="rd-apply">提交品牌</button><a class="sec2" href="'+c.live+'" rel="noopener">在线核对全部证据 ↗</a></div></section>';
+    doc.innerHTML=c.ch.map(function(x,i){return '<section class="pg" id="rd'+i+'">'+x[1]+'</section>'}).join('')+'<section class="endc pg" id="rdend"><h3>想要你品牌的这份报告？</h3><p>把产品名和官网给我们，一周内交付。首次体检免费。</p><div class="row"><button class="pri" id="rd-apply">提交品牌</button><a class="sec2" href="'+c.live+'" rel="noopener">查看完整分析 ↗</a></div></section>';
     body.scrollTop=0;
     if(io) io.disconnect();
     io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in'); var i=e.target.id.replace('rd',''); toc.querySelectorAll('a').forEach(function(a){a.classList.toggle('on',a.dataset.i===i)})}})},{root:body,rootMargin:'-35% 0px -55% 0px'});
@@ -669,6 +708,15 @@ footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
   document.querySelectorAll('.cover').forEach(function(c){c.addEventListener('click',function(){open(c)})});
   document.getElementById('rd-x').addEventListener('click',function(){close()});
   document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!reader.hidden)close()});
+})();
+</script><script>
+(function(){
+  var lab=document.getElementById('lab'); if(!lab) return;
+  var BASE='';
+  var D={a:{key:'direct_a',q:'30 个',r:'240 条',g:'16 条'},b:{key:'product_b',q:'12 个',r:'86 条',g:'8 条'}};
+  function set(c){var d=D[c]; lab.querySelectorAll('.lab-seg button').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.c===c)}); lab.querySelectorAll('.lab-list a').forEach(function(a){a.href=BASE+'/app/?case='+d.key+'#'+a.dataset.h}); lab.querySelector('[data-n=q]').textContent=d.q; lab.querySelector('[data-n=r]').textContent=d.r; lab.querySelector('[data-n=g]').textContent=d.g;}
+  lab.querySelector('.lab-seg').addEventListener('click',function(e){var b=e.target.closest('button'); if(b) set(b.dataset.c)});
+  set('a');
 })();
 </script></body>
 </html>
