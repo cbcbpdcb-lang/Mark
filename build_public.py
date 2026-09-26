@@ -11,6 +11,7 @@
   2. 额外可识别信息（证照号、电话、邮箱、地址、专有名词）→ “（已隐藏）”，或名单里指定的替换文字
   3. 裸域名（doterra.cn 这类没有 https:// 的写法）→ “官方网站（已隐藏）”
   4. 品牌名和别名（不分大小写，长的先换）→ “品牌 A”
+  5. 把 `const PUBLIC_BUILD = false` 改为 true：公开版不显示「分析一个产品」等自助入口
 
 用法：
   python3 build_public.py            # 生成 dist/index.html
@@ -92,6 +93,12 @@ def build(html):
     # 4. 品牌名
     out, n = name_re.subn(ANON, out)
     bump('品牌名', n)
+
+    # 5. 公开版开关：隐藏「分析一个产品」等自助入口（to B 交付，不做 SaaS 自助）
+    out, n = re.subn(r'^const PUBLIC_BUILD = false;', 'const PUBLIC_BUILD = true;', out, count=1, flags=re.M)
+    if n != 1:
+        sys.exit('index.html 里找不到 `const PUBLIC_BUILD = false;`，无法生成公开版')
+    bump('公开版开关 PUBLIC_BUILD', n)
 
     # 检查：所有名单项都不能再出现
     leaks = []
