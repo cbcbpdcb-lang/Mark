@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="ledger">
+<head><style>:root, [data-theme="ledger"] {
+  --canvas: #f6f3ec;
+  --surface: #fffdf8;
+  --surface-alt: #efe9dc;
+  --line: #ddd5c4;
+  --line-strong: #8f8672;
+  --ink: #1c1a16;
+  --ink-muted: #5c5649;
+  --brand: #c23b22;
+  --brand-ink: #ad3219;
+  --on-brand: #fffdf8;
+  --brand-soft: #f7e1d9;
+  --verified: #24527a;
+  --verified-soft: #e0e9f1;
+  --deviation: #86600f;
+  --deviation-soft: #f3e7cb;
+  --error: var(--brand-ink);
+  --error-soft: var(--brand-soft);
+  --absent: #e2dccd;
+  --focus: #24527a;
+  --series-me: #c23b22;
+  --series-other: #b9b09c;
+  --inverse: #1c1a16;
+  --on-inverse: #f6f3ec;
+  --shadow-card: 0 1px 0 rgba(28,26,22,0.05);
+  --shadow-pop: 0 12px 32px rgba(28,26,22,0.14);
+}
+[data-theme="sonar"] {
+  --canvas: #0a0b0d;
+  --surface: #121418;
+  --surface-alt: #1a1d22;
+  --line: #23272e;
+  --line-strong: #5f6773;
+  --ink: #eceef1;
+  --ink-muted: #9aa2ae;
+  --brand: #c6f24e;
+  --brand-ink: #c6f24e;
+  --on-brand: #0a0b0d;
+  --brand-soft: #222a10;
+  --verified: #6cb8ff;
+  --verified-soft: #10233a;
+  --deviation: #f2c14e;
+  --deviation-soft: #2b2410;
+  --error: #ff7a5c;
+  --error-soft: #33170f;
+  --absent: #2a2f37;
+  --focus: #c6f24e;
+  --series-me: #c6f24e;
+  --series-other: #4a515c;
+  --inverse: #eceef1;
+  --on-inverse: #0a0b0d;
+  --shadow-card: 0 0 0 1px rgba(255,255,255,0.02);
+  --shadow-pop: 0 16px 48px rgba(0,0,0,0.6);
+}
+[data-theme="clarity"] {
+  --canvas: #f7f7f8;
+  --surface: #ffffff;
+  --surface-alt: #f1f1f3;
+  --line: #e5e5ea;
+  --line-strong: #8b8b95;
+  --ink: #0b0b0f;
+  --ink-muted: #5b5b66;
+  --brand: #1f5fe0;
+  --brand-ink: #1a54c9;
+  --on-brand: #ffffff;
+  --brand-soft: #e8efff;
+  --verified: var(--brand);
+  --verified-soft: var(--brand-soft);
+  --deviation: #9c5700;
+  --deviation-soft: #fff1dc;
+  --error: #cc2a1e;
+  --error-soft: #fdebe9;
+  --absent: #e4e4e9;
+  --focus: #1f5fe0;
+  --series-me: #1f5fe0;
+  --series-other: #c6c6ce;
+  --inverse: #0b0b0f;
+  --on-inverse: #ffffff;
+  --shadow-card: 0 1px 2px rgba(16,16,24,0.06), 0 8px 24px rgba(16,16,24,0.05);
+  --shadow-pop: 0 4px 8px rgba(16,16,24,0.06), 0 24px 56px rgba(16,16,24,0.14);
+}
+[data-theme="echo"] {
+  --canvas: #f0eee7;
+  --surface: #fbfaf6;
+  --surface-alt: #e6e2d6;
+  --line: #d6d1c3;
+  --line-strong: #878171;
+  --ink: #121212;
+  --ink-muted: #54514a;
+  --brand: #2536f5;
+  --brand-ink: #2536f5;
+  --on-brand: #ffffff;
+  --brand-soft: #dfe2ff;
+  --verified: var(--brand);
+  --verified-soft: var(--brand-soft);
+  --deviation: #8a6000;
+  --deviation-soft: #f5e6b8;
+  --error: #b0340f;
+  --error-soft: #fbe3d8;
+  --absent: #dcd7c9;
+  --focus: #2536f5;
+  --series-me: #2536f5;
+  --series-other: #b8b2a2;
+  --inverse: #121212;
+  --on-inverse: #f0eee7;
+  --shadow-card: 4px 4px 0 #121212;
+  --shadow-pop: 8px 8px 0 #121212;
+}
+:root {
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-24: 96px;
+  --space-32: 128px;
+  --radius-a: 2px;
+  --radius-b: 6px;
+  --radius-b-lg: 10px;
+  --radius-c: 10px;
+  --radius-c-lg: 16px;
+  --radius-d: 24px;
+  --radius-pill: 999px;
+  --dur-fast: 120ms;
+  --dur-base: 200ms;
+  --dur-slow: 420ms;
+  --dur-count: 900ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --font-sans: "Noto Sans SC", "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", system-ui, sans-serif;
+  --font-serif: "Newsreader", "Noto Serif SC", "Songti SC", "STSong", serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --font-geist: "Geist", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-geist-mono: "Geist Mono", "Noto Sans SC", ui-monospace, Menlo, monospace;
+  --font-instrument: "Instrument Sans", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-bricolage: "Bricolage Grotesque", "Noto Sans SC", "PingFang SC", system-ui, sans-serif;
+  --font-apple: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "PingFang SC", "Instrument Sans", "Noto Sans SC", system-ui, sans-serif;
+}
+.a-display { font-family: var(--font-serif); font-size: 56px; line-height: 64px; font-weight: 600; letter-spacing: -0.01em; }
+.a-title { font-family: var(--font-serif); font-size: 28px; line-height: 38px; font-weight: 600; }
+.a-numeral { font-family: var(--font-serif); font-size: 44px; line-height: 48px; font-weight: 500; letter-spacing: -0.01em; }
+.a-body { font-family: var(--font-sans); font-size: 15px; line-height: 26px; font-weight: 400; }
+.a-note { font-family: var(--font-sans); font-size: 13px; line-height: 22px; font-weight: 400; }
+.a-label { font-family: var(--font-mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.06em; }
+.b-display { font-family: var(--font-geist); font-size: 60px; line-height: 64px; font-weight: 600; letter-spacing: -0.03em; }
+.b-title { font-family: var(--font-geist); font-size: 20px; line-height: 28px; font-weight: 600; letter-spacing: -0.01em; }
+.b-numeral { font-family: var(--font-geist-mono); font-size: 34px; line-height: 38px; font-weight: 500; letter-spacing: -0.02em; }
+.b-body { font-family: var(--font-geist); font-size: 14px; line-height: 22px; font-weight: 400; }
+.b-label { font-family: var(--font-geist-mono); font-size: 11px; line-height: 16px; font-weight: 500; letter-spacing: 0.06em; }
+.c-display { font-family: var(--font-apple); font-size: 60px; line-height: 66px; font-weight: 600; letter-spacing: -0.025em; }
+.c-title { font-family: var(--font-apple); font-size: 22px; line-height: 30px; font-weight: 600; letter-spacing: -0.01em; }
+.c-numeral { font-family: var(--font-apple); font-size: 32px; line-height: 38px; font-weight: 600; letter-spacing: -0.02em; }
+.c-body { font-family: var(--font-apple); font-size: 15px; line-height: 24px; font-weight: 400; }
+.c-caption { font-family: var(--font-apple); font-size: 12px; line-height: 18px; font-weight: 500; }
+.d-display { font-family: var(--font-bricolage); font-size: 96px; line-height: 96px; font-weight: 800; letter-spacing: -0.04em; }
+.d-numeral { font-family: var(--font-bricolage); font-size: 160px; line-height: 140px; font-weight: 800; letter-spacing: -0.05em; }
+.d-title { font-family: var(--font-bricolage); font-size: 32px; line-height: 36px; font-weight: 700; letter-spacing: -0.02em; }
+.d-body { font-family: var(--font-sans); font-size: 16px; line-height: 26px; font-weight: 400; }
+.d-label { font-family: var(--font-bricolage); font-size: 13px; line-height: 18px; font-weight: 600; }
+@font-face{font-family:"Noto Sans SC";src:local("Noto Sans CJK SC");font-weight:400}@font-face{font-family:"Noto Sans SC";src:local("Noto Sans CJK SC");font-weight:500}@font-face{font-family:"Noto Sans SC";src:local("Noto Sans CJK SC");font-weight:600}@font-face{font-family:"Noto Sans SC";src:local("Noto Sans CJK SC");font-weight:700}@font-face{font-family:"Noto Sans SC";src:local("Noto Sans CJK SC");font-weight:900}@font-face{font-family:"Noto Serif SC";src:local("Noto Serif CJK SC");font-weight:400}@font-face{font-family:"Noto Serif SC";src:local("Noto Serif CJK SC");font-weight:500}@font-face{font-family:"Noto Serif SC";src:local("Noto Serif CJK SC");font-weight:600}@font-face{font-family:"Noto Serif SC";src:local("Noto Serif CJK SC");font-weight:700}@font-face{font-family:"Noto Serif SC";src:local("Noto Serif CJK SC");font-weight:900}</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>EchoRank · AI 回答体检</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Noto+Sans+SC:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%}
+*{box-sizing:border-box}
+.root{--f:var(--font-apple,-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif);--sp:var(--ease-spring,cubic-bezier(.32,.72,0,1));height:100vh;background:var(--surface);color:var(--ink);font:17px/1.6 var(--f);-webkit-font-smoothing:antialiased;overflow:hidden;letter-spacing:-.005em}
+.sc{height:100%;overflow-y:auto;overflow-x:hidden;scroll-behavior:smooth}
+.w{max-width:1080px;margin:0 auto;padding:0 44px}
+a{color:inherit;text-decoration:none}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--focus);outline-offset:3px;border-radius:8px}
+.muted{color:var(--ink-muted)}
+/* reveal: IO toggles .in once; transform + opacity only */
+.rv{opacity:0;transform:translateY(40px);transition:opacity 1.1s var(--sp),transform 1.2s var(--sp)}
+.rv.in{opacity:1;transform:none}
+.d1{transition-delay:.1s}.d2{transition-delay:.2s}.d3{transition-delay:.3s}.d4{transition-delay:.4s}
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 78%,transparent);backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid color-mix(in srgb,var(--line) 70%,transparent)}
+nav .w{display:flex;align-items:center;height:52px;gap:34px;max-width:1180px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:600;font-size:17px;letter-spacing:-.02em}
+.mk{width:22px;height:22px;border-radius:7px;background:var(--brand);display:grid;place-items:center}
+nav ul{display:flex;gap:28px;list-style:none;margin:0 0 0 auto;padding:0;font-size:13px}
+nav li a{color:var(--ink-muted);transition:color .25s}
+nav li a:hover{color:var(--ink)}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:500;font-size:17px;padding:13px 26px;border-radius:999px;background:var(--brand);color:var(--on-brand);cursor:pointer;border:0;transition:transform .5s var(--sp),background .3s,box-shadow .5s var(--sp)}
+.pill:hover{background:color-mix(in srgb,var(--brand) 88%,#fff);box-shadow:0 10px 28px -10px color-mix(in srgb,var(--brand) 70%,transparent)}
+.pill:active{transform:scale(.96)}
+.pill.sm{font-size:12.5px;padding:6px 14px}
+.tl{display:inline-flex;align-items:center;gap:4px;color:var(--brand-ink);font-weight:500;font-size:17px;cursor:pointer}
+.tl i{font-style:normal;display:inline-block;transition:transform .5s var(--sp)}
+.tl:hover i{transform:translateX(4px)}
+.tl:hover span{text-decoration:underline;text-underline-offset:3px}
+/* hero */
+.hero{min-height:calc(100vh - 52px);display:flex;flex-direction:column;justify-content:center;text-align:center;padding:40px 0 60px;background:radial-gradient(1200px 520px at 50% -10%,var(--brand-soft),transparent 70%)}
+.eyb{font-size:17px;font-weight:600;color:var(--brand-ink);margin-bottom:18px;display:block}
+.hero h1{font-size:78px;line-height:1.08;letter-spacing:-.05em;font-weight:600;margin:0 auto 26px}
+.hero p{font-size:22px;line-height:1.5;color:var(--ink-muted);max-width:26em;margin:0 auto 38px}
+.cta{display:flex;gap:30px;justify-content:center;align-items:center}
+.scrollhint{margin-top:64px;font-size:13px;color:var(--ink-muted);display:flex;flex-direction:column;align-items:center;gap:8px}
+.scrollhint i{width:22px;height:34px;border-radius:12px;box-shadow:inset 0 0 0 1.5px var(--line-strong);position:relative}
+.scrollhint i::after{content:"";position:absolute;left:50%;top:7px;width:3px;height:7px;border-radius:2px;background:var(--ink-muted);transform:translateX(-50%);animation:wheel 1.8s var(--sp) infinite}
+@keyframes wheel{0%{opacity:0;transform:translate(-50%,0)}30%{opacity:1}100%{opacity:0;transform:translate(-50%,10px)}}
+/* big statements: one per screen */
+.st{min-height:100vh;display:flex;align-items:center}
+.st p{font-size:64px;line-height:1.14;letter-spacing:-.045em;font-weight:600;margin:0;max-width:13em}
+.st p em{font-style:normal;color:var(--brand-ink)}
+.st p s{text-decoration-thickness:4px;text-decoration-color:var(--error)}
+.st small{display:block;font-size:19px;line-height:1.55;letter-spacing:0;font-weight:400;color:var(--ink-muted);margin-top:26px;max-width:32em}
+.st.dark{background:var(--inverse);color:var(--on-inverse)}
+.st.dark small{color:color-mix(in srgb,var(--on-inverse) 70%,var(--inverse))}
+.quotes{display:grid;gap:14px;margin-top:40px}
+.qt{display:flex;align-items:center;gap:14px;font-size:22px;font-weight:500;letter-spacing:-.02em}
+.qt s{text-decoration-thickness:3px;text-decoration-color:var(--error)}
+.qt span{font-size:13px;font-weight:600;letter-spacing:0;border-radius:999px;padding:3px 11px;background:color-mix(in srgb,var(--error) 25%,var(--inverse));color:#ffb4aa}
+/* section headers */
+.sec{padding:150px 0}
+.sec.alt{background:var(--canvas)}
+.sh2{font-size:60px;line-height:1.08;letter-spacing:-.045em;font-weight:600;margin:0 0 20px;max-width:14em}
+.lead{font-size:22px;line-height:1.5;color:var(--ink-muted);max-width:28em;margin:0 0 70px}
+.center{text-align:center}.center .sh2,.center .lead{margin-left:auto;margin-right:auto}
+/* give */
+.give{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.gv{background:var(--surface);border-radius:30px;padding:38px 34px 40px;min-height:330px;display:flex;flex-direction:column;transition:transform .6s var(--sp),box-shadow .6s var(--sp)}
+.gv:hover{transform:translateY(-6px);box-shadow:0 30px 60px -30px rgba(16,16,24,.3)}
+.gv .n{font-size:88px;font-weight:600;letter-spacing:-.06em;line-height:1;color:var(--brand);margin-bottom:auto}
+.gv h3{font-size:26px;letter-spacing:-.03em;margin:30px 0 8px;font-weight:600}
+.gv p{margin:0;color:var(--ink-muted);font-size:16px}
+.gv .opt{font-size:13px;font-weight:600;color:var(--ink-muted);background:var(--canvas);border-radius:999px;padding:3px 10px;align-self:flex-start;margin-top:14px}
+.nolog{margin-top:34px;text-align:center;font-size:16px;color:var(--ink-muted)}
+.nolog b{color:var(--ink);font-weight:600}
+/* process: sticky title, steps reveal */
+.proc{display:grid;grid-template-columns:380px 1fr;gap:80px}
+.proc .l{position:sticky;top:130px;align-self:start}
+.proc .l .sh2{font-size:52px}
+.day{display:inline-flex;align-items:baseline;gap:6px;font-size:15px;color:var(--ink-muted);margin-top:14px}
+.day b{font-size:56px;font-weight:600;letter-spacing:-.05em;color:var(--ink);font-variant-numeric:tabular-nums;transition:opacity .3s}
+.steps{display:grid;gap:26px;padding:40px 0 30vh}
+.step{background:var(--surface);border-radius:28px;padding:34px 36px;box-shadow:var(--shadow-card);opacity:.35;transform:scale(.97);transition:opacity .7s var(--sp),transform .8s var(--sp),box-shadow .6s}
+.step.on{opacity:1;transform:none;box-shadow:0 1px 2px rgba(16,16,24,.05),0 30px 60px -30px rgba(16,16,24,.25)}
+.step .when{font-size:14px;font-weight:600;color:var(--brand-ink)}
+.step h3{font-size:28px;letter-spacing:-.03em;margin:8px 0 10px;font-weight:600}
+.step p{margin:0;color:var(--ink-muted);font-size:16.5px}
+.step .who{display:inline-flex;gap:8px;margin-top:16px;font-size:13px}
+.step .who span{background:var(--canvas);border-radius:999px;padding:4px 12px;color:var(--ink-muted)}
+.step .who span.you{background:var(--brand-soft);color:var(--brand-ink);font-weight:500}
+/* deliverables: horizontal snap gallery */
+.gal{display:flex;gap:22px;overflow-x:auto;scroll-snap-type:x mandatory;padding:10px max(44px,calc((100% - 1080px) / 2 + 44px)) 30px;scrollbar-width:none;scroll-behavior:smooth}
+.gal::-webkit-scrollbar{display:none}
+.dv{flex:none;width:560px;height:520px;scroll-snap-align:center;background:var(--surface);border-radius:32px;padding:34px;display:flex;flex-direction:column;gap:18px;transition:transform .6s var(--sp)}
+.dv:hover{transform:scale(1.01)}
+.dv h3{font-size:30px;letter-spacing:-.035em;margin:0;font-weight:600}
+.dv>p{margin:0;color:var(--ink-muted);font-size:16px}
+.mock{flex:1;background:var(--canvas);border-radius:20px;padding:20px 22px;font-size:14px;overflow:hidden;display:flex;flex-direction:column;gap:10px}
+.mock .big{font-size:52px;font-weight:600;letter-spacing:-.05em;line-height:1}
+.mock .row{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line)}
+.mock .row:last-child{border-bottom:0}
+.badge{display:inline-block;font-size:12px;font-weight:600;border-radius:999px;padding:2px 10px;white-space:nowrap}
+.badge.ok{background:var(--verified-soft);color:var(--verified)}.badge.dev{background:var(--deviation-soft);color:var(--deviation)}.badge.err{background:var(--error-soft);color:var(--error)}.badge.n{background:var(--surface-alt);color:var(--ink-muted)}
+.ax{position:relative;height:16px}
+.ax::before{content:"";position:absolute;left:0;right:0;top:7px;height:2px;background:var(--surface-alt);border-radius:2px}
+.ax i{position:absolute;top:4px;height:8px;border-radius:4px;background:var(--brand-soft);box-shadow:inset 0 0 0 1.5px var(--brand)}
+.ax b{position:absolute;top:2px;width:12px;height:12px;border-radius:50%;background:var(--brand);border:2.5px solid var(--surface);transform:translateX(-50%)}
+.mock mark{background:var(--error-soft);color:inherit;border-radius:4px;padding:1px 2px;box-shadow:inset 0 -1.5px 0 var(--error)}
+.mock mark.ok{background:var(--verified-soft);box-shadow:none}
+.galnav{display:flex;justify-content:center;gap:12px;margin-top:6px}
+.gb{all:unset;width:44px;height:44px;border-radius:50%;background:color-mix(in srgb,var(--ink) 7%,var(--surface));display:grid;place-items:center;cursor:pointer;transition:background .25s,transform .4s var(--sp)}
+.gb:hover{background:color-mix(in srgb,var(--ink) 12%,var(--surface))}
+.gb:active{transform:scale(.92)}
+.gb:focus-visible{outline:2px solid var(--focus)}
+.gb svg{width:16px;height:16px;fill:none;stroke:var(--ink);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+/* principles */
+.pr{display:grid;grid-template-columns:repeat(3,1fr);gap:50px;margin-top:10px}
+.pr b{display:block;font-size:72px;letter-spacing:-.06em;font-weight:600;line-height:1;margin-bottom:18px;font-variant-numeric:tabular-nums}
+.pr h3{font-size:22px;letter-spacing:-.02em;margin:0 0 8px;font-weight:600}
+.pr p{margin:0;color:var(--ink-muted);font-size:16px}
+/* plans */
+.plans{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pl{background:var(--surface);border-radius:30px;padding:36px 32px;box-shadow:var(--shadow-card);display:flex;flex-direction:column;gap:14px;transition:transform .6s var(--sp),box-shadow .6s var(--sp)}
+.pl:hover{transform:translateY(-6px);box-shadow:0 30px 60px -30px rgba(16,16,24,.3)}
+.pl.hot{box-shadow:0 0 0 2px var(--brand),var(--shadow-card)}
+.pl h3{font-size:24px;letter-spacing:-.03em;margin:0;font-weight:600}
+.pl .pr2{font-size:34px;font-weight:600;letter-spacing:-.04em}
+.pl .pr2 small{font-size:15px;font-weight:400;color:var(--ink-muted);letter-spacing:0}
+.pl ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-size:15px;flex:1}
+.pl li{display:flex;gap:10px}
+.pl li::before{content:"";flex:none;width:18px;height:18px;margin-top:3px;border-radius:50%;background:var(--brand-soft) url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 18'><path d='M5 9.4l2.6 2.6L13 6.6' fill='none' stroke='%231a54c9' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/></svg>") center/18px no-repeat}
+.btn2{all:unset;box-sizing:border-box;text-align:center;font-weight:500;font-size:15px;padding:12px;border-radius:999px;box-shadow:0 0 0 1px var(--line-strong);cursor:pointer;transition:background .25s,transform .4s var(--sp)}
+.btn2:hover{background:var(--canvas)}.btn2:active{transform:scale(.97)}
+.pl.hot .btn2{background:var(--brand);color:var(--on-brand);box-shadow:none}
+.pl.hot .btn2:hover{background:color-mix(in srgb,var(--brand) 88%,#fff)}
+.pnote{text-align:center;font-size:14px;color:var(--ink-muted);margin-top:26px}
+/* faq */
+.faq{max-width:820px;margin:0 auto}
+.qa{border-bottom:1px solid var(--line)}
+.qh{all:unset;box-sizing:border-box;width:100%;display:flex;justify-content:space-between;align-items:center;padding:26px 4px;font-size:21px;font-weight:600;letter-spacing:-.02em;cursor:pointer}
+.qh:focus-visible{outline:2px solid var(--focus)}
+.pm{position:relative;width:16px;height:16px;flex:none}
+.pm::before,.pm::after{content:"";position:absolute;left:0;right:0;top:7px;height:2px;border-radius:2px;background:var(--ink-muted);transition:transform .5s var(--sp)}
+.pm::after{transform:rotate(90deg)}
+.qa.open .pm::after{transform:rotate(0)}
+.qb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .6s var(--sp)}
+.qa.open .qb{grid-template-rows:1fr}
+.qb>div{overflow:hidden}
+.qb p{margin:0 4px 26px;color:var(--ink-muted);font-size:17px}
+/* form */
+.form{max-width:760px;margin:0 auto;background:var(--surface);border-radius:32px;box-shadow:0 1px 2px rgba(16,16,24,.05),0 40px 80px -40px rgba(16,16,24,.3);padding:44px;position:relative;overflow:hidden}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fl{display:flex;flex-direction:column;gap:6px;font-size:14px;font-weight:500}
+.fl.full{grid-column:1/-1}
+.fl input,.fl select,.fl textarea{border:0;background:var(--canvas);border-radius:14px;padding:14px 16px;font-size:16px;transition:box-shadow .25s,background .25s}
+.fl textarea{resize:vertical;min-height:84px}
+.fl input:focus,.fl select:focus,.fl textarea:focus{outline:none;background:var(--surface);box-shadow:0 0 0 2px var(--brand),0 0 0 6px var(--brand-soft)}
+.fl small{font-weight:400;color:var(--ink-muted)}
+.fsub{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-top:26px}
+.fsub p{margin:0;font-size:13.5px;color:var(--ink-muted);max-width:26em}
+.done{position:absolute;inset:0;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;opacity:0;pointer-events:none;transition:opacity .5s}
+.done.on{opacity:1;pointer-events:auto}
+.done .ck{width:72px;height:72px;border-radius:50%;background:var(--brand);display:grid;place-items:center;transform:scale(.4);transition:transform .7s var(--sp)}
+.done.on .ck{transform:none}
+.done .ck svg{width:34px;height:34px;fill:none;stroke:var(--on-brand);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:40;stroke-dashoffset:40;transition:stroke-dashoffset .6s var(--sp) .3s}
+.done.on .ck svg{stroke-dashoffset:0}
+.done h3{font-size:30px;letter-spacing:-.03em;margin:10px 0 0}
+.done p{margin:0;color:var(--ink-muted)}
+footer{background:var(--canvas);padding:40px 0 50px;font-size:13px;color:var(--ink-muted)}
+footer .w{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}.rv,.step{opacity:1;transform:none}}
+
+/* —— 报告案例 —— */
+.cases{padding:130px 0 140px}
+.cases .w{display:grid;justify-items:center;text-align:center}
+.covers{display:grid;grid-template-columns:repeat(2,minmax(0,360px));gap:40px;margin-top:60px;perspective:1400px}
+.cover{all:unset;box-sizing:border-box;cursor:pointer;position:relative;aspect-ratio:3/4;border-radius:6px 16px 16px 6px;background:#fbfbfc;color:#0b0b0f;padding:34px 32px 30px;display:flex;flex-direction:column;text-align:left;box-shadow:inset 6px 0 0 rgba(16,16,24,.05),0 0 0 1px rgba(16,16,24,.06),0 30px 60px -30px rgba(16,16,24,.45);transform-origin:0 50%;transition:transform .7s cubic-bezier(.32,.72,0,1),box-shadow .5s}
+.cover.dark{background:#111217;color:#f5f5f7;box-shadow:inset 6px 0 0 rgba(255,255,255,.05),0 30px 60px -30px rgba(16,16,24,.6)}
+.cover:hover,.cover:focus-visible{transform:translateY(-8px) rotateY(-9deg);box-shadow:inset 6px 0 0 rgba(16,16,24,.05),0 0 0 1px rgba(16,16,24,.06),0 50px 80px -34px rgba(31,95,224,.45);outline:none}
+.cover.dark:hover,.cover.dark:focus-visible{box-shadow:inset 6px 0 0 rgba(255,255,255,.05),0 50px 80px -34px rgba(16,16,24,.7)}
+.cover:focus-visible{box-shadow:0 0 0 3px #1f5fe0,0 50px 80px -34px rgba(31,95,224,.45)}
+.cv-top{display:flex;align-items:center;gap:8px;font-size:12px;letter-spacing:.04em;opacity:.6}
+.cv-mk{width:14px;height:14px;border-radius:4px;background:#1f5fe0}
+.cv-name{font-size:40px;font-weight:700;letter-spacing:-.03em;margin-top:auto;line-height:1.1}
+.cv-cat{font-size:14px;opacity:.6;margin-top:8px}
+.cv-line{height:1px;background:currentColor;opacity:.12;margin:26px 0 20px}
+.cv-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;font-size:12px;opacity:.9}
+.cv-stats span{display:grid;gap:2px;opacity:.75}
+.cv-stats b{font-size:24px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;opacity:1}
+.cv-foot{font-size:11.5px;opacity:.5;margin-top:22px}
+.cv-open{position:absolute;right:26px;top:30px;font-size:13px;font-weight:600;color:#1f5fe0;opacity:0;transform:translateX(-6px);transition:opacity .3s,transform .45s cubic-bezier(.32,.72,0,1)}
+.cover.dark .cv-open{color:#8db4ff}
+.cover:hover .cv-open,.cover:focus-visible .cv-open{opacity:1;transform:none}
+.cases-note{margin-top:44px;font-size:14.5px;color:var(--ink-muted,#5b5b66)}
+/* 封面翻开 */
+.flycv{position:fixed;z-index:120;border-radius:6px 16px 16px 6px;transform-origin:0 50%;transition:all .85s cubic-bezier(.32,.72,0,1);pointer-events:none}
+.veil2{position:fixed;inset:0;z-index:110;background:rgba(247,247,248,0);transition:background .6s;pointer-events:none}
+.veil2.on{background:rgba(247,247,248,1)}
+/* 阅读器 */
+.reader{position:fixed;inset:0;z-index:130;background:#f7f7f8;color:#0b0b0f;display:grid;grid-template-rows:auto 1fr;opacity:0;transition:opacity .45s}
+.reader.on{opacity:1}
+.reader[hidden]{display:none}
+.rd-bar{display:flex;align-items:center;gap:14px;padding:12px 24px;padding-top:calc(12px + env(safe-area-inset-top,0px));background:rgba(247,247,248,.85);-webkit-backdrop-filter:saturate(1.6) blur(18px);backdrop-filter:saturate(1.6) blur(18px);border-bottom:1px solid #e6e6eb}
+.rd-x{all:unset;cursor:pointer;width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:#ececf0;color:#0b0b0f;transition:background .2s}
+.rd-x:hover{background:#e0e0e6}.rd-x:focus-visible{outline:2px solid #1f5fe0}
+.rd-t{font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.rd-prog{flex:1;height:2px;border-radius:2px;background:#e6e6eb;overflow:hidden;min-width:40px}
+.rd-prog i{display:block;height:100%;width:100%;background:#1f5fe0;transform:scaleX(0);transform-origin:left;transition:transform .15s linear}
+.rd-live{font-size:13.5px;color:#1a4fc0;text-decoration:none;white-space:nowrap}
+.rd-live:hover{text-decoration:underline;text-underline-offset:3px}
+.rd-body{overflow-y:auto;display:grid;grid-template-columns:220px minmax(0,760px);justify-content:center;gap:56px;padding:48px 24px 120px;scroll-behavior:smooth}
+.rd-toc{position:sticky;top:0;align-self:start;display:grid;gap:2px;padding-top:6px}
+.rd-toc a{display:grid;grid-template-columns:28px 1fr;gap:4px;padding:8px 10px;border-radius:10px;color:#5b5b66;text-decoration:none;font-size:14px;transition:background .25s,color .25s}
+.rd-toc a span{font-variant-numeric:tabular-nums;opacity:.6}
+.rd-toc a:hover{background:#ececf0;color:#0b0b0f}
+.rd-toc a.on{background:#fff;color:#0b0b0f;box-shadow:0 1px 2px rgba(16,16,24,.06),0 0 0 1px rgba(16,16,24,.04)}
+.rd-doc{display:grid;gap:22px}
+.pg{background:#fff;border-radius:20px;padding:44px 48px;box-shadow:0 0 0 1px rgba(16,16,24,.04),0 1px 2px rgba(16,16,24,.03);scroll-margin-top:24px;opacity:0;transform:translateY(24px);transition:opacity .8s cubic-bezier(.32,.72,0,1),transform .9s cubic-bezier(.32,.72,0,1)}
+.pg.in{opacity:1;transform:none}
+.pg .no{font-size:12px;letter-spacing:.08em;color:#1a4fc0;font-weight:600}
+.pg h3{font-size:26px;letter-spacing:-.02em;line-height:1.3;margin:8px 0 14px;text-wrap:balance}
+.pg p{font-size:15.5px;line-height:1.8;color:#3a3a44;margin:0 0 12px;max-width:62ch}
+.pg .big{font-size:30px;line-height:1.35;letter-spacing:-.02em;font-weight:600;color:#0b0b0f;margin:10px 0 18px;text-wrap:balance}
+.pg .big em{font-style:normal;color:#1f5fe0}
+.kn{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}
+.kn div{background:#f7f7f8;border-radius:14px;padding:16px 18px}
+.kn b{display:block;font-size:30px;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.kn b small{font-size:13px;color:#5b5b66;font-weight:500;letter-spacing:0;margin-left:4px}
+.kn span{font-size:13px;color:#5b5b66}
+.fx{display:grid;gap:12px;margin-top:6px}
+.fxi{display:grid;grid-template-columns:34px 1fr;gap:12px;padding:18px 0;border-top:1px solid #ececf0}
+.fxi:first-child{border-top:0}
+.fxi .n{font-size:22px;font-weight:600;color:#c8c8d0;font-variant-numeric:tabular-nums}
+.fxi h4{margin:0 0 6px;font-size:17px;letter-spacing:-.01em}
+.fxi p{margin:0 0 6px;font-size:14.5px}
+.fxi .do{display:inline-block;margin-top:4px;font-size:13.5px;background:#e8effd;color:#1a4fc0;padding:4px 10px;border-radius:8px}
+.tag{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;border-radius:999px;padding:2px 9px;margin-left:8px;vertical-align:2px}
+.tag::before{content:"";width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag.err{background:#f7ebe6;color:#9a5442}.tag.dev{background:#f6efe3;color:#86652f}.tag.gap{background:#ececf0;color:#5b5b66}
+.qa{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 0 6px}
+.qa div{border-radius:14px;padding:16px 18px;font-size:14.5px;line-height:1.75}
+.qa .ai{background:#f7ebe6}.qa .of{background:#f7f7f8}
+.qa small{display:block;font-size:12px;color:#5b5b66;margin-bottom:6px}
+.qa mark{background:none;box-shadow:inset 0 -2px 0 #c07a64;color:inherit}
+.gaps{display:grid;gap:0;margin-top:8px}
+.gaps div{display:grid;grid-template-columns:120px 1fr;gap:16px;padding:14px 0;border-top:1px solid #ececf0;font-size:14.5px}
+.gaps div:first-child{border-top:0}
+.gaps b{font-weight:600}
+.gaps span{color:#3a3a44;line-height:1.7}
+.meth{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:10px}
+.meth div{background:#f7f7f8;border-radius:14px;padding:14px 16px;font-size:14px;line-height:1.7;color:#3a3a44}
+.meth b{display:block;color:#0b0b0f;margin-bottom:2px}
+.endc{background:#0b0b0f;color:#fff;border-radius:20px;padding:40px 48px;display:grid;gap:10px;justify-items:start}
+.endc h3{margin:0;font-size:26px;letter-spacing:-.02em}
+.endc p{margin:0;color:rgba(255,255,255,.66);font-size:15px}
+.endc .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
+.endc button,.endc a{all:unset;cursor:pointer;border-radius:999px;padding:11px 20px;font-size:14.5px;font-weight:600}
+.endc .pri{background:#fff;color:#0b0b0f}.endc .sec2{box-shadow:inset 0 0 0 1px rgba(255,255,255,.3);color:#fff}
+.endc button:focus-visible,.endc a:focus-visible{outline:2px solid #8db4ff;outline-offset:2px}
+@media (max-width:860px){.covers{grid-template-columns:minmax(0,340px);gap:28px}.rd-body{grid-template-columns:minmax(0,1fr);gap:18px;padding:20px 14px 90px}.rd-toc{position:static;display:flex;overflow-x:auto;gap:4px}.rd-toc a{white-space:nowrap;grid-template-columns:auto auto}.pg{padding:28px 22px}.kn,.qa,.meth{grid-template-columns:1fr}.gaps div{grid-template-columns:1fr;gap:4px}.rd-live{display:none}.endc{padding:30px 24px}}
+@media (prefers-reduced-motion:reduce){.cover,.flycv,.pg,.reader,.veil2{transition:none}.pg{opacity:1;transform:none}}
+
+</style>
+</head>
+<body>
+<div class="root" data-theme="clarity" id="root">
+<div class="sc" id="sc">
+  <nav><div class="w">
+    <a class="logo" href="#top"><span class="mk"><svg width="13" height="13" viewBox="0 0 14 14" aria-hidden="true"><circle cx="3" cy="11" r="1.8" fill="#fff"/><path d="M3 6.5A4.5 4.5 0 0 1 7.5 11M3 2a9 9 0 0 1 9 9" stroke="#fff" stroke-width="1.6" fill="none"/></svg></span>EchoRank</a>
+    <ul><li><a href="#give">怎么合作</a></li><li><a href="#proc">服务流程</a></li><li><a href="#get">你会拿到</a></li><li><a href="#cases">看案例</a></li><li><a href="#plans">方案</a></li><li><a href="#faq">常见问题</a></li></ul>
+    <a class="pill sm" href="#apply">提交品牌</a>
+  </div></nav>
+
+  <header class="hero" id="top"><div class="w">
+    <span class="eyb rv">AI 回答体检服务</span>
+    <h1 class="rv d1">AI 正在替你介绍产品。<br>我们帮你把它说对。</h1>
+    <p class="rv d2">你给我们产品名和官网。我们去问 DeepSeek、豆包、元宝、Kimi、千问，逐句核对它们怎么说你，一周内交给你一份体检报告和该做的事。</p>
+    <div class="cta rv d3"><a class="pill" href="#apply">提交品牌，免费体检</a><a class="tl" href="#cases"><span>先看一份体检报告</span><i>›</i></a></div>
+    <div class="scrollhint rv d4"><i></i>向下滚动</div>
+  </div></header>
+
+  <section class="st"><div class="w"><p class="rv">越来越多的客户，<br>先问 AI，<em>再看你的官网</em>。<small class="rv d1">“适合 20 人团队的会议工具有哪些？”这样的问题，AI 给出的答案会直接决定你有没有进入候选名单。</small></p></div></section>
+
+  <section class="st dark"><div class="w"><p class="rv">可 AI 说的，<br>不一定是真的。</p>
+    <div class="quotes">
+      <div class="qt rv d1"><s>“NovaNote 专业版每月 79 元”</s><span>过期 · 现价 99 元</span></div>
+      <div class="qt rv d2"><s>“NovaNote 支持私有化部署”</s><span>说反了</span></div>
+      <div class="qt rv d3"><s>“NovaNote 目前主要支持英文”</s><span>过期 · 已支持中英日</span></div>
+    </div>
+    <small class="rv d4" style="font-size:15px;margin-top:30px">示例品牌 NovaNote 为虚构，回答为人工编写。</small>
+  </div></section>
+
+  <section class="st"><div class="w"><p class="rv">它学的是去年的评测、<br>别人的软文。<br><em>而你看不到。</em><small class="rv d1">这些回答不在你的后台，也不在任何报表里。我们做的第一件事，就是把它们找出来、摆在你面前。</small></p></div></section>
+
+  <section class="sec alt" id="give"><div class="w">
+    <div class="center"><h2 class="sh2 rv">你只需要给我们三样东西。</h2><p class="lead rv d1">剩下的采集、核对、溯源和报告，全部由我们完成。</p></div>
+    <div class="give">
+      <div class="gv rv"><span class="n">1</span><h3>产品名和官网</h3><p>我们从官网整理出价格、功能、定位，做成一份“事实底账”，由你确认。</p></div>
+      <div class="gv rv d1"><span class="n">2</span><h3>一位对接人</h3><p>确认事实底账、回答几个问题。整个过程大约占用对方 1 小时。</p></div>
+      <div class="gv rv d2"><span class="n">3</span><h3>你在意的问题</h3><p>比如“哪款适合中小团队”“和某竞品比怎么样”。不给也行，我们按行业准备一套。</p><span class="opt">可选</span></div>
+    </div>
+    <p class="nolog rv"><b>不需要</b>你的后台账号、代码或数据权限。</p>
+  </div></section>
+
+  <section class="sec" id="proc"><div class="w proc">
+    <div class="l"><h2 class="sh2 rv">一周之内，<br>我们替你做完。</h2><div class="day rv d1">第 <b id="dayn">1</b> 天</div></div>
+    <div class="steps" id="steps">
+      <div class="step" data-day="1"><span class="when">第 1 天</span><h3>整理事实底账</h3><p>从官网和你给的资料里，整理出价格、功能、定位和“不能说的话”，每条都带生效日期和出处。</p><div class="who"><span>我们整理</span><span class="you">你确认一次</span></div></div>
+      <div class="step" data-day="3"><span class="when">第 2–3 天</span><h3>在五个模型上各问两次</h3><p>按用户的购买路径准备问题：发现、比较、决策。DeepSeek、Kimi、千问走官方接口，豆包、元宝在 App 里问，两类结果分开统计。</p><div class="who"><span>我们执行</span></div></div>
+      <div class="step" data-day="4"><span class="when">第 4 天</span><h3>逐句核对，追到出处</h3><p>把每条回答拆成一句句关于你的说法，对照事实底账判对错；说错的，找到它引用的是哪篇文章。</p><div class="who"><span>我们执行</span><span>规则判定 + 人工复核</span></div></div>
+      <div class="step" data-day="5"><span class="when">第 5 天</span><h3>交付报告，当面讲一遍</h3><p>一份体检报告、一张行动清单。30 分钟会议，讲清楚先改哪三处、为什么。</p><div class="who"><span>我们交付</span><span class="you">你听 30 分钟</span></div></div>
+      <div class="step" data-day="19"><span class="when">两周后</span><h3>复测，看改动有没有用</h3><p>用同一批问题、同样的条件再问一遍，把改动前后的变化放在一起给你看。</p><div class="who"><span>我们复测</span></div></div>
+    </div>
+  </div></section>
+
+  <section class="sec alt" id="get" style="padding-bottom:110px">
+    <div class="w center"><h2 class="sh2 rv">你会拿到什么。</h2><p class="lead rv d1" style="margin-bottom:50px">不是一堆截图，而是能直接拿去开会、拿去改的结论。左右滑动看看。</p></div>
+    <div class="gal" id="gal">
+      <div class="dv"><h3>一个你能相信的数字</h3><p>AI 提到你时说对了多少。区间和样本量都写在旁边，不夸大。</p>
+        <div class="mock"><span class="muted" style="font-size:13px">说对且有依据 · 示例</span><span class="big">38%</span><div class="ax"><i style="left:30%;width:17%"></i><b style="left:38%"></b></div><span class="muted" style="font-size:13px">45 / 119 次回答 · 真实值大概率在 30–47% 之间</span><div class="row"><span>提到你的回答</span><b>75%</b></div><div class="row"><span>说错了的回答</span><b>28 次</b></div></div></div>
+      <div class="dv"><h3>每一句错在哪</h3><p>AI 原话照录，说错的地方标出来，旁边写着正确的是什么。</p>
+        <div class="mock"><span class="muted" style="font-size:13px">元宝 · App · 第 1 次</span><div style="font-size:16px;line-height:2">NovaNote <mark class="ok">适合中小团队</mark>，<mark>专业版每月 79 元</mark>，还<mark>支持私有化部署</mark>。</div><div class="row"><span>专业版每月 79 元</span><span class="badge err">过期 · 现价 99 元</span></div><div class="row"><span>支持私有化部署</span><span class="badge err">说反了</span></div></div></div>
+      <div class="dv"><h3>错误从哪学来的</h3><p>每条错误连到它引用的网页，标出过期评测和疑似软文。</p>
+        <div class="mock"><div class="row"><span><b>review.example</b><br><small class="muted">2025 年的评测</small></span><span class="badge dev">过期来源 · 11 条</span></div><div class="row"><span><b>blog.example.cn</b><br><small class="muted">排行榜式软文</small></span><span class="badge err">疑似软文 · 7 条</span></div><div class="row"><span><b>你的官网</b><br><small class="muted">被引用 24 次</small></span><span class="badge ok">0 条错误</span></div></div></div>
+      <div class="dv"><h3>先改哪三处</h3><p>按影响的回答数排好序，每一条都写清谁来做、怎么做。</p>
+        <div class="mock"><div class="row"><span>联系评测站更正价格与语言</span><span class="badge err">纠正 · 16 条</span></div><div class="row"><span>安全页写明：暂不支持私有化部署</span><span class="badge err">纠正 · 6 条</span></div><div class="row"><span>功能页补一句跨会议检索</span><span class="badge dev">补内容 · 9 条</span></div></div></div>
+      <div class="dv"><h3>改完有没有用</h3><p>两周后用同一批问题复测，前后对比一目了然。</p>
+        <div class="mock"><span class="muted" style="font-size:13px">仍说“79 元”的回答</span><div style="display:flex;align-items:flex-end;gap:30px"><div><span class="big">9</span><br><small class="muted">改动前</small></div><div style="font-size:30px;color:var(--ink-muted);padding-bottom:26px">→</div><div><span class="big" style="color:var(--brand)">?</span><br><small class="muted">复测后</small></div></div><div class="row"><span>复测条件</span><span class="badge ok">与基线可比</span></div></div></div>
+    </div>
+    <div class="galnav"><button class="gb" id="gp" aria-label="上一张"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5"/></svg></button><button class="gb" id="gn" aria-label="下一张"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5"/></svg></button></div>
+  </section>
+
+
+  <section class="sec cases" id="cases"><div class="w">
+    <h2 class="sh2 rv">这是我们交付的报告。</h2>
+    <p class="lead rv d1">两份真实的体检，一份来自精油直销品牌，一份来自在线会议产品。点开任意一份，从封面读到最后一页，大约三分钟。</p>
+    <div class="covers">
+      <button class="cover rv d2" data-case="a" aria-label="打开品牌 A 的体检报告">
+        <span class="cv-top"><span class="cv-mk"></span>EchoRank · AI 回答体检报告</span>
+        <span class="cv-name">品牌 A</span>
+        <span class="cv-cat">精油与个人护理 · 直销</span>
+        <span class="cv-line"></span>
+        <span class="cv-stats"><span><b>240</b>条回答</span><span><b>2</b>条说错</span><span><b>16</b>处官网没说清</span></span>
+        <span class="cv-foot">2026 年 9 月 · 30 个问题 · DeepSeek、Kimi、千问、豆包</span>
+        <span class="cv-open">打开报告 <i>›</i></span>
+      </button>
+      <button class="cover dark rv d3" data-case="t" aria-label="打开产品 B 的体检报告">
+        <span class="cv-top"><span class="cv-mk"></span>EchoRank · AI 回答体检报告</span>
+        <span class="cv-name">产品 B</span>
+        <span class="cv-cat">在线会议与 AI 会议记录</span>
+        <span class="cv-line"></span>
+        <span class="cv-stats"><span><b>72</b>条回答</span><span><b>3</b>条说错</span><span><b>10</b>次漏说关键能力</span></span>
+        <span class="cv-foot">2026 年 9 月 · 12 个问题 · DeepSeek、Kimi、千问、豆包</span>
+        <span class="cv-open">打开报告 <i>›</i></span>
+      </button>
+    </div>
+    <p class="cases-note rv">两份报告均已匿名处理。每份报告都附一个在线核对页，每个数字都能点回 AI 的原话和官网原文。</p>
+  </div></section>
+
+  <div class="reader" id="reader" role="dialog" aria-modal="true" aria-labelledby="rd-title" hidden>
+    <div class="rd-bar">
+      <button class="rd-x" id="rd-x" aria-label="关闭报告"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M6 6l12 12M18 6 6 18"/></svg></button>
+      <span class="rd-t" id="rd-title"></span>
+      <span class="rd-prog"><i id="rd-prog"></i></span>
+      <a class="rd-live" id="rd-live" href="/app/" rel="noopener">在线核对全部证据 ↗</a>
+    </div>
+    <div class="rd-body">
+      <nav class="rd-toc" id="rd-toc" aria-label="章节"></nav>
+      <article class="rd-doc" id="rd-doc"></article>
+    </div>
+  </div>
+
+  <section class="sec"><div class="w">
+    <h2 class="sh2 rv">我们只说能核对的话。</h2><p class="lead rv d1">这也是我们和“GEO 代运营”最大的不同：先弄清 AI 说的是不是真的，再决定做什么。</p>
+    <div class="pr">
+      <div class="rv"><b>100%</b><h3>结论有出处</h3><p>每一个“说错了”，都对应事实底账里的一条记录和一个网页链接。</p></div>
+      <div class="rv d1"><b>95%</b><h3>数字带区间</h3><p>AI 的回答会变。我们写明样本量和可信范围，不拿一次截图下结论。</p></div>
+      <div class="rv d2"><b>0</b><h3>篇代写软文</h3><p>我们不批量生产内容去“覆盖”说法，只帮你把官方信息写清楚、找对的人更正。</p></div>
+    </div>
+  </div></section>
+
+  <section class="sec alt" id="plans"><div class="w">
+    <div class="center"><h2 class="sh2 rv">从一次体检开始。</h2><p class="lead rv d1">先看清问题，再决定要不要长期跟进。</p></div>
+    <div class="plans">
+      <div class="pl rv"><h3>首次体检</h3><div class="pr2">免费 <small>· 限 1 个品牌</small></div><ul><li>12 个问题 × 5 个模型 × 2 次</li><li>体检报告 + 先改哪三处</li><li>30 分钟解读会</li></ul><a class="btn2" href="#apply">提交品牌</a></div>
+      <div class="pl hot rv d1"><h3>月度监测</h3><div class="pr2">按月 <small>· 按问题数报价</small></div><ul><li>每月一轮采集与核对</li><li>竞品对照、信源追踪</li><li>行动清单跟进与复测</li><li>月度报告与解读会</li></ul><a class="btn2" href="#apply">预约沟通</a></div>
+      <div class="pl rv d2"><h3>年度陪跑</h3><div class="pr2">按年 <small>· 多品牌、多产品线</small></div><ul><li>包含月度监测全部内容</li><li>内容实验设计与效果复测</li><li>新品发布前的 AI 口径预检</li><li>专属对接人</li></ul><a class="btn2" href="#apply">预约沟通</a></div>
+    </div>
+    <p class="pnote rv">具体价格随品牌数、问题数和模型数变化，沟通后给你报价。</p>
+  </div></section>
+
+  <section class="sec" id="faq"><div class="w">
+    <div class="center"><h2 class="sh2 rv">你可能想问</h2></div>
+    <div class="faq rv d1" id="faqs">
+      <div class="qa open"><button class="qh" aria-expanded="true">需要给你们后台账号或数据吗？<i class="pm"></i></button><div class="qb"><div><p>不需要。我们只用公开信息：你的官网，和各家 AI 对公开问题的回答。你只需要确认我们整理的事实是否准确。</p></div></div></div>
+      <div class="qa"><button class="qh" aria-expanded="false">和 GEO 代运营有什么不同？<i class="pm"></i></button><div class="qb"><div><p>代运营通常靠批量发内容来影响 AI。我们先核实 AI 说的对不对，再给出纠正、澄清或补内容的建议，由你决定做什么。</p></div></div></div>
+      <div class="qa"><button class="qh" aria-expanded="false">结果会不会每次都不一样？<i class="pm"></i></button><div class="qb"><div><p>会有波动，所以每个问题问两次，数字都带可信范围；样本不够时会直接告诉你“仅作方向”，不会夸大。</p></div></div></div>
+      <div class="qa"><button class="qh" aria-expanded="false">多久能拿到结果？<i class="pm"></i></button><div class="qb"><div><p>从你确认事实底账算起，一般 5 个工作日内交付第一份报告。</p></div></div></div>
+    </div>
+  </div></section>
+
+  <section class="sec alt" id="apply"><div class="w">
+    <div class="center"><h2 class="sh2 rv">提交你的品牌。</h2><p class="lead rv d1">填好下面几项，我们会在 1 个工作日内联系你，确认体检范围。</p></div>
+    <form class="form rv" id="form" novalidate>
+      <div class="fg">
+        <label class="fl">品牌 / 产品名<input name="brand" required placeholder="例如：NovaNote"></label>
+        <label class="fl">官网<input name="site" required placeholder="https://"></label>
+        <label class="fl">所在行业<select name="ind"><option>企业软件 / SaaS</option><option>消费电子</option><option>美妆个护</option><option>教育</option><option>金融</option><option>其他</option></select></label>
+        <label class="fl">主要竞品 <small>可选</small><input name="comp" placeholder="例如：Lumo、Kairo"></label>
+        <label class="fl full">你最在意 AI 怎么回答哪些问题？ <small>可选，一行一个</small><textarea name="q" placeholder="适合中小团队的会议工具有哪些？"></textarea></label>
+        <label class="fl">你的称呼<input name="name" required></label>
+        <label class="fl">手机或微信<input name="contact" required></label>
+      </div>
+      <div class="fsub"><p>提交即表示同意我们为本次体检使用以上信息。我们不会把你的信息用于其他用途。</p><button class="pill" type="submit">提交，免费体检</button></div>
+      <div class="done" id="done"><span class="ck"><svg viewBox="0 0 34 34"><path d="M8 17.5l6 6L26 11"/></svg></span><h3>已收到，谢谢。</h3><p>我们会在 1 个工作日内联系你，确认体检范围。</p></div>
+    </form>
+  </div></section>
+
+  <footer><div class="w"><span>EchoRank · AI 回答体检服务</span><span>页面中的 NovaNote 为虚构示例品牌，示例数据为人工编写，不代表任何真实模型的表现。</span></div></footer>
+</div>
+</div>
+<script>
+(function () {
+  var sc = document.getElementById('sc'), RM = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  // reveal once
+  var io = new IntersectionObserver(function (es) { es.forEach(function (e) { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }); }, { root: sc, threshold: 0.18 });
+  document.querySelectorAll('.rv').forEach(function (el) { if (RM) el.classList.add('in'); else io.observe(el); });
+  // process: the step crossing the middle is active; day counter follows
+  var dayn = document.getElementById('dayn'), steps = [].slice.call(document.querySelectorAll('.step'));
+  var pio = new IntersectionObserver(function (es) { es.forEach(function (e) { if (!e.isIntersecting) return; steps.forEach(function (s) { s.classList.toggle('on', s === e.target); }); dayn.textContent = e.target.dataset.day; }); }, { root: sc, rootMargin: '-45% 0px -45% 0px' });
+  steps.forEach(function (s) { pio.observe(s); }); steps[0].classList.add('on');
+  // gallery arrows
+  var gal = document.getElementById('gal');
+  function step(d) { var w = gal.querySelector('.dv').offsetWidth + 22; gal.scrollBy({ left: d * w, behavior: 'smooth' }); }
+  document.getElementById('gp').addEventListener('click', function () { step(-1); });
+  document.getElementById('gn').addEventListener('click', function () { step(1); });
+  // in-page anchors scroll the inner container
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) { a.addEventListener('click', function (e) { var t = document.querySelector(a.getAttribute('href')); if (!t) return; e.preventDefault(); sc.scrollTo({ top: t.getBoundingClientRect().top - sc.getBoundingClientRect().top + sc.scrollTop - (a.getAttribute('href') === '#top' ? 60 : 40), behavior: 'smooth' }); }); });
+  // faq
+  document.getElementById('faqs').addEventListener('click', function (e) { var b = e.target.closest('.qh'); if (!b) return; var q = b.parentNode, o = !q.classList.contains('open'); q.classList.toggle('open', o); b.setAttribute('aria-expanded', o); });
+  // form (demo: no data leaves the page)
+  var form = document.getElementById('form');
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var bad = [].slice.call(form.querySelectorAll('[required]')).filter(function (i) { return !i.value.trim(); });
+    form.querySelectorAll('[required]').forEach(function (i) { i.style.boxShadow = ''; });
+    if (bad.length) { bad.forEach(function (i) { i.style.boxShadow = '0 0 0 2px var(--error)'; }); bad[0].focus(); return; }
+    document.getElementById('done').classList.add('on');
+  });
+})();
+</script>
+
+<script>
+(function(){
+  var R={
+    a:{title:'品牌 A · 精油直销 · AI 回答体检报告', live:'/app/?case=direct_a#report',
+      ch:[
+        ['结论','<p class="no">01 · 一句话结论</p><h3>AI 很少说错品牌 A，但官网有 16 个地方没说清。</h3><p class="big">240 条提到品牌 A 的回答里，<em>2 条说错</em>，都和“30 天无理由退货”有关。</p><p>更大的风险在官网没写的地方：能不能内服、孕妇和儿童能不能用、加入要不要交钱。消费者问得最多，官方却没有一句可以被 AI 引用的话，AI 只能各说各话。</p><div class="kn"><div><b>2<small>/ 240</small></b><span>说错的回答</span></div><div><b>47%<small>112 条</small></b><span>说对且有依据</span></div><div><b>16</b><span>处官网没说清</span></div></div>'],
+        ['先改这三处','<p class="no">02 · 先改这三处</p><h3>按影响的回答数排好了顺序。</h3><div class="fx"><div class="fxi"><span class="n">1</span><div><h4>“30 天无理由退货”<span class="tag err">说错</span></h4><p>千问、豆包各有 1 条回答这样说。官网只写了“完好无损、不影响二次销售”的产品可以退换货，没有“无理由”。</p><span class="do">在售后页写一句可以直接引用的退换货说明</span></div></div><div class="fxi"><span class="n">2</span><div><h4>说了“300 元”<span class="tag dev">无法核对</span></h4><p>2 条回答报了价格，官网没有公布价格，AI 说多少都无从判断。</p><span class="do">在官方页面写明当前价格和生效日期</span></div></div><div class="fxi"><span class="n">3</span><div><h4>说了“35 元”<span class="tag dev">无法核对</span></h4><p>同样是官网没写的价格，另有 2 条回答提到。</p><span class="do">和第 2 条一起处理</span></div></div></div>'],
+        ['AI 怎么说你','<p class="no">03 · AI 怎么说你</p><h3>原话照录，错在哪一眼能看到。</h3><p>关于退换货的提问：</p><div class="qa"><div class="ai"><small>千问的回答</small>品牌 A 支持 <mark>30 天无理由换：自购买之日起 30 天内</mark>……</div><div class="of"><small>官网原文</small>通过官方认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单办理退换货。</div></div><p>报告里每一条“说错”都这样并排给出，并注明出现在哪个模型、第几次回答。</p>'],
+        ['官网没说清的地方','<p class="no">04 · 官网没说清的地方</p><h3>这些话题，AI 怎么说都没有依据。</h3><div class="gaps"><div><b>直销经营许可</b><span>证照页只展示了营业执照和食品经营备案。页面上没展示，不等于没有许可，但 AI 无论说有还是没有，都缺乏依据。</span></div><div><b>能否内服</b><span>中国官网没有说明，产品页没有使用方法。</span></div><div><b>孕妇和儿童</b><span>产品页没有禁忌人群，而这正是消费者最常问的安全问题。</span></div><div><b>不能代替药物</b><span>官网没有“不用于诊断、治疗”之类的声明。</span></div><div><b>加入是否收费</b><span>只写了成为优惠顾客的条件，没有写明是否有入会费。</span></div></div><p style="margin-top:14px">完整报告列出全部 16 处，每处附官网现状和建议补充的说法。</p>'],
+        ['数字怎么来的','<p class="no">05 · 这些数字怎么来的</p><h3>我们只说能核对的话。</h3><div class="meth"><div><b>30 个问题</b>消费者购买前真实会问的问题，按比较、决策分组。</div><div><b>4 个 AI，每题问 2 次</b>DeepSeek、Kimi、千问、豆包，共 240 条回答。</div><div><b>逐句对照官网原文</b>每条官方口径都附原文和来源页面。</div><div><b>每个比例带区间</b>比如 47% 的可能范围是 40%–53%，样本少时会直接写明。</div></div>']
+      ]},
+    t:{title:'产品 B · 在线会议 · AI 回答体检报告', live:'/app/?case=tencent#report',
+      ch:[
+        ['结论','<p class="no">01 · 一句话结论</p><h3>AI 说错得不多，漏说得不少。</h3><p class="big">72 条提到产品 B 的回答里，<em>3 条说错</em>；另有 10 次回答没提到“会中实时字幕与实时转写”。</p><p>说错集中在一处：AI 纪要功能到底免不免费。官方对这项功能的说明分散在几个页面，名称和适用范围不完全一致，AI 容易说反。</p><div class="kn"><div><b>3<small>/ 72</small></b><span>说错的回答</span></div><div><b>60%<small>43 条</small></b><span>说对且有依据</span></div><div><b>10</b><span>处官网没说清</span></div></div>'],
+        ['先改这三处','<p class="no">02 · 先改这三处</p><h3>按影响的回答数排好了顺序。</h3><div class="fx"><div class="fxi"><span class="n">1</span><div><h4>“AI 纪要不能免费使用”<span class="tag err">说反了</span></h4><p>千问 2 条回答这样说。官方写明这项功能目前对免费版用户限时免费。</p><span class="do">在官方 FAQ 写清正确口径、适用版本和核对日期</span></div></div><div class="fxi"><span class="n">2</span><div><h4>漏说“会中实时字幕与实时转写”<span class="tag gap">漏说</span></h4><p>10 次回答在该提的时候没有提到这项能力。</p><span class="do">在功能页写成一句可以被引用的话，附上适用版本</span></div></div><div class="fxi"><span class="n">3</span><div><h4>漏说“录音文件多语言翻译”<span class="tag gap">漏说</span></h4><p>3 条回答没有提到，这是付费版本的能力。</p><span class="do">同上，写清适用版本</span></div></div></div>'],
+        ['AI 怎么说你','<p class="no">03 · AI 怎么说你</p><h3>原话照录，错在哪一眼能看到。</h3><p>关于 AI 纪要是否收费的提问：</p><div class="qa"><div class="ai"><small>千问的回答</small>直接回答您的疑问：产品 B 的“AI 纪要”（包含智能总结、章节划分、发言提炼等）<mark>不能免费使用</mark>。</div><div class="of"><small>官方口径</small>AI 纪要：免费版及各付费版本用户限时免费使用。</div></div><p>报告里每一条“说错”都这样并排给出，并注明出现在哪个模型、第几次回答。</p>'],
+        ['官网没说清的地方','<p class="no">04 · 官网没说清的地方</p><h3>同一项能力，说明散在几处。</h3><p>AI 纪要的名称和免费范围在不同页面写法不完全一致。AI 学到的，正是这些不一致的说法。</p><p>完整报告列出全部 10 处官网没说清的话题，每处附官网现状和建议补充的说法。</p>'],
+        ['数字怎么来的','<p class="no">05 · 这些数字怎么来的</p><h3>我们只说能核对的话。</h3><div class="meth"><div><b>12 个问题</b>从发现、比较到决策，覆盖买会议工具的全过程。</div><div><b>4 个 AI，每题问 2 次</b>共采集 86 条回答，其中 72 条提到产品 B。</div><div><b>逐句对照官网原文</b>检查 8 条官方口径，每条附原文和来源页面。</div><div><b>每个比例带区间</b>比如 60% 的可能范围是 48%–70%，样本少时会直接写明。</div></div>']
+      ]}
+  };
+  var reader=document.getElementById('reader'),doc=document.getElementById('rd-doc'),toc=document.getElementById('rd-toc'),body=reader.querySelector('.rd-body'),prog=document.getElementById('rd-prog'),lastCover=null,io=null;
+  function build(k){
+    var c=R[k]; document.getElementById('rd-title').textContent=c.title; document.getElementById('rd-live').href=c.live;
+    toc.innerHTML=c.ch.map(function(x,i){return '<a href="#rd'+i+'" data-i="'+i+'"><span>0'+(i+1)+'</span>'+x[0]+'</a>'}).join('');
+    doc.innerHTML=c.ch.map(function(x,i){return '<section class="pg" id="rd'+i+'">'+x[1]+'</section>'}).join('')+'<section class="endc pg" id="rdend"><h3>想要你品牌的这份报告？</h3><p>把产品名和官网给我们，一周内交付。首次体检免费。</p><div class="row"><button class="pri" id="rd-apply">提交品牌</button><a class="sec2" href="'+c.live+'" rel="noopener">在线核对全部证据 ↗</a></div></section>';
+    body.scrollTop=0;
+    if(io) io.disconnect();
+    io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in'); var i=e.target.id.replace('rd',''); toc.querySelectorAll('a').forEach(function(a){a.classList.toggle('on',a.dataset.i===i)})}})},{root:body,rootMargin:'-35% 0px -55% 0px'});
+    doc.querySelectorAll('.pg').forEach(function(p,i){io.observe(p); if(i===0) p.classList.add('in')});
+    var io2=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting)e.target.classList.add('in')})},{root:body,threshold:.05});
+    doc.querySelectorAll('.pg').forEach(function(p){io2.observe(p)});
+    toc.querySelector('a').classList.add('on');
+    document.getElementById('rd-apply').addEventListener('click',function(){close(function(){var a=document.getElementById('apply');if(a)a.scrollIntoView({behavior:'smooth'})})});
+  }
+  toc.addEventListener('click',function(e){var a=e.target.closest('a');if(!a)return;e.preventDefault();document.getElementById('rd'+a.dataset.i).scrollIntoView({behavior:'smooth',block:'start'})});
+  var ticking=false; body.addEventListener('scroll',function(){if(ticking)return;ticking=true;requestAnimationFrame(function(){var m=body.scrollHeight-body.clientHeight;prog.style.transform='scaleX('+(m>0?body.scrollTop/m:0)+')';ticking=false})},{passive:true});
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function open(cv){
+    lastCover=cv; build(cv.dataset.case);
+    var r=cv.getBoundingClientRect(), veil=document.createElement('div'); veil.className='veil2'; document.body.appendChild(veil);
+    var fly=cv.cloneNode(true); fly.className=cv.className+' flycv'; fly.removeAttribute('data-case'); fly.style.cssText='left:'+r.left+'px;top:'+r.top+'px;width:'+r.width+'px;height:'+r.height+'px;margin:0;aspect-ratio:auto'; document.body.appendChild(fly);
+    cv.style.visibility='hidden'; document.documentElement.style.overflow='hidden';
+    var done=function(){reader.hidden=false;requestAnimationFrame(function(){reader.classList.add('on');document.getElementById('rd-x').focus()});setTimeout(function(){fly.remove();veil.remove();cv.style.visibility=''},500)};
+    if(reduce){done();return}
+    requestAnimationFrame(function(){requestAnimationFrame(function(){
+      veil.classList.add('on');
+      fly.style.transform='rotateY(-72deg) translateX(-10%)'; fly.style.opacity='0';
+      fly.style.left=(innerWidth/2-r.width*.7)+'px'; fly.style.top=(innerHeight/2-r.height*.7)+'px'; fly.style.width=(r.width*1.4)+'px'; fly.style.height=(r.height*1.4)+'px';
+      setTimeout(done,620);
+    })});
+  }
+  function close(cb){reader.classList.remove('on');setTimeout(function(){reader.hidden=true;document.documentElement.style.overflow='';if(lastCover&&!cb)lastCover.focus();if(cb)cb()},420)}
+  document.querySelectorAll('.cover').forEach(function(c){c.addEventListener('click',function(){open(c)})});
+  document.getElementById('rd-x').addEventListener('click',function(){close()});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'&&!reader.hidden)close()});
+})();
+</script></body>
+</html>
