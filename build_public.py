@@ -8,7 +8,7 @@
 替换名单只有一处：index.html 里 `const DIRECT_A_PUBLIC = {...}` 那一行（JSON）。
 替换顺序和页面运行时的匿名（【改这里 23】makeMasker）一致：
   1. 整条网址：官网域名的网址 → “官方页面（已核对）”；网址里含品牌名的 → “外部页面（已隐藏）”
-  2. 额外可识别信息（证照号、电话、邮箱、地址、专有名词）→ “（已隐藏）”，或名单里指定的替换文字
+  2. 额外可识别信息（证照号、电话、邮箱、地址、专有名词）→ “（已隐藏）”加一段看不见的编号（每项不同），或名单里指定的替换文字
   3. 裸域名（doterra.cn 这类没有 https:// 的写法）→ “官方网站（已隐藏）”
   4. 品牌名和别名（不分大小写，长的先换）→ “品牌 A”
   5. 把 `const PUBLIC_BUILD = false` 改为 true：公开版不显示「分析一个产品」等自助入口
@@ -35,6 +35,13 @@ MASK_DOMAIN = '官方网站（已隐藏）'
 MASK_HIDDEN = '（已隐藏）'
 
 
+
+def mask_token(k):
+    # 每一项隐藏信息用各自不同的占位：“（已隐藏）”后面跟一段看不见的编号（零宽字符）。
+    # 页面上显示为灰色斜纹小块；口径正则里的占位只会匹配同一项信息，不会误中别的被隐藏内容（与 index.html 的 maskToken 同一规则）
+    return MASK_HIDDEN + '\u200b' * (k + 1) + '\u200c'
+
+
 def load_config(html):
     m = re.search(r'^const DIRECT_A_PUBLIC = (\{.*\});', html, re.M)
     if not m:
@@ -43,8 +50,8 @@ def load_config(html):
     names = sorted(cfg['names'], key=len, reverse=True)
     domains = [d.lower().removeprefix('www.') for d in cfg['domains']]
     extra = []
-    for x in cfg['extra']:
-        extra.append((x[0], x[1]) if isinstance(x, list) else (x, MASK_HIDDEN))
+    for k, x in enumerate(cfg['extra']):
+        extra.append((x[0], x[1]) if isinstance(x, list) else (x, mask_token(k)))
     extra.sort(key=lambda t: len(t[0]), reverse=True)
     return names, domains, extra
 
