@@ -299,6 +299,145 @@ code{border-radius:5px}
 @keyframes er-enter{from{opacity:0;transform:translateY(10px)}}
 @media (max-width:900px){.side{position:static;height:auto;border-right:0;border-bottom:1px solid var(--rule)}.main{padding:0 16px 32px}.topbar{margin:0 -16px;padding:12px 16px}}
 @media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
+/* =========================================================
+   v5.5 · 设计系统七页交互（ClarityApp 原型移植，改交互不改数据与规则）
+   ========================================================= */
+.nav{position:relative}
+.nav li:not(.hl){position:relative;z-index:1}
+.nav .hl{position:absolute;left:0;right:0;top:0;height:32px;border-radius:10px;background:var(--accent-soft);transition:transform .5s var(--sp),height .3s;pointer-events:none;opacity:0}
+.nav .hl.on{opacity:1}
+.nav button[aria-current="page"]{background:transparent}
+.help{all:unset;box-sizing:border-box;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer;transition:background .25s,color .25s}
+.help:hover{background:var(--surface-2);color:var(--ink)} .help:focus-visible{outline:2px solid var(--accent)}
+.help kbd{margin-left:auto;font:inherit;font-size:11px;color:var(--faint);background:var(--surface-2);border-radius:5px;padding:0 5px}
+.tip{position:fixed;z-index:80;background:var(--ink);color:var(--bg);font-size:12px;line-height:1.5;padding:5px 9px;border-radius:8px;pointer-events:none;opacity:0;transform:translate(-50%,4px);transition:opacity .15s,transform .25s var(--sp);white-space:nowrap;max-width:min(360px,90vw)}
+.tip.on{opacity:1;transform:translate(-50%,0)}
+.tip.wide{white-space:normal;width:260px;line-height:1.55}
+.hq{display:inline-grid;place-items:center;width:15px;height:15px;border-radius:50%;background:var(--surface-2);color:var(--muted);font-size:10.5px;font-weight:600;cursor:help;margin-left:5px;vertical-align:1px;transition:background .2s,color .2s}
+.hq:hover,.hq:focus-visible{background:var(--accent-soft);color:var(--accent);outline:none}
+.kpi .ax{position:relative;height:14px;margin:2px 0 6px}
+.kpi .ax::before{content:"";position:absolute;left:0;right:0;top:6px;height:2px;border-radius:2px;background:var(--surface-2)}
+.kpi .ax i{position:absolute;top:3px;height:8px;border-radius:4px;background:var(--accent-soft);box-shadow:inset 0 0 0 1.5px var(--accent)}
+.kpi .ax b{position:absolute;top:1px;width:12px;height:12px;border-radius:50%;background:var(--accent);border:2.5px solid var(--surface);box-shadow:0 0 0 1px var(--accent);transform:translateX(-50%)}
+.bars .bar{transition:opacity .25s,background .25s;border-radius:8px}
+.bars:hover .bar{opacity:.4} .bars .bar:hover{opacity:1}
+.bar .fill{transform-origin:left;animation:er-grow .9s var(--sp) both}
+@keyframes er-grow{from{transform:scaleX(0)}}
+.sample{display:flex;align-items:center;gap:10px;background:var(--accent-soft);color:var(--ink);border-radius:14px;padding:10px 14px;font-size:13.5px;margin-top:12px}
+.sample b{color:var(--accent);font-weight:600} .sample .sp{flex:1}
+.sample button{all:unset;cursor:pointer;color:var(--accent);font-weight:500} .sample button:hover{text-decoration:underline}
+/* 抽屉 */
+.scrim{position:fixed;inset:0;background:rgba(11,11,15,.22);opacity:0;pointer-events:none;transition:opacity .35s;z-index:40}
+.scrim.on{opacity:1;pointer-events:auto}
+.drawer{position:fixed;top:10px;right:10px;bottom:10px;width:min(540px,calc(100vw - 20px));background:var(--surface);border-radius:22px;box-shadow:0 24px 60px -12px rgba(16,16,24,.35),0 0 0 1px var(--rule);transform:translateX(calc(100% + 24px));transition:transform .55s var(--sp);z-index:41;display:flex;flex-direction:column}
+.drawer.on{transform:none}
+.drawer .dh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;padding:18px 20px 10px}
+.drawer .dh h3{margin:8px 0 0;font-size:16px;line-height:1.45;font-weight:600}
+.drawer .x{all:unset;cursor:pointer;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);flex:none;font-size:18px;line-height:1;transition:background .25s}
+.drawer .x:hover{background:var(--rule)} .drawer .x:focus-visible{outline:2px solid var(--accent)}
+.drawer .db{padding:0 20px 20px;overflow-y:auto;flex:1}
+.drawer .db .resp{margin-top:0}
+/* 体检报告：可展开的发现 */
+.fd{border-radius:16px;background:var(--bg);margin-bottom:10px;overflow:hidden;transition:box-shadow .3s,background .3s}
+.fd.open{background:var(--surface);box-shadow:0 0 0 1px var(--rule)}
+.fd:hover{box-shadow:0 1px 2px rgba(16,16,24,.05),0 12px 28px -14px rgba(16,16,24,.2)}
+.fh{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:28px minmax(0,1fr) auto 16px;gap:12px;align-items:center;padding:14px 18px;cursor:pointer}
+.fh:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.fh .i{font-size:12px;color:var(--muted);font-variant-numeric:tabular-nums}
+.fh b{font-weight:600} .fh .tags{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}
+.chev{width:10px;height:10px;border-right:1.6px solid var(--muted);border-bottom:1.6px solid var(--muted);transform:rotate(45deg) translateY(-3px);transition:transform .45s var(--sp)}
+.fd.open .chev{transform:rotate(225deg) translateY(-2px)}
+.fb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--sp)}
+.fd.open .fb{grid-template-rows:1fr} .fb>div{overflow:hidden}
+.fbi{padding:0 18px 16px 58px;display:grid;gap:10px}
+.cmp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cmp>div{background:var(--bg);border-radius:12px;padding:12px 14px;font-size:13.5px}
+.cmp small{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}
+/* 回答记录：问题列表的状态点、高亮句提示 */
+.qlist .qt{display:block}
+.dots{display:flex;gap:3px;margin-top:5px}
+.dots i{width:7px;height:7px;border-radius:2px;background:var(--rule)}
+.dots i.v{background:var(--accent)} .dots i.m{background:var(--warn)} .dots i.f{background:var(--bad)} .dots i.t{background:none;box-shadow:inset 0 0 0 1px var(--faint)}
+.resp .txt mark[data-tip]{cursor:help;transition:box-shadow .2s;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.resp .txt mark[data-tip]:hover{box-shadow:0 0 0 1.5px var(--accent)}
+/* 理由与行动：看板 */
+.board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.colb{background:color-mix(in srgb,var(--ink) 4%,var(--bg));border-radius:16px;padding:10px;min-height:200px}
+.colb h4{margin:4px 6px 10px;font-size:13px;font-weight:600;display:flex;justify-content:space-between}
+.colb h4 span{color:var(--muted);font-weight:500}
+.rc{background:var(--surface);border-radius:12px;padding:11px 12px;box-shadow:var(--shadow);margin-bottom:8px;font-size:13px;animation:er-enter .45s var(--sp) both;transition:transform .35s var(--sp),box-shadow .35s}
+.rc:hover{transform:translateY(-2px);box-shadow:0 1px 2px rgba(16,16,24,.05),0 12px 24px -12px rgba(16,16,24,.22)}
+.rc q{display:block;font-weight:500;quotes:"“" "”";margin-bottom:6px}
+.rc .f{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rc .go{all:unset;margin-left:auto;font-size:12px;color:var(--accent);cursor:pointer;opacity:0;transform:translateX(-4px);transition:opacity .25s,transform .35s var(--sp)}
+.rc:hover .go,.rc .go:focus-visible,.rc.done .go{opacity:1;transform:none}
+/* 信源溯源：建议动作 */
+.fix{background:var(--accent-soft);border-radius:12px;padding:12px 14px;font-size:13px;margin-bottom:10px}
+.fix b{display:block;color:var(--accent);margin-bottom:4px}
+/* 内容实验：时间线、基线与复测、可比性 */
+.tl{display:grid;grid-template-columns:repeat(4,1fr);position:relative;margin:14px 0 10px}
+.tl::before{content:"";position:absolute;left:12%;right:12%;top:13px;height:2px;background:var(--rule)}
+.tl::after{content:"";position:absolute;left:12%;top:13px;height:2px;width:calc(76% * var(--tlp,0));background:var(--accent);transform-origin:left;animation:er-grow 1.2s var(--sp) both}
+.ts{text-align:center;position:relative;z-index:1;font-size:13px}
+.ts i{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;margin:0 auto 8px;background:var(--surface);box-shadow:0 0 0 2px var(--rule);font-style:normal;font-size:12px;font-weight:600;color:var(--muted)}
+.ts.done i{background:var(--accent);box-shadow:none;color:var(--accent-ink)}
+.ts.now i{box-shadow:0 0 0 2px var(--accent);color:var(--accent);animation:er-pulse 2s infinite}
+@keyframes er-pulse{50%{box-shadow:0 0 0 2px var(--accent),0 0 0 7px var(--accent-soft)}}
+.ts small{display:block;color:var(--muted);font-size:12px}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 14px}
+.vs>div{background:var(--bg);border-radius:14px;padding:14px 16px}
+.vs b{display:block;font-size:28px;font-weight:600;letter-spacing:-.03em;margin:4px 0;font-variant-numeric:tabular-nums}
+.chk{display:grid;gap:8px}
+.chk>div{display:flex;align-items:flex-start;gap:10px;font-size:13.5px}
+.chk .ck{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:700;flex:none;margin-top:3px}
+.chk .ck.ok{background:var(--ok-soft);color:var(--ok)} .chk .ck.warn{background:var(--warn-soft);color:var(--warn)} .chk .ck.bad{background:var(--bad-soft);color:var(--bad)}
+/* 事实底账：版本横幅、悬停编辑 */
+.banner{display:flex;align-items:center;gap:12px;background:var(--surface);border-radius:16px;box-shadow:var(--shadow);padding:12px 16px;margin:12px 0 14px;font-size:13.5px;flex-wrap:wrap}
+.banner .ic{width:28px;height:28px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;font-weight:700;flex:none}
+.banner.draft .ic{background:var(--warn-soft);color:var(--warn)}
+.banner .bt{flex:1;min-width:200px} .banner .bt b{display:block}
+.frow td{transition:background .2s}
+.frow .ed{opacity:0;transition:opacity .2s}
+.frow:hover .ed,.frow .ed:focus-visible,.frow.editing .ed{opacity:1}
+@media (hover:none){.frow .ed{opacity:1}}
+.frow.editing td{background:var(--accent-soft)!important}
+.fx>td{padding:8px 0 14px!important} .fx .cand{margin:0}
+/* 欢迎页 */
+.wel{position:fixed;inset:0;z-index:70;background:rgba(11,11,15,.28);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .35s}
+.wel.on{opacity:1;pointer-events:auto}
+.wbox{width:620px;max-width:100%;max-height:calc(100vh - 32px);overflow:auto;background:var(--surface);border-radius:28px;box-shadow:0 24px 60px -12px rgba(16,16,24,.35);padding:32px 36px 26px;transform:translateY(16px) scale(.98);transition:transform .6s var(--sp)}
+.wel.on .wbox{transform:none}
+.wbox .mk{width:44px;height:44px;border-radius:13px;margin-bottom:16px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:700;font-size:20px}
+.wbox h2{font-size:26px;letter-spacing:-.03em;line-height:1.2;margin:0 0 10px}
+.wbox>p{color:var(--muted);font-size:15px;margin:0 0 18px}
+.steps{display:grid;gap:4px;margin-bottom:16px}
+.stp{display:grid;grid-template-columns:32px 1fr;gap:12px;align-items:start;padding:10px 12px;border-radius:14px;opacity:0;transform:translateY(8px);transition:opacity .5s,transform .6s var(--sp),background .25s}
+.wel.on .stp{opacity:1;transform:none}
+.wel.on .stp:nth-child(2){transition-delay:.08s} .wel.on .stp:nth-child(3){transition-delay:.16s} .wel.on .stp:nth-child(4){transition-delay:.24s}
+.stp:hover{background:var(--bg)}
+.stp i{width:32px;height:32px;border-radius:10px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;font-style:normal;font-weight:600;font-size:14px}
+.stp b{display:block;font-size:15px;font-weight:600} .stp span{font-size:13.5px;color:var(--muted)}
+.note2{background:var(--bg);border-radius:14px;padding:12px 14px;font-size:13.5px;color:var(--muted);margin-bottom:18px}
+.note2 b{color:var(--ink);font-weight:600}
+.wact{display:flex;gap:10px;justify-content:flex-end;align-items:center;flex-wrap:wrap}
+/* ⌘K 搜索 */
+.spot{position:fixed;inset:0;background:rgba(11,11,15,.2);display:flex;justify-content:center;align-items:flex-start;padding:min(120px,14vh) 16px 16px;opacity:0;pointer-events:none;transition:opacity .25s;z-index:50}
+.spot.on{opacity:1;pointer-events:auto}
+.sbox{width:580px;max-width:100%;background:color-mix(in srgb,var(--surface) 94%,transparent);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-radius:20px;box-shadow:0 24px 60px -12px rgba(16,16,24,.35),0 0 0 1px var(--rule);overflow:hidden;transform:scale(.97) translateY(-6px);transition:transform .4s var(--sp)}
+.spot.on .sbox{transform:none}
+.sbox input{all:unset;box-sizing:border-box;width:100%;padding:16px 20px;font-size:17px;border-bottom:1px solid var(--rule)}
+.sbox ul{list-style:none;margin:0;padding:6px;max-height:320px;overflow-y:auto}
+.sbox li{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;font-size:13.5px;cursor:pointer}
+.sbox li small{margin-left:auto;color:var(--muted);font-size:12px;flex:none}
+.sbox li.on{background:var(--accent);color:var(--accent-ink)} .sbox li.on small{color:var(--accent-ink);opacity:.8}
+@media (max-width:900px){
+  .nav .hl{display:none} .nav button[aria-current="page"]{background:var(--accent-soft)}
+  .board{grid-template-columns:1fr} .cmp{grid-template-columns:1fr} .fbi{padding-left:18px}
+  .fh{grid-template-columns:28px minmax(0,1fr) 16px} .fh .tags{grid-column:2;justify-content:flex-start}
+  .vs{grid-template-columns:1fr} .tl{grid-template-columns:repeat(2,1fr);gap:12px 0} .tl::before,.tl::after{display:none}
+  .drawer{top:auto;height:88vh;left:10px;width:auto;border-radius:22px 22px 18px 18px;transform:translateY(calc(100% + 24px))}
+}
+@media (prefers-reduced-motion: reduce){ *{transition:none!important;animation:none!important} }
 </style>
 </head>
 <body>
@@ -307,6 +446,23 @@ code{border-radius:5px}
   <main class="main" id="main" tabindex="-1"></main>
 </div>
 <div id="flash" class="flash" hidden></div>
+<div class="scrim" id="scrim"></div>
+<aside class="drawer" id="drawer" aria-hidden="true" aria-label="回答原文"><div class="dh" id="dh"></div><div class="db" id="db"></div></aside>
+<div class="wel" id="wel" role="dialog" aria-modal="true" aria-labelledby="wt"><div class="wbox">
+  <div class="mk" aria-hidden="true">E</div>
+  <h2 id="wt">先看 AI 说得对不对，再决定改什么</h2>
+  <p>EchoRank 把 AI 对一个品牌的说法，逐句对照品牌方确认过的官网口径，找出说错、说反和该说没说的地方。</p>
+  <div class="steps">
+    <div class="stp"><i>1</i><div><b>确认官网口径</b><span>在「事实底账」逐条看原文，确认后它就是评测的正确答案。</span></div></div>
+    <div class="stp"><i>2</i><div><b>用同一批问题问各家模型</b><span>「大模型回答记录」里，同一个问题在不同模型上的回答并排对齐。</span></div></div>
+    <div class="stp"><i>3</i><div><b>读体检报告</b><span>哪些说法和官网不一致，出现了多少次，先改哪一处。</span></div></div>
+    <div class="stp"><i>4</i><div><b>改内容，再复测</b><span>「内容实验」记下基线，改完官网后用同一批问题复测。</span></div></div>
+  </div>
+  <div class="note2"><b>每个数字旁边都写着它能不能信。</b>比例带 95% 区间，判定可以逐条人工复核，误判率放在首页。</div>
+  <div class="wact"><button class="btn" data-act="wel-close">先看看</button><button class="btn primary" id="wgo" data-act="wel-go">去看概览</button></div>
+</div></div>
+<div class="spot" id="spot"><div class="sbox" role="dialog" aria-label="搜索"><input id="sin" placeholder="搜索页面、问题、口径、来源…" autocomplete="off"><ul id="sres"></ul></div></div>
+<div class="tip" id="tip" role="tooltip"></div>
 
 <script>
 /* =========================================================
@@ -1359,8 +1515,8 @@ function page_report() {
   <header class="ph"><h1>${esc(d.T.entity_name)}：官网口径体检报告</h1>
     <p class="lede">检查口径 ${d.facts} 条，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
   <div class="kpis">
-    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div><div class="ks">95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}</div></div>
-    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答${hq('提到品牌的回答里，至少有一处说法和官网口径不一致的比例。')}</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div>${axis(d.dA, d.nA)}<div class="ks">95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险${hq('AI 替品牌宣称疗效的回答数。由规则识别，每条都应对照原文复核。')}</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>
     <div class="kpi"><div class="kt"><i></i>发现</div><div class="kv">${d.list.length}<small>类</small></div><div class="ks">先按严重度，再按出现次数排序</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>建议补充的口径</div><div class="kv">${d.unresolved.length + d.extras.length}</div><div class="ks">官网没说清，模型各说各话</div></div>
   </div>
@@ -1379,15 +1535,18 @@ function page_report() {
   </tbody></table></div>
 
   <h2>逐条发现</h2>
-  ${d.list.map((g, i) => `<div class="editor" style="background:var(--surface)">
-    <div class="spread"><b>${i + 1}. ${esc(g.title)}</b><span><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span></div>
-    <div class="grid2" style="margin-top:10px">
-      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div>
-      <div><div class="small muted">AI 原句</div>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
-    </div>
-    <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
-    ${g.cause ? `<p class="small">推断：${esc(g.cause.replace(/^推断：/, ''))}</p>` : ''}
-    <p class="small"><b>修改方向</b>　${esc((NEXT_STEP[g.type] || ['', '查看原文后决定'])[1])}</p>
+  <p class="prose muted">点一条展开官网口径、AI 原句和修改方向。先按严重度，再按出现次数排序。</p>
+  ${d.list.map((g, i) => `<div class="fd${i === 0 ? ' open' : ''}">
+    <button class="fh" data-act="fd-toggle" aria-expanded="${i === 0}"><span class="i">${String(i + 1).padStart(2, '0')}</span><b>${esc(g.title)}</b><span class="tags"><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span><span class="chev"></span></button>
+    <div class="fb"><div><div class="fbi">
+      <div class="cmp">
+        <div><small>官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</small>${esc(g.official)}<div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div></div>
+        <div><small>AI 原句</small>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
+      </div>
+      <p class="small muted" style="margin:0">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
+      ${g.cause ? `<p class="small" style="margin:0">推断：${esc(g.cause.replace(/^推断：/, ''))}</p>` : ''}
+      <p class="small" style="margin:0"><b>修改方向</b>　${esc((NEXT_STEP[g.type] || ['', '查看原文后决定'])[1])}</p>
+    </div></div></div>
   </div>`).join('') || '<p class="muted">没有发现不一致。</p>'}
 
   <h2>建议补充的口径</h2>
@@ -1511,18 +1670,22 @@ function page_reasons() {
   <div class="bars">${catTotals.map(c => `<div class="bar"><span>${c.k} ${c.name}</span><div class="track"><div class="fill" style="width:${Math.round(c.n / maxCat * 100)}%"></div></div><span class="val">${c.n} 条</span></div>`).join('')}</div>
 
   <h2>行动清单</h2>
-  <div class="row" style="margin-bottom:12px"><span class="small muted">品牌</span><select class="inp sel sm" style="max-width:220px" data-reason-brand aria-label="选择品牌">${brands.map(b => `<option value="${esc(b)}" ${b === UI.reasonBrand ? 'selected' : ''}>${esc(b)}${b === me ? '（监测对象）' : '（竞品）'}</option>`).join('')}</select><span class="small muted">按优先级排序：频次 × 位置 × 可改性 × 证据强度</span></div>
-  <div class="scroll"><table class="tbl">
-    <thead><tr><th>反面或条件理由</th><th>类别</th><th>可核对性</th><th class="num">出现</th><th>第一步：核实</th><th>通道</th><th>行动写成什么样</th></tr></thead>
-    <tbody>${neg.map(g => { const a = ACTION_MAP[g.cat]; return `<tr>
-      <td class="wide">“${esc(g.quotes[0].quote)}”<div class="small faint">${g.quotes.slice(0, 2).map(q => `<button class="linkbtn" data-act="open-run" data-q="${(allRuns().find(r => r.run_id === q.run_id) || {}).query_id || ''}">${esc(engName(q.engine))}</button>`).join('，')}${g.polarity === '条件' ? '　<span class="tag">条件句</span>' : ''}</div></td>
-      <td><span class="tag">${g.cat} ${g.catName}</span></td>
-      <td class="small">${g.verifiability}</td>
-      <td class="num">${g.runs.length} 次<br><span class="small muted">${g.engines.length} 个模型</span></td>
-      <td class="small">${esc(a.verify)}</td>
-      <td class="small">${esc(a.lanes)}</td>
-      <td class="small" style="min-width:220px">${esc(a.action)}</td></tr>`; }).join('') || `<tr><td colspan="7" class="muted">没有找到关于 ${esc(UI.reasonBrand)} 的反面理由。</td></tr>`}</tbody>
-  </table></div>
+  <div class="row" style="margin-bottom:12px"><span class="small muted">品牌</span><select class="inp sel sm" style="max-width:220px" data-reason-brand aria-label="选择品牌">${brands.map(b => `<option value="${esc(b)}" ${b === UI.reasonBrand ? 'selected' : ''}>${esc(b)}${b === me ? '（监测对象）' : '（竞品）'}</option>`).join('')}</select><span class="small muted">按优先级排序：频次 × 位置 × 可改性 × 证据强度。悬停卡片，把它推到下一步。</span></div>
+  ${(() => {
+    const AS = S.actionState || (S.actionState = {});
+    const key = g => `${g.brand}|${g.cat}|${g.polarity}`;
+    const COLS = ['待核实', '进行中', '已完成'];
+    const card = (g, ci) => { const a = ACTION_MAP[g.cat], k = key(g); return `<div class="rc${ci === 2 ? ' done' : ''}">
+      <q>${esc(g.quotes[0].quote)}</q>
+      <div class="f"><span class="tag ${g.polarity === '反面' ? 'bad' : ''}">${g.polarity}</span><span class="tag">${g.cat} ${g.catName}</span><span class="tag ${g.verifiability === '可核对事实' ? 'acc' : ''}">${g.verifiability}</span><span class="small muted">${g.runs.length} 次 · ${g.engines.length} 个模型</span></div>
+      <div class="small muted" style="margin-top:6px">第一步核实：${esc(a.verify)}<br>通道：${esc(a.lanes)}</div>
+      <div class="small" style="margin-top:4px">${esc(a.action)}</div>
+      <div class="f" style="margin-top:6px">${g.quotes.slice(0, 2).map(q => `<button class="linkbtn small" data-act="open-run" data-q="${(allRuns().find(r => r.run_id === q.run_id) || {}).query_id || ''}">${esc(engName(q.engine))}原文</button>`).join('')}${ci < 2 ? `<button class="go" data-act="act-next" data-key="${esc(k)}">${ci === 0 ? '开始核实 ›' : '标记完成 ›'}</button>` : `<button class="go" data-act="act-reset" data-key="${esc(k)}">退回待核实</button>`}</div>
+    </div>`; };
+    return neg.length ? `<div class="board">${COLS.map((c, ci) => { const cs = neg.filter(g => (AS[key(g)] || 0) === ci); return `<div class="colb"><h4>${c}<span>${cs.length}</span></h4>${cs.map(g => card(g, ci)).join('') || '<p class="small muted" style="margin:6px">没有</p>'}</div>`; }).join('')}</div>`
+      : `<p class="muted">${UI.reasonBrand ? `没有找到关于 ${esc(UI.reasonBrand)} 的反面理由。` : '规则 v1 没有从这批回答里抽出理由：它的判断词表是按会议工具写的，换品类前先看「这一页能信吗」。'}</p>`;
+  })()}
+  ${note('这块看板记的是“核实到哪一步了”，不改变理由本身。判断标准和行动模板见每张卡片；“已完成”只表示你处理过，不表示 AI 已经改口，那要靠复测。')}
   <h3>正面理由</h3>
   <div class="scroll"><table class="tbl"><thead><tr><th>理由</th><th>类别</th><th class="num">出现</th></tr></thead>
     <tbody>${pos.map(g => `<tr><td class="wide">“${esc(g.quotes[0].quote)}”</td><td><span class="tag ok">${g.cat} ${g.catName}</span></td><td class="num">${g.runs.length} 次，${g.engines.length} 个模型</td></tr>`).join('') || '<tr><td colspan="3" class="muted">无</td></tr>'}</tbody></table></div>
@@ -1578,6 +1741,7 @@ const ITERATIONS = [
   { v: 'v2', date: '2026-09-23', title: '可信度、溯源、导入', trigger: '竞品研究发现营销人最大的疑虑是“结果不稳定、只能当参照”', changed: '每个比例带 Wilson 区间和可信度等级；错误溯源到引用页并标疑似软文；官网文字抽取事实并做原文校验；国产模型采集脚本与人工导入', why: '“数据本身可不可信”是竞品都没回答的问题', dropped: '豆包、元宝 App 的界面自动化采集（合规风险）', evidence: '竞品矩阵 30 款；Digiday、3·15 报道', lesson: '把测量的不确定性放在台前，反而更可信' },
   { v: 'R1', date: '2026-09-24', title: '第一批真实数据', trigger: '四家 API 跑通，96 次调用 89 次成功', changed: '真实批次写进页面；发现虚构品牌被三个模型编造事实', why: '需要真实数据来验证平台，而不是继续演示', dropped: '把编造率当北极星（它测的是模型，不是 GEO）', evidence: '32 条品牌问题回答，逐条人工标注', lesson: '真实数据会推翻你原来的叙事，这是好事' },
   { v: 'v3', date: '2026-09-24', title: '看板风格', trigger: '用户希望像 AnswerBit 一样自然的看板', changed: '卡片布局、指标卡、条形图、分组导航', why: '演示给品牌方看时，形式要像日常在用的工具', dropped: '环比、综合分（换成区间和可信度）', evidence: 'AnswerBit 界面截图', lesson: '审美可以借，指标不能借' },
+  { v: 'v5.5', date: '2026-09-26', title: '设计系统七页交互并入产品', trigger: '产品设计会话在 EchoRank 设计系统里做了七个页面的原型（ClarityApp），产品负责人确认全部并入', changed: '侧栏高亮块滑动、⌘K 搜索页面/问题/口径/来源、首次打开的欢迎页、指标用白话命名并带“?”说明和 95% 区间轴；概览格子悬停提示、点开右侧抽屉看原文和评测，不再跳页；体检报告逐条发现改为可展开；回答记录的问题列表带各模型状态点，高亮句悬停显示判定原因；理由与行动加“待核实 / 进行中 / 已完成”看板，状态保存在工作区；信源溯源展开行给出建议动作并可复制纠正要点；内容实验加时间线、基线与复测对照、可比性清单；事实底账改为按分类的表格，悬停出“编辑”展开编辑卡，每条口径增加客户确认人与确认日期，版本横幅显示已确认或有未确认修改', why: '这些页面在设计系统里只是原型；并进产品后，演示和交付用的是同一份页面，判定规则与数据没有动', dropped: '原型里的“提交复核”“加入行动清单”按钮只弹提示，没有对应数据，没有并入；导出 PDF 未做', evidence: '回归测试 44/44；R3 与腾讯会议预设的报告数字与 v5.3 一致；build_public.py --check 通过；概览、报告、回答记录、理由、信源、实验、底账七页在浅色与深色下截图无报错', lesson: '交互可以整段移植，但每个交互都要接到真实数据上，否则只是动画' },
   { v: 'v5.3', date: '2026-09-26', title: 'R3 抽检后修判错规则', trigger: 'docs/SPOTCHECK.md：R3 报告里 6 条“说反了”没有一条是真的说反（4 条是“能不能退”正反问、1 条说假货、1 条说海外代购），33 条“合规风险”的 46 个小句没有一条是模型自己宣称疗效（否定句、复述问题、转述批评经销商、引用免责声明、“治疗级”品牌用语）；另有 3 条把官方退货政策说成“无理由退货”的回答被放过了', changed: '正反问（能不能、是否、能否…）只算提及，不参与判定；退货口径加 unless（假货、代购、海外购、电商平台法定规则、已拆封）：说这些渠道或情形“不能退”不算否认官方口径；否认判定跳过转述句（“上线忽悠你‘不能退’”）；合规风险用更宽的否定词表 NEG_WIDE（不是、并未、不用于、不可能、禁止、达不到…），转述词表加鼓吹、宣传、营销、话术、包治百病、代理等，转述和整句引语以整句为范围，“治疗级”“CPTG”先去掉再找疗效词，提到医生、治疗师、就医、监管审批、耽误正规治疗的小句不算；多特瑞口径新增“不应说：30 天无理由退货”（官网只说完好无损、不影响二次销售）；“X 的规则如下：”这种冒号引出的列表，紧接着 4 行里不提品牌的沿用品牌归属；回归测试从 20 条增加到 44 条（S-01 至 S-08、U-01 至 U-04、C-01 至 C-12）', why: '误判不是个别词漏了，而是四类语言现象没有建模：正反问、范围限定（渠道、商品状态）、转述与引语、品牌用语；每类各修一处，并让每条误判都变成回归测试', dropped: '没有把品牌归属扩展到整篇回答（会让所有统计口径一起变，先只做冒号列表的 4 行）；标题行（“### 常规退货（30 天内未拆封无理由退）”）仍不当作主张，所以 3 条“无理由退货”漏判里有 1 条在标题里，这版仍放过；NEG 本身没有加宽（关键口径的否认仍用旧词表，避免改变腾讯会议预设）；疗效词表仍未经懂广告法的人审核', evidence: '回归测试改动前 20/20、改动后 44/44 通过；R3 头条数字：与官网口径不一致 42/240（18%）→ 7/240（3%，95% 区间 1%–6%），合规风险 33 条 → 0 条，说反了 6 条 → 0 条，新增“与官方说明冲突：30 天无理由退货”2 条，价格未核实 3 → 5 条（冒号列表沿用归属后多算进 2 条会员费 35 元）；腾讯会议预设 R2：不一致 21/72 → 20/72（一条“能力遗漏”因列表沿用归属而说对），否认官方口径 2 条不变；新报告见 docs/REPORT_R3.md', lesson: '规则第一版的数字只能当线索，不能当结论：抽检 11 条就把两个头条数字全推翻了。以后每批新数据先抽检再对外' },
   { v: 'v5.2', date: '2026-09-25', title: '直销演示案例（T6）：匿名、分组汇总、口径录入', trigger: '仓库是公开的、网站手动上传：公开版本不能出现真实品牌名；单条口径样本只有几条回答，区间太宽；对话端从官网整理出 12 条口径，但只有 1 条是逐字原文', changed: '预设可标 anonymize：公开网站上品牌名、别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”，证照号、电话、专有名词等一起隐藏，AI 原句同样替换；本地和 Claude 里显示真实版，可勾选按公开版预览；build_public.py 生成源代码里也没有真实信息的公开版；体检报告增加“按问题分组汇总”；事实底账新增“对话端整理（转述）”和“官网未说明”两类信息，转述不能代替原文，未说明的话题进报告的“建议补充的口径”；合规风险的官网依据改为引用“功效表述边界”里的官方原话，区分官方原话和 AI 的延伸；报告新增“采集完整性”（模型 × 分组的成功次数，补跑后按“同一题同一次只要有一条成功”合并，缺数据的格子标出并在分模型数字旁注明）；没有 group 字段的问题集按阶段分组；修复被逗号隔开的否定句漏判（前一小句只有主题、后一小句只有否定时合起来判，前一小句已肯定的不合并）', why: '匿名要在数据层做，评测结果才能和真实版一致；分组的样本比单条大一个数量级，才可能给出“仅作方向”以上的结论；转述录进原文字段会让“逐字原文”失去意义', dropped: '只在显示层替换品牌名（源代码里仍然全是真实信息）；把对话端的转述直接当作原文引语', evidence: '批次 R3（30 题 × 4 模型 × 2 次，240/240 成功，30 条补跑）的体检结果：240 条回答里 42 条至少一处与官网口径不一致（18%，95% 区间 13%–23%，结论可用）；替品牌宣称疗效 33 条，集中在“功效”组（17/48）；“说反了”6 条，都是退货政策；建议补充的口径 6 条官网未说明 + 10 条额外说法。回归测试 16 → 20 条全部通过（R-06/R-07 逗号否定、R-08 反例、A-01 至 A-03 匿名）；用虚构回答比对真实版和匿名版，回答数、不一致数、五组数字完全一致；模拟公开网站逐页扫描 16 个页面，屏幕文字、输入框、链接和 Markdown 导出里都没有品牌名', lesson: '“匿名”不只是换掉名字：证照号、客服电话、地址、专有的项目名都能把品牌认回来，名单要和口径一起维护' },
   { v: 'v5.1', date: '2026-09-25', title: '官网口径逐条复核（T3）', trigger: '交接文档 T3：事实底账要能按分类看、看到原文和核对日期、逐条确认；同时发现官网抽取默认用 DeepSeek，而 DeepSeek 也是被测模型', changed: '「事实底账」页把能力、套餐、不应出现的说法合并为“官网口径”，按六类分组展示，每条显示原文引语、来源、核对日期、复核状态，可以逐条确认或撤回并记下复核人和时间；没有原文引语不能确认，已确认的口径改了原文或来源会退回待复核；从官网导入的口径保留校验过的引语，标为待复核；体检报告里待复核的口径会标出来；Worker 的官网抽取和理由抽取改用 EXTRACT_ENGINE（默认 Claude），不允许设成被测模型', why: '人是最后一道门：确认必须针对一句能被别人核对的原文，而不是一句转述；裁判和被测对象是同一个模型时，它的偏差会同时出现在答案和判卷里', dropped: '让“已确认”决定参不参与评测（会让腾讯会议预设里没有引语的 5 条口径一下子失效）；另建 source_url 字段（与已有的 evidence_url 重复）', evidence: '回归测试改动前 14/14、改动后 14/14 通过；腾讯会议预设 11 条口径里，2 条有引语的可以确认，其余 9 条（5 条能力、3 个套餐、1 条不应出现的说法）确认按钮不可用；绕过按钮直接触发确认也会被拦下', lesson: '“已验证”和“已确认”是两件事：前者说这条口径能不能用来判卷，后者说有没有人看过原文。混在一个字段里，任何一个都说不清' },
@@ -1752,7 +1916,7 @@ function makeDefaultState() {
     querySet: { version: 1, frozen: true, frozen_at: '2026-09-20 09:30', queries: clone(DEFAULT_QUERIES) },
     engines: clone(DEFAULT_ENGINES),
     liveRuns: [], importedRuns: [],
-    reviews: {}, sourceOverrides: {}, sourceMeta: {}, probeLabels: {},
+    reviews: {}, sourceOverrides: {}, sourceMeta: {}, probeLabels: {}, actionState: {},
     factImport: { source_url: '', origin: '', extracted_at: '', candidates: [] }, reasonsLLM: {},
     experiments: [], learnMode: false, learnDone: {},
     log: [
@@ -1817,7 +1981,7 @@ const KEY = 'echorank-workspace-v2';
 let S = makeDefaultState();
 const UI = { page: 'overview', scope: 'real', q: 'q_de_04', editQ: null, qFilter: 'all', exp: 'EXP-01', newExp: false,
   liveBusy: {}, liveCtl: null, sample: undefined, downloads: undefined, saveWhere: '本机浏览器', resetArm: false,
-  srcFilter: 'all', srcOpen: null, impOpen: false, impText: '', impBusy: false, impCtl: null, importResult: null,
+  srcFilter: 'all', srcOpen: null, drawerRun: null, drawerFrom: null, factEdit: null, impOpen: false, impText: '', impBusy: false, impCtl: null, importResult: null,
   reasonBrand: null, reasonsBusy: null, workerUrl: localStorage.getItem('echorank-worker-url') || '', workerToken: localStorage.getItem('echorank-worker-token') || '', reviewer: localStorage.getItem('echorank-reviewer') || '你', anonPreview: localStorage.getItem('echorank-anon-preview') === '1',
   analyze: { product: '', url: '', category: 'AI 会议记录工具', competitors: '', engines: ['deepseek', 'kimi', 'qwen', 'doubao_api'], followups: true, repeats: 1, busy: null, log: [], stop: false } };
 
@@ -2504,7 +2668,7 @@ function renderSide() {
   const side = document.getElementById('side');
   const T = S.truth;
   const initials = esc(T.entity_name.slice(0, 2));
-  side.innerHTML = `
+  const top = `
     <div class="brand"><span class="logo">E</span><span>EchoRank<small>AI 回答事实审计</small></span></div>
     <div class="pcard">
       <div class="pname"><span class="pava">${initials}</span><span>${esc(T.entity_name)}<div class="small muted" style="font-weight:400">${isFictional() ? '虚构探针品牌' : esc(T.category)}</div></span></div>
@@ -2516,11 +2680,28 @@ function renderSide() {
         <span class="tag ${S.querySet.frozen ? 'acc' : 'warn'}">问题集 v${S.querySet.version}${S.querySet.frozen ? '' : ' 草稿'}</span>
         <span class="tag">真实 ${realRuns().length} 条</span>
       </div>
-    </div>
-    <ul class="nav">${NAV_GROUPS.map(([g, items]) => `<li class="grp">${g}</li>` + items.map(([k, v]) => `<li><button data-act="nav" data-page="${k}" ${UI.page === k ? 'aria-current="page"' : ''}>${v}</button></li>`).join('')).join('')}</ul>
+    </div>`;
+  const bottom = `
     <div class="ws"><div class="faint">保存在${esc(UI.saveWhere)}</div></div>
-    <div><label class="switch"><input type="checkbox" data-act="learn-toggle" ${S.learnMode ? 'checked' : ''}> 讲解模式</label></div>`;
+    <div><label class="switch"><input type="checkbox" data-act="learn-toggle" ${S.learnMode ? 'checked' : ''}> 讲解模式</label></div>
+    <button class="help" data-act="spot-open">搜索页面、问题、口径<kbd>⌘K</kbd></button>
+    <button class="help" data-act="wel-open">EchoRank 是做什么的？</button>`;
+  // 导航只建一次，页签切换时高亮块滑过去（C 清透 · 侧栏）
+  if (!side.querySelector('.nav')) {
+    side.innerHTML = `<div id="side-top"></div><ul class="nav"><li class="hl" aria-hidden="true"></li>${NAV_GROUPS.map(([g, items]) => `<li class="grp">${g}</li>` + items.map(([k, v]) => `<li><button data-act="nav" data-page="${k}">${v}</button></li>`).join('')).join('')}</ul><div id="side-bot"></div>`;
+  }
+  side.querySelector('#side-top').innerHTML = top;
+  side.querySelector('#side-bot').innerHTML = bottom;
+  side.querySelectorAll('.nav button[data-page]').forEach(b => { if (b.dataset.page === UI.page) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
+  moveNavHl();
   document.body.classList.toggle('learn', !!S.learnMode);
+}
+function moveNavHl() {
+  const nav = document.querySelector('.side .nav'); if (!nav) return;
+  const hl = nav.querySelector('.hl'), b = nav.querySelector('button[aria-current="page"]');
+  if (!hl) return;
+  if (!b) { hl.classList.remove('on'); return; }
+  hl.style.transform = `translateY(${b.parentNode.offsetTop}px)`; hl.style.height = b.offsetHeight + 'px'; hl.classList.add('on');
 }
 
 /* =========================================================
@@ -2544,17 +2725,29 @@ function scopeSwitch() {
 function matrixEngines(runs) {
   return S.engines.filter(e => !e.live && (runs.some(r => r.engine === e.id)));
 }
+function runCellInfo(run) {
+  if (run.status !== 'SUCCESS') return { cls: 't', tip: '未成功' };
+  const e = evaluate(run);
+  const fo = finalOf(run, e);
+  const cls = fo.pending ? 'm' : fo.v ? 'v' : (fo.corrected && fo.final === 'none') ? 'n' : e.mentioned ? 'm' : 'n';
+  const tip = fo.corrected ? '人工纠正为：' + FINAL_LABEL[fo.final] : e.verifiable ? '说对且有依据' : e.mentioned ? (e.issues.length ? '提到了，但有问题：' + e.issues.map(i => i.label).join('、') : '提到了，但没有可核对的说法') : '没有提到';
+  return { cls, tip };
+}
 function cellFor(runs, qid, eid) {
   const list = runs.filter(r => r.query_id === qid && r.engine === eid).sort((a, b) => (a.started_at > b.started_at ? 1 : -1)).slice(-3);
-  if (!list.length) return `<span class="cell e" title="没有数据"></span>`;
-  return list.map(run => {
-    if (run.status !== 'SUCCESS') return `<button class="cell t" data-act="open-run" data-q="${qid}" title="${esc(run.run_id)}：未成功"></button>`;
-    const e = evaluate(run);
-    const fo = finalOf(run, e);
-    const cls = fo.pending ? 'm' : fo.v ? 'v' : (fo.corrected && fo.final === 'none') ? 'n' : e.mentioned ? 'm' : 'n';
-    const tip = fo.corrected ? '人工纠正为：' + FINAL_LABEL[fo.final] : e.verifiable ? '说对且有依据' : e.mentioned ? '提到了，但有问题：' + e.issues.map(i => i.label).join('、') : '没有提到';
-    return `<button class="cell ${cls}" data-act="open-run" data-q="${qid}" title="${esc(run.run_id)}：${esc(tip)}" aria-label="${esc(run.run_id + ' ' + tip)}"></button>`;
+  if (!list.length) return `<span class="cell e" data-tip="没有数据"></span>`;
+  const eng = ENG(eid) || { name: eid };
+  return list.map((run, k) => {
+    const { cls, tip } = runCellInfo(run);
+    const label = `${eng.name} · 第 ${k + 1} 次 · ${tip}`;
+    return `<button class="cell ${cls}" data-act="peek-run" data-run="${esc(run.run_id)}" data-q="${qid}" data-tip="${esc(label)}" aria-label="${esc(run.run_id + ' ' + tip)}"></button>`;
   }).join('');
+}
+const hq = t => `<span class="hq" tabindex="0" data-tip="${esc(t)}">?</span>`;
+function axis(k, n) {
+  const w = wilson(k, n); if (!w) return '';
+  const lo = w[0] * 100, hi = w[1] * 100, p = k / n * 100;
+  return `<div class="ax" aria-hidden="true"><i style="left:${lo.toFixed(1)}%;width:${(hi - lo).toFixed(1)}%"></i><b style="left:${p.toFixed(1)}%"></b></div>`;
 }
 function captureMixText(m) {
   const names = { 'MOCK|API': '样本（模拟 API）', 'MOCK|APP': '样本（模拟 App 导入）', 'OFFICIAL_API|API': '官方 API', 'MANUAL_IMPORT|APP': 'App 人工导入', 'MANUAL_IMPORT|API': '人工导入', 'PERMITTED_CONNECTOR|API': 'Claude 授权接口' };
@@ -2580,10 +2773,10 @@ function page_overview() {
   const unstableText = m.unstable.slice(0, 3).map(k => { const [qid, eid] = k.split('|'); const e = ENG(eid); return `${qid}（${e ? e.name : eid}）`; }).join('、');
   return head + todoCard(m) + `
   <div class="kpis">
-    <div class="kpi"><div class="kt"><i></i>可验证认知覆盖率</div><div class="kv">${pct(m.verifiable, m.n)}<small>${m.verifiable} / ${m.n}</small></div><div class="ks">95% 区间 ${wilsonText(m.verifiable, m.n)}　${credTag(cN)}${m.corrected ? `<br>含人工纠正 ${m.corrected} 条` : ''}</div></div>
-    <div class="kpi"><div class="kt"><i style="background:var(--accent-2)"></i>品牌提及率</div><div class="kv">${pct(m.mention, m.n)}<small>${m.mention} / ${m.n}</small></div><div class="ks">非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}</div></div>
-    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>事实错误</div><div class="kv">${m.unsupported + m.outdated + m.misattr + (m.denied || 0)}<small>次</small></div><div class="ks">说反 ${m.denied || 0}，冲突 ${m.unsupported}，过期 ${m.outdated}，错误归属 ${m.misattr}，遗漏 ${m.omission}</div></div>
-    <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>重复一致</div><div class="kv">${pct(m.stable, m.pairsN)}<small>${m.stable} / ${m.pairsN}</small></div><div class="ks">同一问题同一模型多次是否一致</div></div>
+    <div class="kpi"><div class="kt"><i></i>说对且有依据${hq('提到产品的回答里，说法能在事实底账里找到依据的比例。行业里也叫“可验证认知覆盖率”。')}</div><div class="kv">${pct(m.verifiable, m.n)}<small>${m.verifiable} / ${m.n}</small></div>${axis(m.verifiable, m.n)}<div class="ks">95% 区间 ${wilsonText(m.verifiable, m.n)}　${credTag(cN)}${m.corrected ? `<br>含人工纠正 ${m.corrected} 条` : ''}</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--accent-2)"></i>提到了产品${hq('所有有效回答里，提到产品名字或别名的比例。')}</div><div class="kv">${pct(m.mention, m.n)}<small>${m.mention} / ${m.n}</small></div><div class="ks">非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>事实错误${hq('与事实底账不一致的说法次数，按类型分开数。每一类都对应底账里的一条记录。')}</div><div class="kv">${m.unsupported + m.outdated + m.misattr + (m.denied || 0)}<small>次</small></div><div class="ks">说反 ${m.denied || 0}，冲突 ${m.unsupported}，过期 ${m.outdated}，错误归属 ${m.misattr}，遗漏 ${m.omission}</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>重复一致${hq('同一问题、同一模型问多次，结论是否一致。不一致的问题，结论不要只看一次。')}</div><div class="kv">${pct(m.stable, m.pairsN)}<small>${m.stable} / ${m.pairsN}</small></div><div class="ks">同一问题同一模型多次是否一致</div></div>
   </div>
   <div class="hero"><p class="stmt">${m.n} 次有效回答里，${m.verifiable} 次把 ${esc(S.truth.entity_name)} 说对，而且说法能在产品事实里找到依据。</p>
   <p class="stmt-sub">${cN.more ? `要达到“结论可用”，大约还要 ${cN.more} 次有效回答。` : ''}${m.failed ? `另有 ${m.failed} 次运行未成功，未计入分母。` : ''}${m.mock ? '这一组是人工编写的方法演示样本。' : '全部为官方 API 结果，不代表 App 内表现。'}</p>
@@ -2757,12 +2950,27 @@ function factCard({ list, kind, i, x }) {
         <label class="small muted">分类<select class="sel inp sm" data-path="${p}.category" aria-label="口径分类">${['', ...FACT_CATEGORIES].map(c => `<option value="${c}" ${(x.category || '') === c ? 'selected' : ''}>${c || '未分类'}${!c && FACT_LISTS.find(f => f.list === list).defCat ? `（默认：${FACT_LISTS.find(f => f.list === list).defCat}）` : ''}</option>`).join('')}</select></label>
       </div>
     </div>
+    <div class="grid2">
+      <label class="small muted">客户确认人${inp(`${p}.client_confirmed_by`, x.client_confirmed_by || '', { sm: 1, label: '客户确认人', ph: '客户方签字人' })}</label>
+      <label class="small muted">客户确认日期${inp(`${p}.client_confirmed_at`, x.client_confirmed_at || '', { sm: 1, type: 'date', label: '客户确认日期' })}</label>
+    </div>
     <div class="row" style="margin-top:8px">
       ${ok ? `<span class="small muted">由${esc(x.reviewed_by || '—')}于 ${esc(x.reviewed_at || '—')} 确认</span><button class="btn sm" data-act="fact-unconfirm" data-list="${list}" data-i="${i}">撤回确认</button>`
         : `<button class="btn sm ${q ? 'primary' : ''}" data-act="fact-confirm" data-list="${list}" data-i="${i}" ${q ? '' : 'disabled title="没有原文引语，不能确认"'}>我已看过原文，确认</button>${q ? '' : '<span class="small muted">先填入官网原文，才能确认。</span>'}`}
       ${extLink(x.evidence_url, '打开原文', 'small')}${x.evidence_locator ? `<span class="small muted">${esc(x.evidence_locator)}</span>` : ''}
     </div>
   </div>`;
+}
+function factRow(y) {
+  const { list, kind, i, x } = y, key = `${list}.${i}`, editing = UI.factEdit === key;
+  const ok = isConfirmed(x), q = hasQuote(x);
+  const date = x.checked_at || (list === 'offers' ? x.valid_from : '') || '';
+  return `<tr class="frow${editing ? ' editing' : ''}">
+    <td class="c0"><span class="tag">${kind}</span> ${esc(factItemTitle(list, x))}${list === 'capabilities' && x.status !== 'VERIFIED' ? ' <span class="tag">不参与评测</span>' : ''}</td>
+    <td class="num muted">${esc(date || '—')}</td>
+    <td>${ok ? `<span class="tag ok">已确认</span><div class="small faint">${esc(x.reviewed_by || '—')} · ${esc(x.reviewed_at || '—')}</div>` : '<span class="tag warn">待复核</span>'}${q ? '' : ' <span class="tag bad">缺原文引语</span>'}</td>
+    <td class="small">${x.client_confirmed_by ? `<span class="tag acc">客户已确认</span><div class="small faint">${esc(x.client_confirmed_by)} · ${esc(x.client_confirmed_at || '—')}</div>` : '<span class="faint">—</span>'}</td>
+    <td style="text-align:right;white-space:nowrap"><button class="btn sm ed" data-act="fact-edit" data-key="${key}" aria-expanded="${editing}">${editing ? '收起' : '编辑'}</button></td></tr>${editing ? `<tr class="fx"><td colspan="5">${factCard(y)}</td></tr>` : ''}`;
 }
 function factLedger(T) {
   const items = factItems(T);
@@ -2775,7 +2983,7 @@ function factLedger(T) {
   ${cats.map(cat => {
     const list = items.filter(y => y.cat === cat);
     return `<h3>${esc(cat)} <span class="small muted" style="font-weight:400">${list.length} 条${list.length ? `，已确认 ${list.filter(y => isConfirmed(y.x)).length}` : ''}</span></h3>
-    ${list.map(factCard).join('') || '<p class="small muted">这一类还没有口径。</p>'}`;
+    ${list.length ? `<div class="scroll"><table class="tbl"><thead><tr><th style="width:44%">条目</th><th>核对日期</th><th>复核</th><th>客户确认</th><th></th></tr></thead><tbody>${list.map(y => factRow(y)).join('')}</tbody></table></div>` : '<p class="small muted">这一类还没有口径。</p>'}`;
   }).join('')}
   <div class="row" style="margin-top:10px">
     <button class="btn sm" data-act="truth-add" data-list="capabilities">添加口径</button>
@@ -2795,10 +3003,10 @@ function page_truth() {
   const T = S.truth, draft = !truthReady();
   return `
   <header class="ph"><h1>事实底账</h1>
-    <p class="lede">评测时，“AI 说得对不对”全部以这里为准。任何修改都会先变成草稿，你确认后才生效。</p></header>
-  ${draft ? `<div class="state"><h4>有未确认的修改</h4><p>确认后会发布为 v${T.version + 1}，所有回答按新事实重新评测。放弃则回到 v${T.version}。</p>
-    <div class="row"><button class="btn primary" data-act="truth-approve">确认并发布 v${T.version + 1}</button><button class="btn" data-act="truth-revert">放弃修改</button></div></div>`
-  : `<div class="state ok"><h4>v${T.version} 已确认</h4><p>由${esc(T.approved_by)}于 ${esc(T.approved_at)} 确认。直接修改下方任意字段，或从官网导入，都会开始新版本。</p></div>`}
+    <p class="lede">评测时，“AI 说得对不对”全部以这里为准。每条口径记录复核人和客户确认人；任何修改都会先变成草稿，你确认后才生效。</p></header>
+  ${draft ? `<div class="banner draft" role="status"><span class="ic">!</span><span class="bt"><b>有未确认的修改</b><span class="muted">确认后发布为 v${T.version + 1}，所有回答按新事实重新评测；放弃则回到 v${T.version}。确认前评测暂停。</span></span>
+    <span class="row"><button class="btn primary" data-act="truth-approve">确认为 v${T.version + 1}</button><button class="btn" data-act="truth-revert">放弃修改</button></span></div>`
+  : `<div class="banner" role="status"><span class="ic">✓</span><span class="bt"><b>v${T.version} 已确认</b><span class="muted">由${esc(T.approved_by)}于 ${esc(T.approved_at)} 确认。评测的“正确答案”全部来自这里；点任意一行的“编辑”修改，或从官网导入，都会开始新版本。</span></span></div>`}
   ${importPanel()}
   ${note('导入流程里只有“抽取”用模型。模型最常见的失败是编造原文里没有的事实，所以每条候选必须附原文引语，由程序逐字核对；核对不过的不能一键接受。这就是控制幻觉的具体做法：不是让模型“更小心”，而是让它的输出可以被机器检查。')}
 
@@ -2893,11 +3101,18 @@ function page_queries() {
 function renderText(e, raw) {
   if (!e || !e.valid) return esc(raw);
   const brandRe = rx('(' + S.truth.aliases.filter(Boolean).map(escRx).join('|') + ')');
+  // 高亮句悬停提示：这一句被判成了什么
+  const why = new Map();
+  e.issues.forEach(it => (it.idx || []).forEach(i => why.set(i, (why.has(i) ? why.get(i) + '；' : '') + it.label + '：' + it.text)));
+  const goodBy = new Map(); e.goods.forEach(g => { if (g.clause) goodBy.set(g.clause, '说对了：' + g.text); });
   return e.parts.map((p, i) => {
     let h = esc(p.c);
     if (brandRe) h = h.replace(new RegExp(brandRe.source, 'gi'), m => `<mark class="k-brand">${m}</mark>`);
     const f = e.flags.get(i);
-    if (f && p.c.trim()) h = `<mark class="k-${f}">${h}</mark>`;
+    if (f && p.c.trim()) {
+      const t = why.get(i) || goodBy.get(p.c) || [...goodBy.keys()].filter(k => p.c.includes(k)).map(k => goodBy.get(k))[0] || (f === 'ok' ? '说对了' : f === 'warn' ? '提到了产品，但这一句没有问题' : '有问题');
+      h = `<mark class="k-${f}" data-tip="${esc(t.slice(0, 140))}" tabindex="0">${h}</mark>`;
+    }
     return h + esc(p.d);
   }).join('');
 }
@@ -2941,6 +3156,13 @@ function respBlock(run) {
   </div>`;
   return `<div class="resp">${meta}${promptLine}${stale ? '<p class="small" style="color:var(--warn)">这条回答对应修改前的问题文本，不能和新版本直接比较。</p>' : ''}<div class="txt">${renderText(e, run.raw)}</div>${evHtml}</div>`;
 }
+function qDots(qid) {
+  if (!truthReady() || isFictional()) return '';
+  const runs = scopeRuns().filter(r => r.query_id === qid);
+  if (!runs.length) return '';
+  const engs = matrixEngines(runs);
+  return `<span class="dots" aria-hidden="true">${engs.map(e => runs.filter(r => r.engine === e.id).sort((a, b) => (a.started_at > b.started_at ? 1 : -1)).slice(-3).map(r => `<i class="${runCellInfo(r).cls}"></i>`).join('')).join('')}</span>`;
+}
 function page_runs() {
   const qs = S.querySet.queries;
   if (!Q(UI.q) && qs.length) UI.q = qs[0].id;
@@ -2958,7 +3180,7 @@ function page_runs() {
   ${!truthReady() ? blockedByTruth() : ''}
   <h2>回答对比</h2>
   <div class="runs-layout">
-    <nav aria-label="问题列表"><ul class="qlist">${byStage.map(([s, arr]) => `<li class="grp">${STAGES[s]}</li>` + arr.map(x => `<li><button data-act="sel-q" data-q="${x.id}" aria-current="${x.id === UI.q}">${esc(x.text)}</button></li>`).join('')).join('')}</ul></nav>
+    <nav aria-label="问题列表"><ul class="qlist">${byStage.map(([s, arr]) => `<li class="grp">${STAGES[s]}</li>` + arr.map(x => `<li><button data-act="sel-q" data-q="${x.id}" aria-current="${x.id === UI.q}"><span class="qt">${esc(x.text)}</span>${qDots(x.id)}</button></li>`).join('')).join('')}</ul></nav>
     <section>${q ? `
       <p class="small muted" style="margin:0 0 6px">${q.id}，${STAGES[q.stage]}阶段，${q.branded ? '含品牌名' : '不含品牌名'}</p>
       <p class="qhead">${esc(q.text)}</p>
@@ -3074,6 +3296,7 @@ function page_sources() {
           <label class="small muted">页面标题<input class="inp sm" data-src-meta="${esc(s.url)}" data-mf="title" value="${esc(r.meta.title || '')}"></label>
           <label class="small muted">发布日期<input class="inp sm" type="date" data-src-meta="${esc(s.url)}" data-mf="published" value="${esc(r.meta.published || '')}"></label>
         </div>
+        <div class="fix"><b>建议动作</b>${esc(suggestAction(r, s.issueCount))}<div class="row" style="margin-top:8px"><button class="btn sm" data-act="src-copy" data-url="${esc(s.url)}">复制纠正要点</button></div></div>
         <p class="small muted">补上标题和发布日期后，软文与过期判断会自动更新。关联的错误：</p>
         ${s.strong.concat(s.weak).map(x => `<div class="small" style="margin:4px 0"><span class="tag ${s.strong.includes(x) ? 'acc' : ''}">${s.strong.includes(x) ? '强' : '弱'}</span><span class="tag ${x.iss.type === 'omission' ? 'warn' : 'bad'}">${x.iss.label}</span> ${esc(x.iss.text)}　<button class="linkbtn" data-act="open-run" data-q="${x.run.query_id}">${esc(x.run.run_id)}</button></div>`).join('') || '<p class="small muted">没有关联的错误。</p>'}
       </td></tr>` : ''}`;
@@ -3151,7 +3374,14 @@ function page_experiments() {
   </div>` : ''}
   ${exp ? `
   <div class="state"><h4>这个实验现在还不能证明内容改动有效</h4><p>采集脚本调用的是官方 API，并且没有开联网搜索，模型读不到你刚改的页面。改完官网再用同一方式复测，结果变化只能来自模型本身。要验证内容改动，需要一个确实会检索新页面的渠道（开联网的 App 或检索接口），并记录它这次读到了哪些页面。受控检索实验和真实 App 效果要分开表述。</p></div>
-  <h2>${esc(exp.id)}　${esc(exp.title)}</h2>
+  <h2>${esc(exp.id)}　${esc(exp.title)}<span class="tag ${exp.status === '已复测' ? 'ok' : 'warn'}" style="margin-left:10px">${esc(exp.status)}</span></h2>
+  ${(() => {
+    const now = { '已规划': 1, '内容已发布': 2, '等待期': 2, '已复测': 4 }[exp.status] ?? 1;
+    const left = Math.ceil((new Date(retest) - new Date(TODAY)) / 864e5);
+    const steps = [['基线 ' + exp.baseline.batch, exp.baseline.captured], ['发布改动', exp.status === '已规划' ? '未发布' : exp.published_at], ['等待 ' + exp.wait_days + ' 天', now === 2 ? (left > 0 ? `还剩 ${left} 天` : '已到期') : ''], ['复测', retest + ' · 问题集 v' + exp.baseline.query_set_version]];
+    return `<div class="tl" style="--tlp:${Math.min(1, now / 3).toFixed(2)}">${steps.map((x, i) => `<div class="ts ${i < now ? 'done' : i === now ? 'now' : ''}"><i>${i < now ? '✓' : i + 1}</i>${esc(x[0])}<small>${esc(x[1] || '　')}</small></div>`).join('')}</div>
+    <div class="vs"><div><span class="small muted">基线 · 说对“${esc(capName(exp.cap))}”</span><b>${st.hit} / ${st.valid}</b><span class="small muted">95% 区间 ${wilsonText(st.hit, st.valid)}</span></div><div><span class="small muted">复测 · ${retest}</span><b class="muted">—</b><span class="small muted">${exp.status === '已复测' ? '复测结果需要在真实运行后录入' : '复测后自动计算差值与区间'}</span></div></div>`;
+  })()}
   <div class="field"><label>假设</label><div>${esc(exp.hypothesis)}</div></div>
   <div class="field"><label>观察指标</label><div>“${esc(capName(exp.cap))}”在目标问题中被说对的次数</div></div>
   <div class="field"><label>目标问题</label><div>${exp.target_queries.map(id => { const q = Q(id); return `<div>${esc(id)}　${q ? esc(q.text) : '<span style="color:var(--bad)">已删除</span>'}</div>`; }).join('')}</div></div>
@@ -3170,10 +3400,7 @@ function page_experiments() {
     <h4>${cmp.comparable ? '当前条件与基线可比' : '当前条件与基线不可比'}</h4>
     <p>${cmp.comparable ? '现在复测，结果差异才可能归因到内容改动。' : `原因：${cmp.blocking.map(c => c.name).join('、')}发生了变化。恢复这些条件，或者新建实验、重新记录基线。`}</p>
   </div>
-  <div class="scroll"><table class="tbl">
-    <thead><tr><th>条件</th><th>检查</th><th>说明</th></tr></thead>
-    <tbody>${cmp.checks.map(c => `<tr><td>${esc(c.name)}</td><td><span class="tag ${c.level}">${c.level === 'ok' ? '一致' : c.level === 'warn' ? '需重评' : '不一致'}</span></td><td class="small muted">${esc(c.detail)}</td></tr>`).join('')}</tbody>
-  </table></div>
+  <div class="chk">${cmp.checks.map(c => `<div><span class="ck ${c.level}">${c.level === 'ok' ? '✓' : c.level === 'warn' ? '!' : '×'}</span><div>${esc(c.name)}　<span class="tag ${c.level}">${c.level === 'ok' ? '一致' : c.level === 'warn' ? '需重评' : '不一致'}</span><div class="small muted">${esc(c.detail)}</div></div></div>`).join('')}</div>
   ${exp.id !== 'EXP-01' ? `<button class="btn quiet sm danger" data-act="exp-del" data-id="${exp.id}" style="margin-top:14px">删除这个实验</button>` : ''}
   ` : '<p class="muted">还没有实验。</p>'}`;
 }
@@ -3307,11 +3534,13 @@ function render() {
   const keep = document.getElementById('imp-text'); if (keep) UI.impText = keep.value;
   const body = (PAGES[UI.page] || page_overview)();
   const top = `<div class="topbar"><div class="crumb">${PAGE_TITLE[UI.page] || '概览'} <span>／ ${esc(S.truth.entity_name)}</span></div><div class="row">${['overview','runs','diff','sources'].includes(UI.page) ? scopeSwitch() : ''}</div></div>`;
-  document.getElementById('main').innerHTML = top + cardify(body);
+  const sample = isFictional() ? `<div class="sample"><b>示例</b>${esc(S.truth.entity_name)} 是一个虚构品牌，用来演示方法；左上角可以切换到真实产品。<span class="sp"></span><button data-act="wel-open">这是什么？</button></div>` : '';
+  document.getElementById('main').innerHTML = top + sample + cardify(body);
+  if (UI.drawerRun) renderDrawer();
 }
 function go(page) {
   if (!PAGES[page]) page = 'overview';
-  UI.page = page; UI.resetArm = false;
+  UI.page = page; UI.resetArm = false; hideTip(); spotClose(); closeDrawer();
   if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
   render();
   // C 清透：换页时内容依次浮入（只在换页时触发，页内点开关不触发）
@@ -3335,7 +3564,18 @@ document.addEventListener('click', e => {
   switch (a) {
     case 'nav': go(d.page); break;
     case 'scope': UI.scope = d.scope; render(); break;
-    case 'open-run': UI.q = d.q; go('runs'); break;
+    case 'open-run': UI.q = d.q; closeDrawer(); go('runs'); break;
+    case 'peek-run': openDrawer(d.run, el); break;
+    case 'drawer-close': closeDrawer(); break;
+    case 'fd-toggle': { const fd = el.closest('.fd'); const o = !fd.classList.contains('open'); fd.classList.toggle('open', o); el.setAttribute('aria-expanded', o); break; }
+    case 'act-next': { S.actionState = S.actionState || {}; const v = Math.min(2, (S.actionState[d.key] || 0) + 1); S.actionState[d.key] = v; commit(`行动清单：${d.key.split('|')[1]} → ${['待核实', '进行中', '已完成'][v]}`); flash(v === 2 ? '已标记完成' : '已开始核实'); break; }
+    case 'act-reset': { S.actionState = S.actionState || {}; delete S.actionState[d.key]; commit(); break; }
+    case 'src-copy': { const txt = sourceBrief(d.url); copyText(txt); break; }
+    case 'fact-edit': UI.factEdit = UI.factEdit === d.key ? null : d.key; render(); if (UI.factEdit) { const el2 = document.querySelector('.fx .cand input, .fx .cand textarea'); if (el2) el2.focus({ preventScroll: true }); } break;
+    case 'spot-open': spotOpen(); break;
+    case 'wel-open': welOpen(); break;
+    case 'wel-close': welClose(); break;
+    case 'wel-go': welClose(); go('overview'); break;
     case 'sel-q': UI.q = d.q; render(); break;
     case 'open-source': UI.srcOpen = d.url; UI.srcFilter = 'all'; if (!sourceIndex(scopeRuns()).some(s => s.url === d.url)) UI.scope = 'all'; go('sources'); break;
     case 'src-toggle': UI.srcOpen = UI.srcOpen === d.url ? null : d.url; render(); break;
@@ -3353,7 +3593,7 @@ document.addEventListener('click', e => {
       }[d.list];
       (S.truth[d.list] = S.truth[d.list] || []).push(blank); markTruthDraft(); commit(); break;
     }
-    case 'truth-del': S.truth[d.list].splice(Number(d.i), 1); markTruthDraft(); commit(); break;
+    case 'truth-del': S.truth[d.list].splice(Number(d.i), 1); UI.factEdit = null; markTruthDraft(); commit(); break;
     case 'fact-confirm': case 'fact-unconfirm': {
       const x = (S.truth[d.list] || [])[Number(d.i)]; if (!x) return;
       const title = factItemTitle(d.list, x);
@@ -3505,6 +3745,8 @@ document.addEventListener('change', e => {
   if (path.startsWith('@')) { setPath(S.competitors, path.slice(1).replace(/^competitors\./, ''), val); markTruthDraft(); commit(); return; }
   if (path.startsWith('#')) { const p = path.slice(1).replace(/^engines\./, ''); setPath(S.engines, p, val); const eng = S.engines[Number(p.split('.')[0])]; commit(`${eng.name}版本改为 ${val}`); return; }
   if (path.startsWith('$')) { const exp = S.experiments.find(x => x.id === UI.exp) || S.experiments[0]; exp.intervention_url = val; commit(); return; }
+  // 客户确认人 / 确认日期只是记录，不改变口径本身：不开新版本；底账已发布时同步到已发布版本
+  if (/\.client_confirmed_(by|at)$/.test(path)) { setPath(S.truth, path, val); if (truthReady()) S.truthApproved = clone(S.truth); commit(val ? `客户确认：${path.split('.').pop() === 'client_confirmed_by' ? val : val}` : ''); return; }
   setPath(S.truth, path, val);
   // 已确认的口径换了引语或来源，原来的确认不再成立
   const m = path.match(/^(capabilities|offers|prohibited_claims)\.(\d+)\.(source_quote|evidence_url)$/);
@@ -3514,6 +3756,109 @@ document.addEventListener('change', e => {
 document.addEventListener('input', e => { if (e.target.id === 'imp-text') UI.impText = e.target.value; });
 window.addEventListener('hashchange', () => { const p = location.hash.slice(1); if (p && p !== UI.page) go(p); });
 
+/* =========================================================
+   v5.5 共用交互：提示、抽屉、⌘K 搜索、欢迎页（只改交互，不改数据与规则）
+   ========================================================= */
+const $id = id => document.getElementById(id);
+function showTip(el, text) {
+  const t = $id('tip'); if (!t || !text) return;
+  const r = el.getBoundingClientRect();
+  t.textContent = text; t.classList.toggle('wide', el.classList.contains('hq') || text.length > 40);
+  t.style.left = Math.min(window.innerWidth - 20, Math.max(20, r.left + r.width / 2)) + 'px';
+  t.classList.add('on');
+  const h = t.offsetHeight; t.style.top = (r.top - h - 8 > 4 ? r.top - h - 8 : r.bottom + 8) + 'px';
+}
+function hideTip() { const t = $id('tip'); if (t) t.classList.remove('on'); }
+document.addEventListener('mouseover', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, el.dataset.tip); });
+document.addEventListener('mouseout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
+document.addEventListener('focusin', e => { const el = e.target.closest('[data-tip]'); if (el) showTip(el, el.dataset.tip); });
+document.addEventListener('focusout', e => { if (e.target.closest('[data-tip]')) hideTip(); });
+window.addEventListener('scroll', hideTip, true);
+
+function openDrawer(runId, fromEl) {
+  UI.drawerRun = runId; UI.drawerFrom = fromEl && fromEl.dataset ? fromEl.dataset.run : null;
+  hideTip(); renderDrawer();
+  $id('drawer').classList.add('on'); $id('scrim').classList.add('on'); $id('drawer').setAttribute('aria-hidden', 'false');
+  setTimeout(() => { const x = $id('drawer').querySelector('.x'); if (x) x.focus({ preventScroll: true }); }, 60);
+}
+function closeDrawer() {
+  if (!UI.drawerRun) return;
+  const from = UI.drawerFrom; UI.drawerRun = null; UI.drawerFrom = null;
+  $id('drawer').classList.remove('on'); $id('scrim').classList.remove('on'); $id('drawer').setAttribute('aria-hidden', 'true');
+  if (from) { const el = document.querySelector(`[data-run="${CSS.escape(from)}"]`); if (el) el.focus({ preventScroll: true }); }
+}
+function renderDrawer() {
+  const run = allRuns().find(r => r.run_id === UI.drawerRun);
+  if (!run) { closeDrawer(); return; }
+  const q = Q(run.query_id), eng = ENG(run.engine) || { name: run.engine };
+  const info = truthReady() && !isFictional() ? runCellInfo(run) : { cls: 'n', tip: run.status === 'SUCCESS' ? '未评测' : '未成功' };
+  const tagCls = { v: 'acc', m: 'warn', f: 'bad', n: '', t: '' }[info.cls] || '';
+  $id('dh').innerHTML = `<div><span class="tag ${tagCls}">${esc(eng.name)} · ${esc(info.tip)}</span><h3>${esc(q ? q.text : run.query_id)}</h3></div><button class="x" data-act="drawer-close" aria-label="关闭">×</button>`;
+  $id('db').innerHTML = respBlock(run) + `<div class="row" style="justify-content:flex-end;margin-top:14px"><button class="btn sm" data-act="open-run" data-q="${esc(run.query_id)}">在回答记录里打开</button></div>`;
+}
+
+function copyText(txt) {
+  const done = () => flash('已复制。'), fail = () => { window.prompt('复制下面的内容：', txt); };
+  try { navigator.clipboard.writeText(txt).then(done, fail); } catch (e) { fail(); }
+}
+function sourceBrief(url) {
+  const sx = sourceIndex(scopeRuns()).find(x => x.url === url); if (!sx) return url;
+  const r = sx.risk, lines = [`来源：${r.meta.title || hostOf(url)}`, url, `判断：${STATUS_LABEL[r.status]}${r.meta.published ? `，发布于 ${r.meta.published}` : ''}`, `被引用 ${sx.cites} 次，关联错误 强 ${sx.strong.length} 弱 ${sx.weak.length}`, `建议动作：${suggestAction(r, sx.issueCount)}`, ''];
+  sx.strong.concat(sx.weak).forEach(x => lines.push(`- [${sx.strong.includes(x) ? '同句引用' : '同回答引用'}] ${x.iss.label}：${x.iss.text}（${x.run.run_id}）`));
+  return lines.join('\n');
+}
+
+/* ⌘K 搜索 */
+const SPOT = { list: [], i: 0 };
+function spotItems() {
+  const items = NAV_GROUPS.flatMap(([, it]) => it.map(([k, v]) => ({ t: v, k: '页面', page: k })));
+  S.querySet.queries.forEach(q => items.push({ t: q.text, k: '问题', q: q.id }));
+  factItems(S.truth).forEach(y => items.push({ t: factItemTitle(y.list, y.x), k: '口径', fact: `${y.list}.${y.i}` }));
+  try { sourceIndex(scopeRuns()).forEach(x => items.push({ t: (x.risk.meta.title ? x.risk.meta.title + '　' : '') + hostOf(x.url), k: '来源', url: x.url })); } catch (e) {}
+  return items;
+}
+function spotRender() {
+  const q = $id('sin').value.trim().toLowerCase();
+  SPOT.list = spotItems().filter(x => !q || x.t.toLowerCase().includes(q)).slice(0, 8);
+  SPOT.i = Math.min(SPOT.i, Math.max(0, SPOT.list.length - 1));
+  $id('sres').innerHTML = SPOT.list.map((x, i) => `<li class="${i === SPOT.i ? 'on' : ''}" data-si="${i}">${esc(x.t)}<small>${x.k}</small></li>`).join('') || '<li class="muted">没有结果</li>';
+}
+function spotOpen() { hideTip(); $id('spot').classList.add('on'); $id('sin').value = ''; SPOT.i = 0; spotRender(); setTimeout(() => $id('sin').focus(), 30); }
+function spotClose() { const el = $id('spot'); if (el) el.classList.remove('on'); }
+function spotRun(x) {
+  spotClose(); if (!x) return;
+  if (x.q) { UI.q = x.q; go('runs'); }
+  else if (x.fact) { UI.factEdit = x.fact; go('truth'); }
+  else if (x.url) { UI.srcOpen = x.url; UI.srcFilter = 'all'; go('sources'); }
+  else go(x.page);
+}
+
+/* 欢迎页 */
+const WEL_KEY = 'echorank-welcome-seen';
+function welOpen() { hideTip(); $id('wel').classList.add('on'); setTimeout(() => $id('wgo').focus(), 80); }
+function welClose() { $id('wel').classList.remove('on'); try { localStorage.setItem(WEL_KEY, '1'); } catch (e) {} }
+
+function bindShell() {
+  $id('scrim').addEventListener('click', closeDrawer);
+  $id('spot').addEventListener('click', e => { if (e.target === $id('spot')) spotClose(); const li = e.target.closest('li[data-si]'); if (li) spotRun(SPOT.list[+li.dataset.si]); });
+  $id('sin').addEventListener('input', () => { SPOT.i = 0; spotRender(); });
+  $id('sin').addEventListener('keydown', e => {
+    if (e.key === 'ArrowDown') { SPOT.i = Math.min(SPOT.list.length - 1, SPOT.i + 1); spotRender(); e.preventDefault(); }
+    else if (e.key === 'ArrowUp') { SPOT.i = Math.max(0, SPOT.i - 1); spotRender(); e.preventDefault(); }
+    else if (e.key === 'Enter') spotRun(SPOT.list[SPOT.i]);
+    else if (e.key === 'Escape') spotClose();
+  });
+  $id('wel').addEventListener('click', e => { if (e.target === $id('wel')) welClose(); });
+  document.addEventListener('keydown', e => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); spotOpen(); return; }
+    if (e.key !== 'Escape') return;
+    if ($id('spot').classList.contains('on')) spotClose();
+    else if ($id('wel').classList.contains('on')) welClose();
+    else if (UI.drawerRun) closeDrawer();
+  });
+  window.addEventListener('resize', moveNavHl);
+}
+
 (function boot() {
   const local = Store.loadLocal();
   if (local) S = local;
@@ -3522,7 +3867,9 @@ window.addEventListener('hashchange', () => { const p = location.hash.slice(1); 
   UI.scope = realRuns().length ? 'real' : 'sample';
   const p = location.hash.slice(1);
   if (PAGES[p]) UI.page = p;
+  bindShell();
   render();
+  { let seen = false; try { seen = localStorage.getItem(WEL_KEY) === '1'; } catch (e) {} if (!seen && !navigator.webdriver) setTimeout(welOpen, 350); }
   Store.connect().then(res => {
     if (res && res !== 'empty') { S = res; UI.saveWhere = 'Claude 工作区'; if (realRuns().length) UI.scope = 'real'; render(); }
     else if (res === 'empty') { UI.saveWhere = 'Claude 工作区'; Store.save(S); renderSide(); }
