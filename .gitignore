@@ -3,3 +3,6 @@
 .DS_Store
 __pycache__/
 /dist/
+
+# 采集中途的临时文件
+*.partial

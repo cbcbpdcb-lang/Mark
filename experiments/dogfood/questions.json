@@ -1,0 +1,18 @@
+{
+  "version": "draft-1",
+  "status": "草稿：按官网现有文字起草，收到实验计划 2.1 后按原文替换，version 同步改掉",
+  "brand": "EchoRank",
+  "site": "echorank.markjcai.com",
+  "questions": [
+    { "id": "Q01", "type": "品牌词", "text": "EchoRank 是什么？", "facts": ["f_what"] },
+    { "id": "Q02", "type": "非品牌词", "text": "有没有服务能帮品牌检查 DeepSeek、豆包这些 AI 是怎么介绍自己的产品的？", "facts": ["f_what"] },
+    { "id": "Q03", "type": "品牌词", "text": "EchoRank 的 AI 回答体检怎么收费？", "facts": ["f_pricing"] },
+    { "id": "Q04", "type": "品牌词", "text": "EchoRank 的免费体检包括哪些内容？", "facts": ["f_scope"] },
+    { "id": "Q05", "type": "品牌词", "text": "找 EchoRank 做 AI 回答体检，多久能拿到报告？", "facts": ["f_delivery"] },
+    { "id": "Q06", "type": "品牌词", "text": "用 EchoRank 做体检，需要提供后台账号或者数据吗？", "facts": ["f_noaccess"] },
+    { "id": "Q07", "type": "品牌词", "text": "EchoRank 和 GEO 代运营有什么区别？", "facts": ["f_notgeo"] },
+    { "id": "Q08", "type": "品牌词", "text": "EchoRank 怎么判断 AI 说得对不对？", "facts": ["f_method"] },
+    { "id": "Q09", "type": "品牌词", "text": "EchoRank 的官网是哪个？", "facts": ["f_site"] },
+    { "id": "Q10", "type": "品牌词", "text": "EchoRank 会检查哪些 AI 模型的回答？", "facts": ["f_models"] }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "version": "draft-1",
+  "status": "草稿：按官网现有文字起草，一条对应一个 FAQ 问题；收到实验计划附录的 FAQ 文案后按原文替换",
+  "brand": "EchoRank",
+  "brand_match": "echo\\s*rank",
+  "site": "echorank.markjcai.com",
+  "negation": "不|没|非|无|别",
+  "facts": [
+    {
+      "claim_id": "f_what",
+      "faq": "Q01",
+      "group": "marketing",
+      "statement": "EchoRank 是 AI 回答体检服务：去问 DeepSeek、豆包、元宝、Kimi、千问，逐句核对它们怎么介绍品牌，交付体检报告和该做的事",
+      "match": "AI\\s*回答体检|(核对|检查|体检|比对)[^。\\n]{0,16}(AI|大模型|模型)[^。\\n]{0,10}(怎么|如何)?(介绍|描述|说|回答)|(AI|大模型)[^。\\n]{0,6}(回答|说法)[^。\\n]{0,8}(核对|体检|比对)",
+      "wrong": "(是|为|提供)[^。，,\\n]{0,10}(SEO|搜索引擎优化|关键词排名|刷排名|音乐|音频|播客|声学|游戏|加密货币|区块链)",
+      "wrong_needs_brand": true,
+      "wrong_note": "把 EchoRank 说成 SEO 排名、音频、游戏、加密货币之类的别的东西",
+      "evidence_locator": "官网首屏",
+      "source_quote": "AI 回答体检服务。你给我们产品名和官网。我们去问 DeepSeek、豆包、元宝、Kimi、千问，逐句核对它们怎么说你，一周内交给你一份体检报告和该做的事。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_pricing",
+      "faq": "Q03",
+      "group": "key",
+      "statement": "首次体检免费，限 1 个品牌；月度监测按月、按问题数报价；具体价格沟通后报价",
+      "match": "首次[^。\\n]{0,8}免费|免费[^。\\n]{0,4}(首次|第一次)|限\\s*(1|一)\\s*个品牌|按问题数[^。\\n]{0,4}报价|沟通后[^。\\n]{0,6}报价",
+      "wrong": "(首次|第一次)[^。\\n]{0,10}(收费|付费|\\d+\\s*元)",
+      "wrong_note": "把首次体检说成收费。官网没公布月度和年度的具体价格，回答里给出具体金额只算没说对，不算说错",
+      "evidence_locator": "官网 → 方案",
+      "source_quote": "首次体检 免费 · 限 1 个品牌；月度监测 按月 · 按问题数报价；具体价格随品牌数、问题数和模型数变化，沟通后给你报价。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_scope",
+      "faq": "Q04",
+      "group": "key",
+      "statement": "免费体检是 12 个问题 × 5 个模型 × 2 次，交付体检报告和“先改哪三处”，外加 30 分钟解读会",
+      "match": "12\\s*个问题|30\\s*分钟[^。\\n]{0,6}(解读|会议|讲解)|先改哪三处|(5|五)\\s*个模型[^。\\n]{0,6}(2|两)\\s*次",
+      "evidence_locator": "官网 → 方案 → 首次体检",
+      "source_quote": "12 个问题 × 5 个模型 × 2 次；体检报告 + 先改哪三处；30 分钟解读会",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_delivery",
+      "faq": "Q05",
+      "group": "key",
+      "statement": "从确认事实底账算起，一般 5 个工作日内交付第一份报告（一周之内）；两周后复测",
+      "match": "(5|五)\\s*个工作日|一周(内|之内)[^。\\n]{0,10}(交付|报告|做完)|(交付|报告)[^。\\n]{0,6}一周(内|之内)",
+      "wrong": "(需要|大约|通常|一般|要)[^。\\n]{0,4}([2-9]|[两三四五六八]|\\d{2})\\s*(周|个月|个星期)",
+      "wrong_unless": "复测|再测|回访",
+      "wrong_note": "把交付时间说成两周以上（说“两周后复测”不算）",
+      "evidence_locator": "官网 → 服务流程；常见问题“多久能拿到结果？”",
+      "source_quote": "从你确认事实底账算起，一般 5 个工作日内交付第一份报告。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_noaccess",
+      "faq": "Q06",
+      "group": "key",
+      "statement": "不需要后台账号、代码或数据权限，只用公开信息：官网和各家 AI 对公开问题的回答",
+      "match": "不需要[^。\\n]{0,14}(后台|账号|代码|数据|权限)|无需[^。\\n]{0,14}(后台|账号|代码|数据|权限)|只(用|使用|基于|依靠)[^。\\n]{0,4}公开",
+      "wrong": "(需要|必须|要求)[^。\\n]{0,6}(提供|开放|授权|接入)[^。\\n]{0,10}(后台|账号|数据权限|API|接口|数据)",
+      "wrong_note": "说要品牌提供后台账号、接口或数据权限",
+      "evidence_locator": "常见问题“需要给你们后台账号或数据吗？”",
+      "source_quote": "不需要。我们只用公开信息：你的官网，和各家 AI 对公开问题的回答。你只需要确认我们整理的事实是否准确。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_notgeo",
+      "faq": "Q07",
+      "group": "marketing",
+      "statement": "先核实 AI 说得对不对，再给纠正、澄清或补内容的建议，由品牌决定做什么；不批量生产内容，不代写软文",
+      "match": "先(核实|核对|弄清|查清)|不(代写|批量|写)[^。\\n]{0,8}(软文|内容)|(0|零)\\s*篇[^。\\n]{0,4}软文|不(替|帮)[^。\\n]{0,6}(写|发布)[^。\\n]{0,4}(内容|软文)",
+      "wrong": "(批量|代写|代发|铺量)[^。\\n]{0,6}(软文|内容|稿件|文章)",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 批量发内容或代写软文",
+      "evidence_locator": "常见问题“和 GEO 代运营有什么不同？”；官网“0 篇代写软文”",
+      "source_quote": "代运营通常靠批量发内容来影响 AI。我们先核实 AI 说的对不对，再给出纠正、澄清或补内容的建议，由你决定做什么。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_method",
+      "faq": "Q08",
+      "group": "marketing",
+      "statement": "以品牌确认的事实底账为准逐句核对，每个“说错”都有出处；每个问题问两次，数字带可信范围",
+      "match": "事实底账|逐句(核对|比对|对照)|(问|提问|调用)(两|2)\\s*次|可信(范围|区间)|置信区间",
+      "evidence_locator": "官网“我们只说能核对的话”；常见问题“结果会不会每次都不一样？”",
+      "source_quote": "每一个“说错了”，都对应事实底账里的一条记录和一个网页链接。会有波动，所以每个问题问两次，数字都带可信范围。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_site",
+      "faq": "Q09",
+      "group": "key",
+      "statement": "官网是 echorank.markjcai.com",
+      "match": "echorank\\.markjcai\\.com",
+      "wrong": "echorank\\.(com|cn|ai|io|net|org|co)(?![a-z.])",
+      "wrong_note": "给出别的域名当官网",
+      "evidence_locator": "官网地址",
+      "source_quote": "echorank.markjcai.com",
+      "evidence_url": "https://echorank.markjcai.com/"
+    },
+    {
+      "claim_id": "f_models",
+      "faq": "Q10",
+      "group": "key",
+      "statement": "检查 DeepSeek、豆包、元宝、Kimi、千问五个模型；DeepSeek、Kimi、千问走官方接口，豆包、元宝在 App 里问",
+      "match": "DeepSeek[^。\\n]{0,30}(豆包|元宝|Kimi|千问)|(豆包|元宝|Kimi|千问|通义)[^。\\n]{0,30}DeepSeek|(五|5)\\s*(个|家|款)[^。\\n]{0,4}(模型|AI|大模型)",
+      "wrong": "ChatGPT|GPT-?\\d|Gemini|Claude|Perplexity|文心一言",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 检查官网没列出的模型",
+      "evidence_locator": "官网首屏；服务流程第 2–3 天",
+      "source_quote": "我们去问 DeepSeek、豆包、元宝、Kimi、千问……DeepSeek、Kimi、千问走官方接口，豆包、元宝在 App 里问，两类结果分开统计。",
+      "evidence_url": "https://echorank.markjcai.com/"
+    }
+  ]
+}
