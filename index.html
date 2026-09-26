@@ -832,6 +832,13 @@ function applyPreset(key) {
    替换发生在数据层（事实底账、竞品、问题、回答原文一起换），所以评测结果和真实版一致，导出的 Markdown 也不会漏出品牌名。 */
 const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）', MASK_DOMAIN = '官方网站（已隐藏）', MASK_HIDDEN = '（已隐藏）';
 const isMaskedUrl = u => u === MASK_OFFICIAL || u === MASK_OTHER;
+/* ---------- 【改这里 24】公开版：隐藏自助入口 ----------
+   产品定位是 to B 服务交付，不做 SaaS 自助。公开版不显示「分析一个产品」入口（采集由我们用脚本完成，客户只看报告）。
+   PUBLIC_BUILD 由 build_public.py 生成公开版时改为 true；本地勾选“按公开版预览”或部署到非本地域名时同样按公开版处理。 */
+const PUBLIC_BUILD = false;
+function isPublicView() { return PUBLIC_BUILD || !isLocalView() || !!UI.anonPreview; }
+const PUBLIC_HIDDEN_PAGES = ['analyze'];
+const pageHidden = k => isPublicView() && PUBLIC_HIDDEN_PAGES.includes(k);
 function isLocalView() { return location.protocol === 'file:' || /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname) || !!(window.claude && window.claude.use); }
 function anonActive(key = S.preset) { const p = PRESETS[key]; return !!(p && p.anonymize) && (!isLocalView() || !!UI.anonPreview); }
 const _maskers = {};
@@ -1131,7 +1138,7 @@ const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains
 const DIRECT_A_SRC = 'https://doterra.cn/client/index.html#/show/help';
 // v5.3：退货口径只管“认可渠道”。说假货、代购、海外购、电商平台法定规则的小句，不拿来和这条口径比
 const DIRECT_A_OTHER_CHANNEL = '假货|仿品|非正规|非官方|非授权|未授权|未经授权|非认可|二手|海外|境外|代购|直邮|跨境|闲鱼|微商|个人卖家|私下|转卖|第三方|电商平台|天猫|京东|拼多多|淘宝|网购|消费者权益|消保法|电商法|法定|法律规定|条例|7 ?天|七天|临期|特价|(?<!未)(开封|拆封)|已使用|使用过|超过|逾期';
-const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', ...x });
+const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '', ...x });
 const DIRECT_A_TRUTH = {
   product_id: 'direct_a', entity_name: '多特瑞', aliases: DIRECT_A_PUBLIC.names,
   category: '精油与个人护理（直销）', positioning: '', target_users: [],
@@ -1295,6 +1302,8 @@ function reportData() {
       official: (cap && (cap.source_quote || cap.statement)) || (pc && pc.note) || fact.text || (g.type === 'overclaim' ? (eff ? `官方原话只有“${eff.source_quote}”，没有界定是哪方面的作用；具体疗效是 AI 的延伸` : '官方口径未宣称疗效（请在事实底账中补充“功效表述边界”原文）') : '事实底账中没有对应口径'),
       url: (cap && cap.evidence_url) || (pc && pc.evidence_url) || fact.url || (g.type === 'overclaim' && eff ? eff.evidence_url : '') || '',
       pending: !!(cap || pc || (g.type === 'overclaim' && eff)) && !isConfirmed(cap || pc || eff),
+      clientOk: !!(cap || pc || (g.type === 'overclaim' && eff)) && isClientConfirmed(cap || pc || eff),
+      clientText: (cap || pc || (g.type === 'overclaim' && eff)) ? clientConfirmText(cap || pc || eff) : '',
       locator: (cap && cap.evidence_locator) || (pc && pc.evidence_locator) || (g.type === 'overclaim' && eff ? eff.evidence_locator : '') || '',
       cause: (cap && cap.cause) || (pc && pc.cause) || '' };
   }).sort((a, b) => (b.sev - a.sev) || (b.k - a.k));
@@ -1316,12 +1325,15 @@ function reportData() {
   const extras = {};
   evs.forEach(x => (x.e.extras || []).forEach(s => { const key = s.slice(0, 40); if (!extras[key]) extras[key] = { s, n: 0, engines: new Set() }; extras[key].n++; extras[key].engines.add(x.r.engine); }));
   return { T, evs, list, qGroups, coverage, retryNote, unresolved: T.unresolved || [], nA: evs.length, dA: withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
-    extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length };
+    extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length,
+    // 口径确认状态：报告里逐条列出哪些口径已经过客户确认
+    factStatus: FACT_LISTS.filter(f => f.list !== 'offers').flatMap(({ list, kind }) => (T[list] || []).map(x => ({ kind, title: factItemTitle(list, x), cat: catOf(list, x), reviewed: isConfirmed(x), client: isClientConfirmed(x), by: x.client_confirmed_by || '', at: x.client_confirmed_at || '', inEval: list !== 'capabilities' || x.status === 'VERIFIED' }))),
+    clientOk: FACT_LISTS.filter(f => f.list !== 'offers').flatMap(({ list }) => T[list] || []).filter(isClientConfirmed).length };
 }
 function reportMarkdown(d) {
   const engName = id => (ENG(id) || { name: id }).name;
   const L = [];
-  L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(e => engName(e) + engineNote(d.coverage, e)).join('、')}`, '');
+  L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条（客户已确认 ${d.clientOk} 条）　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(e => engName(e) + engineNote(d.coverage, e)).join('、')}`, '');
   L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
   if (d.qGroups.length) {
     L.push('## 按问题分组汇总', '', '同一组问题的回答合在一起统计，样本比单条发现大，区间更窄。', '', '| 分组 | 问题数 | 提到品牌的回答 | 至少一处不一致 | 比例（95% 区间） | 可信度 | 合规风险 |', '| --- | ---: | ---: | ---: | --- | --- | ---: |');
@@ -1336,7 +1348,7 @@ function reportMarkdown(d) {
   L.push('', '## 逐条发现', '');
   d.list.forEach((g, i) => {
     L.push(`### ${i + 1}. ${TYPE_NAME[g.type] || g.label}：${g.title}`, '');
-    L.push(`- 官网口径${g.pending ? '（待复核）' : ''}：${g.official}${g.url ? `（${g.url}${g.locator ? '，' + g.locator : ''}）` : g.locator ? `（${g.locator}）` : ''}`);
+    L.push(`- 官网口径${g.pending ? '（待复核）' : ''}${g.clientText ? `（${g.clientOk ? '客户已确认：' + g.clientText : g.clientText}）` : ''}：${g.official}${g.url ? `（${g.url}${g.locator ? '，' + g.locator : ''}）` : g.locator ? `（${g.locator}）` : ''}`);
     g.quotes.forEach(q => L.push(`- AI 原句（${engName(q.engine)}）：“${q.q}”`));
     L.push(`- 出现：${g.k} / ${g.n} 条回答，${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}；分模型：${Object.entries(g.engines).map(([e, c]) => engName(e) + ' ' + c + engineNote(d.coverage, e)).join('，')}`);
     if (g.cause) L.push(`- 推断：${g.cause.replace(/^推断：/, '')}`);
@@ -1347,7 +1359,10 @@ function reportMarkdown(d) {
     if (d.unresolved.length) { L.push('官网未说明的话题（AI 在这些话题上说什么都缺乏官网依据）：', ''); d.unresolved.forEach(u => L.push(`- **${u.category ? u.category + '：' : ''}${u.topic}**：${u.note}${(u.cause_links || []).length ? `（线索，非中国口径：${u.cause_links.join('，')}）` : ''}`)); L.push(''); }
     if (d.extras.length) { L.push('以下说法在官网口径里找不到对应内容，各模型说法不一，建议官方给出明确说明：', ''); d.extras.forEach(x => L.push(`- “${x.s.slice(0, 80)}”（${x.n} 次）`)); L.push(''); }
   }
-  L.push('## 方法与局限', '', '- 口径只来自官方页面，每条附原文或链接；标注“待复核”的口径需要品牌方确认。', ...(d.retryNote ? [`- ${d.retryNote}`] : []), '- 统计以回答为单位，区间为 Wilson 95% 区间；样本少时区间很宽，只能看方向。', '- 采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。', '- 判定由规则完成，所有发现都应对照原文复核。合规风险识别用的疗效词表是规则 v1，尚未经懂广告法的人审核；只在归属给品牌的小句里找疗效词，否定、转述争议、问句、竞品的说法不算。', '- 本报告只列出问题和修改方向，不包含代写或代发内容。');
+  L.push('## 口径确认状态', '', `检查口径 ${d.factStatus.length} 条，其中客户已确认 ${d.clientOk} 条。“客户已确认”指客户方指定的人认可这条口径可作为评判依据；未经客户确认的口径，其发现仅供参考。`, '', '| 口径 | 分类 | 我方复核 | 客户确认人 | 确认日期 |', '| --- | --- | --- | --- | --- |');
+  d.factStatus.forEach(f => L.push(`| ${f.title}${f.inEval ? '' : '（不参与评测）'} | ${f.cat} | ${f.reviewed ? '已确认' : '待复核'} | ${f.client ? f.by : '未确认'} | ${f.client ? f.at : '—'} |`));
+  L.push('');
+  L.push('## 方法与局限', '', '- 口径只来自官方页面，每条附原文或链接；标注“待复核”的口径需要品牌方确认。', '- 标注“客户已确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考，待客户确认后生效。', ...(d.retryNote ? [`- ${d.retryNote}`] : []), '- 统计以回答为单位，区间为 Wilson 95% 区间；样本少时区间很宽，只能看方向。', '- 采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。', '- 判定由规则完成，所有发现都应对照原文复核。合规风险识别用的疗效词表是规则 v1，尚未经懂广告法的人审核；只在归属给品牌的小句里找疗效词，否定、转述争议、问句、竞品的说法不算。', '- 本报告只列出问题和修改方向，不包含代写或代发内容。');
   return L.join('\n');
 }
 function page_report() {
@@ -1357,7 +1372,7 @@ function page_report() {
   if (!d.nA) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>还没有提到${esc(d.T.entity_name)}的回答</h4><p>先用「用户提问」导出问题集，用采集脚本跑一轮，再到「数据导入」导入结果。</p></div>`;
   return `
   <header class="ph"><h1>${esc(d.T.entity_name)}：官网口径体检报告</h1>
-    <p class="lede">检查口径 ${d.facts} 条，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
+    <p class="lede">检查口径 ${d.facts} 条（客户已确认 ${d.clientOk} 条），提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
   <div class="kpis">
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>与官网不一致的回答</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div><div class="ks">95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>
@@ -1382,7 +1397,7 @@ function page_report() {
   ${d.list.map((g, i) => `<div class="editor" style="background:var(--surface)">
     <div class="spread"><b>${i + 1}. ${esc(g.title)}</b><span><span class="tag ${g.sev >= 3 ? 'bad' : 'warn'}">${esc(TYPE_NAME[g.type] || g.label)}</span><span class="tag">${g.k} / ${g.n} 条回答</span></span></div>
     <div class="grid2" style="margin-top:10px">
-      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div>
+      <div><div class="small muted">官网口径${g.pending ? '　<span class="tag warn">待复核</span>' : ''}${g.clientText ? (g.clientOk ? `　<span class="tag acc" title="${esc(g.clientText)}">客户已确认</span>` : '　<span class="tag">未经客户确认</span>') : ''}</div><div>${esc(g.official)}</div>${extLink(g.url, THIRD_PARTY[g.url] || hostOf(g.url), 'small')}${g.locator ? `<span class="small muted">　${esc(g.locator)}</span>` : ''}</div>
       <div><div class="small muted">AI 原句</div>${g.quotes.map(q => `<div style="margin-bottom:6px">“${esc(q.q)}”<span class="small muted">　${esc(engName(q.engine))}　<button class="linkbtn" data-act="open-run" data-q="${q.qid}">看原文</button></span></div>`).join('')}</div>
     </div>
     <p class="small muted" style="margin-top:8px">出现比例 ${pct(g.k, g.n)}，95% 区间 ${wilsonText(g.k, g.n)}　｜　分模型：${Object.entries(g.engines).map(([e, c]) => esc(engName(e)) + ' ' + c + engineNote(d.coverage, e)).join('，')}</p>
@@ -1398,9 +1413,16 @@ function page_report() {
     ${d.extras.map(x => `<tr><td class="wide">“${esc(x.s.replace(/\*\*/g, '').slice(0, 100))}”</td><td class="num">${x.n}</td><td class="small">${[...x.engines].map(e => esc(engName(e))).join('、')}</td></tr>`).join('') || '<tr><td colspan="3" class="muted">无</td></tr>'}
   </tbody></table></div>
 
+  <h2>口径确认状态</h2>
+  <p class="prose muted">检查口径 ${d.factStatus.length} 条，其中客户已确认 ${d.clientOk} 条。“客户已确认”指客户方指定的人认可这条口径可作为评判依据；未经客户确认的口径，其发现仅供参考。在「事实底账」里填客户确认人和日期。</p>
+  <div class="scroll"><table class="tbl"><thead><tr><th>口径</th><th>分类</th><th>我方复核</th><th>客户确认人</th><th>确认日期</th></tr></thead><tbody>
+    ${d.factStatus.map(f => `<tr><td class="wide">${esc(f.title)}${f.inEval ? '' : '<span class="small muted">　不参与评测</span>'}</td><td class="small">${esc(f.cat)}</td><td>${f.reviewed ? '<span class="tag ok">已确认</span>' : '<span class="tag warn">待复核</span>'}</td><td>${f.client ? esc(f.by) : '<span class="muted">未确认</span>'}</td><td class="small">${f.client ? esc(f.at) : '—'}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">无</td></tr>'}
+  </tbody></table></div>
+
   <h2>方法与局限</h2>
   <div class="prose"><ul>
-    <li>口径只来自官方页面；标注“待复核”的口径需要品牌方确认。</li>${d.retryNote ? `<li>${esc(d.retryNote)}</li>` : ''}
+    <li>口径只来自官方页面；标注“待复核”的口径需要品牌方确认。</li>
+    <li>标注“客户已确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考，待客户确认后生效。</li>${d.retryNote ? `<li>${esc(d.retryNote)}</li>` : ''}
     <li>统计以回答为单位，区间为 Wilson 95% 区间。</li>
     <li>采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。</li>
     <li>判定由规则完成，所有发现都应对照原文复核；可以在「大模型回答记录」里逐条纠正。合规风险识别用的疗效词表是规则 v2（v5.3 按 R3 抽检修过否定、正反问、转述、品牌用语四类误判），尚未经懂广告法的人审核。</li>
@@ -1482,7 +1504,7 @@ const LANE_NAME = { 1: '纠正', 2: '举证', 3: '产品改动', 4: '定位', 5:
 
 function page_reasons() {
   const runs = realRuns().filter(r => r.status === 'SUCCESS');
-  if (!runs.length) return `<header class="ph"><h1>理由与行动</h1></header><div class="state info"><h4>还没有真实数据</h4><p>去「分析一个产品」或「数据导入」。</p></div>`;
+  if (!runs.length) return `<header class="ph"><h1>理由与行动</h1></header><div class="state info"><h4>还没有真实数据</h4><p>${isPublicView() ? '去「数据导入」。' : '去「分析一个产品」或「数据导入」。'}</p></div>`;
   const agg = aggregateReasons(runs);
   const brands = [...new Set(agg.map(g => g.brand))];
   const counts = {}; agg.forEach(g => { counts[g.brand] = (counts[g.brand] || 0) + g.n; });
@@ -1532,7 +1554,7 @@ function page_reasons() {
   <div class="prose">
     <ul>
       <li>规则 v1 只能识别句子里同时出现品牌名和判断词的情况，分不清“飞书比腾讯会议好”里谁被反对，也会把功能罗列误当理由。它适合粗筛。</li>
-      <li>模型抽取 v2 用带原文校验的提示词逐条抽取，在「分析一个产品」页配置采集服务后可用；在 Claude 里打开时也可以用 Claude 抽取。</li>
+      <li>模型抽取 v2 用带原文校验的提示词逐条抽取，${isPublicView() ? '由服务方配置采集服务后可用' : '在「分析一个产品」页配置采集服务后可用'}；在 Claude 里打开时也可以用 Claude 抽取。</li>
       <li>理由本身可能是编造的。“20 人约 4,800 元/年”这类数字，和虚构品牌实验里的编造价格是同一种东西。所以行动清单的第一步永远是核实。</li>
       <li>行动模板是通用写法，落到某个真实品牌前，要先把“核实”那一列做完。</li>
     </ul>
@@ -1574,6 +1596,7 @@ async function extractReasonsAll() {
 
 /* ---------- 迭代日志 ---------- */
 const ITERATIONS = [
+  { v: 'v5.5', date: '2026-09-26', title: 'to B 交付：客户确认字段、公开版隐藏自助入口', trigger: '产品定位调整为 to B 服务交付，不做 SaaS 自助：报告要能说清哪些口径客户认过；公开网站不该有自助采集入口', changed: '事实底账每条口径增加“客户确认人、确认日期”两个字段，可逐条填写或一键记为今日确认；报告页和 Markdown 导出新增“口径确认状态”表，逐条发现旁标“客户已确认 / 未经客户确认”；公开版（build_public.py 生成、或按公开版预览）不显示「分析一个产品」', why: '交付场景里裁判是客户认可的口径，不是我们自己录的口径；自助入口和 to B 定位冲突', dropped: '让客户确认自动开新版本（确认是状态，不是内容修改）；把入口整段删掉（内部仍用它做采集）', evidence: '事实底账页、体检报告页、dist/index.html 侧栏', lesson: '“谁确认了”要和“确认了什么”一样写进报告，客户才有依据签收' },
   { v: 'v1', date: '2026-09-23', title: '事实审计最小版', trigger: '交接文档要求做一个能判断“AI 说得对不对”的平台', changed: '产品事实库（带生效期）、冻结问题集、确定性评测五类错误、认知差异、内容实验与可比性检查、学习手册', why: '评测的正确答案必须由人确认，否则评测器在拿自己编的答案判别人', dropped: '综合分；LLM 评审（没有标注集之前不做）', evidence: '虚构产品 NovaNote 的 48 条样本回答', lesson: '先把闭环跑通，再谈真实数据' },
   { v: 'v2', date: '2026-09-23', title: '可信度、溯源、导入', trigger: '竞品研究发现营销人最大的疑虑是“结果不稳定、只能当参照”', changed: '每个比例带 Wilson 区间和可信度等级；错误溯源到引用页并标疑似软文；官网文字抽取事实并做原文校验；国产模型采集脚本与人工导入', why: '“数据本身可不可信”是竞品都没回答的问题', dropped: '豆包、元宝 App 的界面自动化采集（合规风险）', evidence: '竞品矩阵 30 款；Digiday、3·15 报道', lesson: '把测量的不确定性放在台前，反而更可信' },
   { v: 'R1', date: '2026-09-24', title: '第一批真实数据', trigger: '四家 API 跑通，96 次调用 89 次成功', changed: '真实批次写进页面；发现虚构品牌被三个模型编造事实', why: '需要真实数据来验证平台，而不是继续演示', dropped: '把编造率当北极星（它测的是模型，不是 GEO）', evidence: '32 条品牌问题回答，逐条人工标注', lesson: '真实数据会推翻你原来的叙事，这是好事' },
@@ -1818,7 +1841,7 @@ let S = makeDefaultState();
 const UI = { page: 'overview', scope: 'real', q: 'q_de_04', editQ: null, qFilter: 'all', exp: 'EXP-01', newExp: false,
   liveBusy: {}, liveCtl: null, sample: undefined, downloads: undefined, saveWhere: '本机浏览器', resetArm: false,
   srcFilter: 'all', srcOpen: null, impOpen: false, impText: '', impBusy: false, impCtl: null, importResult: null,
-  reasonBrand: null, reasonsBusy: null, workerUrl: localStorage.getItem('echorank-worker-url') || '', workerToken: localStorage.getItem('echorank-worker-token') || '', reviewer: localStorage.getItem('echorank-reviewer') || '你', anonPreview: localStorage.getItem('echorank-anon-preview') === '1',
+  reasonBrand: null, reasonsBusy: null, workerUrl: localStorage.getItem('echorank-worker-url') || '', workerToken: localStorage.getItem('echorank-worker-token') || '', reviewer: localStorage.getItem('echorank-reviewer') || '你', clientName: localStorage.getItem('echorank-client-name') || '', anonPreview: localStorage.getItem('echorank-anon-preview') === '1',
   analyze: { product: '', url: '', category: 'AI 会议记录工具', competitors: '', engines: ['deepseek', 'kimi', 'qwen', 'doubao_api'], followups: true, repeats: 1, busy: null, log: [], stop: false } };
 
 function migrate(x) {
@@ -2517,7 +2540,7 @@ function renderSide() {
         <span class="tag">真实 ${realRuns().length} 条</span>
       </div>
     </div>
-    <ul class="nav">${NAV_GROUPS.map(([g, items]) => `<li class="grp">${g}</li>` + items.map(([k, v]) => `<li><button data-act="nav" data-page="${k}" ${UI.page === k ? 'aria-current="page"' : ''}>${v}</button></li>`).join('')).join('')}</ul>
+    <ul class="nav">${NAV_GROUPS.map(([g, items]) => [g, items.filter(([k]) => !pageHidden(k))]).filter(([, items]) => items.length).map(([g, items]) => `<li class="grp">${g}</li>` + items.map(([k, v]) => `<li><button data-act="nav" data-page="${k}" ${UI.page === k ? 'aria-current="page"' : ''}>${v}</button></li>`).join('')).join('')}</ul>
     <div class="ws"><div class="faint">保存在${esc(UI.saveWhere)}</div></div>
     <div><label class="switch"><input type="checkbox" data-act="learn-toggle" ${S.learnMode ? 'checked' : ''}> 讲解模式</label></div>`;
   document.body.classList.toggle('learn', !!S.learnMode);
@@ -2568,7 +2591,7 @@ function page_overview() {
   const missingQ = S.querySet.queries.filter(q => !scopeRuns().some(r => r.query_id === q.id));
   const head = `<header class="ph"><h1>${esc(S.truth.entity_name)} 在 AI 回答里的样子</h1>
     <p class="lede">同一批购买决策问题，在 DeepSeek、Kimi、千问、豆包上各问多次。每个数字旁边都写着它能不能信。${S.preset === 'tencent' ? '数据来自真实批次 R2（官方 API，未联网）。事实底账依据官方页面整理，待复核；付费档价格未录入。' : ''}</p></header>
-    ${missingQ.length && UI.scope !== 'sample' ? `<div class="state info"><h4>${missingQ.length} 条问题还没有回答</h4><p>${missingQ.map(q => esc(q.text)).join('；')}。用「分析一个产品」的采集服务，或在「数据导入」导出问题集后用脚本采集。</p></div>` : ''}`;
+    ${missingQ.length && UI.scope !== 'sample' ? `<div class="state info"><h4>${missingQ.length} 条问题还没有回答</h4><p>${missingQ.map(q => esc(q.text)).join('；')}。${isPublicView() ? '' : '用「分析一个产品」的采集服务，或'}在「数据导入」导出问题集后用脚本采集。</p></div>` : ''}`;
   if (!runs.length) return head + `<div class="state info"><h4>还没有真实数据</h4><p>去「数据导入」录入你在豆包、元宝里问到的回答，或导入采集脚本的结果；也可以在「运行结果」用 Claude 实时运行。</p><div class="row"><button class="btn primary" data-act="nav" data-page="import">去导入数据</button><button class="btn" data-act="scope" data-scope="sample">先看样本</button></div></div>`;
   const m = metrics(runs);
   const cN = cred(m.verifiable, m.n, m.mock);
@@ -2704,6 +2727,12 @@ const catOf = (list, x) => x.category || (FACT_LISTS.find(f => f.list === list) 
 const hasQuote = x => !!String(x.source_quote || '').trim();
 const isConfirmed = x => x.review_status === '已确认';
 function unconfirm(x) { x.review_status = '待复核'; x.reviewed_by = ''; x.reviewed_at = ''; }
+/* 客户确认：to B 交付时，每条口径由客户（品牌方）指定的人确认。两个字段：client_confirmed_by（客户确认人）、client_confirmed_at（确认日期）。
+   两个都填了才算“客户已确认”；报告里逐条标注。客户确认独立于内部复核（review_status），不影响评测，不开新版本。
+   原文引语或来源改了，客户确认和内部确认一起作废。 */
+const isClientConfirmed = x => !!(String(x.client_confirmed_by || '').trim() && String(x.client_confirmed_at || '').trim());
+function clientConfirmText(x) { return isClientConfirmed(x) ? `${x.client_confirmed_by} 于 ${x.client_confirmed_at} 确认` : '未经客户确认'; }
+function unclientConfirm(x) { x.client_confirmed_by = ''; x.client_confirmed_at = ''; }
 function guardReview(T) {
   let n = 0;
   FACT_LISTS.forEach(({ list }) => (T[list] || []).forEach(x => { if (isConfirmed(x) && !hasQuote(x)) { unconfirm(x); n++; } }));
@@ -2745,7 +2774,7 @@ function factCard({ list, kind, i, x }) {
       </div>
       <label class="small muted">事实说明${inp(`${p}.note`, x.note, { sm: 1, label: '事实说明' })}</label>`;
   return `<div class="cand ${ok ? '' : q ? '' : 'bad'}">
-    <div class="spread"><span><span class="tag">${kind}</span>${ok ? '<span class="tag ok">已确认</span>' : '<span class="tag warn">待复核</span>'}${q ? '' : '<span class="tag bad">缺原文引语</span>'}${list === 'capabilities' && x.status !== 'VERIFIED' ? '<span class="tag">不参与评测</span>' : ''}</span>
+    <div class="spread"><span><span class="tag">${kind}</span>${ok ? '<span class="tag ok">已确认</span>' : '<span class="tag warn">待复核</span>'}${isClientConfirmed(x) ? '<span class="tag acc">客户已确认</span>' : ''}${q ? '' : '<span class="tag bad">缺原文引语</span>'}${list === 'capabilities' && x.status !== 'VERIFIED' ? '<span class="tag">不参与评测</span>' : ''}</span>
       <button class="btn quiet sm danger" data-act="truth-del" data-list="${list}" data-i="${i}">删除</button></div>
     ${fields}
     <label class="small muted" style="display:block;margin-top:8px">官网原文（逐字）<textarea class="inp sm" rows="2" data-path="${p}.source_quote" aria-label="官网原文" placeholder="从官方页面逐字复制；没有原文就不能确认">${esc(x.source_quote || '')}</textarea></label>
@@ -2762,19 +2791,26 @@ function factCard({ list, kind, i, x }) {
         : `<button class="btn sm ${q ? 'primary' : ''}" data-act="fact-confirm" data-list="${list}" data-i="${i}" ${q ? '' : 'disabled title="没有原文引语，不能确认"'}>我已看过原文，确认</button>${q ? '' : '<span class="small muted">先填入官网原文，才能确认。</span>'}`}
       ${extLink(x.evidence_url, '打开原文', 'small')}${x.evidence_locator ? `<span class="small muted">${esc(x.evidence_locator)}</span>` : ''}
     </div>
+    <div class="row" style="margin-top:8px;align-items:flex-end">
+      <label class="small muted">客户确认人<input class="inp sm" data-cconf="client_confirmed_by" data-list="${list}" data-i="${i}" value="${esc(x.client_confirmed_by || '')}" aria-label="客户确认人" placeholder="客户方姓名/职务" style="max-width:200px"></label>
+      <label class="small muted">确认日期<input class="inp sm" type="date" data-cconf="client_confirmed_at" data-list="${list}" data-i="${i}" value="${esc(x.client_confirmed_at || '')}" aria-label="客户确认日期" style="max-width:170px"></label>
+      ${isClientConfirmed(x) ? `<button class="btn quiet sm" data-act="client-unconfirm" data-list="${list}" data-i="${i}">撤回客户确认</button>`
+        : `<button class="btn sm" data-act="client-confirm" data-list="${list}" data-i="${i}" ${q ? '' : 'disabled title="没有原文引语，客户无从确认"'}>记为客户今日确认</button>`}
+    </div>
   </div>`;
 }
 function factLedger(T) {
   const items = factItems(T);
-  const nOk = items.filter(y => isConfirmed(y.x)).length, nNoQ = items.filter(y => !hasQuote(y.x)).length;
+  const nOk = items.filter(y => isConfirmed(y.x)).length, nNoQ = items.filter(y => !hasQuote(y.x)).length, nClient = items.filter(y => isClientConfirmed(y.x)).length;
   const cats = FACT_CATEGORIES.concat(items.some(y => y.cat === '未分类') ? ['未分类'] : []);
   return `
   <h2>官网口径</h2>
-  <p class="prose muted">共 ${items.length} 条：已确认 ${nOk}，待复核 ${items.length - nOk}，其中缺原文引语 ${nNoQ}。“参与评测”决定这条口径用不用来判定回答；“已确认”表示有人看过官网原文。待复核的口径照常参与评测，报告里会标出来。</p>
+  <p class="prose muted">共 ${items.length} 条：已确认 ${nOk}，待复核 ${items.length - nOk}，其中缺原文引语 ${nNoQ}；客户已确认 ${nClient}。“参与评测”决定这条口径用不用来判定回答；“已确认”表示我方有人看过官网原文；“客户已确认”表示客户方指定的人认可这条口径，报告里会逐条标注。待复核的口径照常参与评测，报告里会标出来。</p>
   <div class="field"><label>复核人</label><div><input class="inp sm" data-reviewer="1" value="${esc(UI.reviewer)}" aria-label="复核人" style="max-width:240px"><div class="hint">确认时会记下复核人和时间。</div></div></div>
+  <div class="field"><label>客户确认人（默认）</label><div><input class="inp sm" data-client-name="1" value="${esc(UI.clientName)}" aria-label="客户确认人（默认）" placeholder="客户方姓名/职务" style="max-width:240px"><div class="hint">点“记为客户今日确认”时填入这个名字和今天的日期；每条也可以单独改。</div></div></div>
   ${cats.map(cat => {
     const list = items.filter(y => y.cat === cat);
-    return `<h3>${esc(cat)} <span class="small muted" style="font-weight:400">${list.length} 条${list.length ? `，已确认 ${list.filter(y => isConfirmed(y.x)).length}` : ''}</span></h3>
+    return `<h3>${esc(cat)} <span class="small muted" style="font-weight:400">${list.length} 条${list.length ? `，已确认 ${list.filter(y => isConfirmed(y.x)).length}，客户已确认 ${list.filter(y => isClientConfirmed(y.x)).length}` : ''}</span></h3>
     ${list.map(factCard).join('') || '<p class="small muted">这一类还没有口径。</p>'}`;
   }).join('')}
   <div class="row" style="margin-top:10px">
@@ -3310,7 +3346,7 @@ function render() {
   document.getElementById('main').innerHTML = top + cardify(body);
 }
 function go(page) {
-  if (!PAGES[page]) page = 'overview';
+  if (!PAGES[page] || pageHidden(page)) page = 'overview';
   UI.page = page; UI.resetArm = false;
   if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
   render();
@@ -3345,9 +3381,9 @@ document.addEventListener('click', e => {
     case 'truth-revert': S.truth = clone(S.truthApproved); S.factImport.candidates.forEach(c => { if (c.status === 'accepted') c.status = 'pending'; }); commit('放弃产品事实的未确认修改'); break;
     case 'truth-add': {
       const blank = {
-        capabilities: { claim_id: 'cap_' + Date.now().toString(36), statement: '新口径', match: '', status: 'VERIFIED', valid_from: TODAY, evidence_url: '', category: '', source_quote: '', checked_at: '', review_status: '待复核' },
-        offers: { offer_id: 'offer_' + Date.now().toString(36), name: '新套餐', price: 0, purchase_channel: '官网', valid_from: TODAY, valid_to: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
-        prohibited_claims: { text: '新说法', match: '', note: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核' },
+        capabilities: { claim_id: 'cap_' + Date.now().toString(36), statement: '新口径', match: '', status: 'VERIFIED', valid_from: TODAY, evidence_url: '', category: '', source_quote: '', checked_at: '', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '' },
+        offers: { offer_id: 'offer_' + Date.now().toString(36), name: '新套餐', price: 0, purchase_channel: '官网', valid_from: TODAY, valid_to: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '' },
+        prohibited_claims: { text: '新说法', match: '', note: '', category: '', source_quote: '', evidence_url: '', checked_at: '', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '' },
         limitations: { text: '新限制', match: '', owner: '' },
         unresolved: { category: '', topic: '新话题', note: '' }
       }[d.list];
@@ -3364,6 +3400,17 @@ document.addEventListener('click', e => {
       // 复核状态不影响评测，不开新版本；底账已发布时同步到已发布版本，免得“放弃修改”把确认冲掉
       if (truthReady()) S.truthApproved = clone(S.truth);
       commit(`${a === 'fact-confirm' ? '确认' : '撤回确认'}口径：${title}`); break;
+    }
+    case 'client-confirm': case 'client-unconfirm': {
+      const x = (S.truth[d.list] || [])[Number(d.i)]; if (!x) return;
+      const title = factItemTitle(d.list, x);
+      if (a === 'client-confirm') {
+        if (!hasQuote(x)) { flash('没有原文引语，客户无从确认。请先填入官网原文。'); return; }
+        if (!UI.clientName) { flash('先在上方填“客户确认人（默认）”，或直接在这条口径里填客户确认人和日期。'); return; }
+        x.client_confirmed_by = UI.clientName; x.client_confirmed_at = TODAY;
+      } else unclientConfirm(x);
+      if (truthReady()) S.truthApproved = clone(S.truth);
+      commit(`${a === 'client-confirm' ? '客户确认' : '撤回客户确认'}口径：${title}`); break;
     }
 
     case 'imp-toggle': UI.impOpen = !UI.impOpen; render(); break;
@@ -3474,6 +3521,14 @@ document.addEventListener('change', e => {
   if (el.dataset.reasonBrand !== undefined) { UI.reasonBrand = el.value; render(); return; }
   if (el.dataset.anon) { UI.anonPreview = el.checked; try { localStorage.setItem('echorank-anon-preview', el.checked ? '1' : ''); } catch (err) {} applyPreset(S.preset); commit(el.checked ? '按公开版（匿名）预览' : '回到真实版'); return; }
   if (el.dataset.reviewer) { UI.reviewer = el.value.trim() || '你'; try { localStorage.setItem('echorank-reviewer', UI.reviewer); } catch (err) {} return; }
+  if (el.dataset.clientName) { UI.clientName = el.value.trim(); try { localStorage.setItem('echorank-client-name', UI.clientName); } catch (err) {} return; }
+  if (el.dataset.cconf) {
+    // 客户确认字段：记录状态，不改口径内容，所以不开新版本；底账已发布时同步到已发布版本
+    const x = (S.truth[el.dataset.list] || [])[Number(el.dataset.i)]; if (!x) return;
+    x[el.dataset.cconf] = el.value.trim();
+    if (truthReady()) S.truthApproved = clone(S.truth);
+    commit(isClientConfirmed(x) ? `客户确认口径：${factItemTitle(el.dataset.list, x)}` : ''); return;
+  }
   if (el.dataset.worker) { if (el.dataset.worker === 'url') { UI.workerUrl = el.value.trim(); localStorage.setItem('echorank-worker-url', UI.workerUrl); } else { UI.workerToken = el.value.trim(); localStorage.setItem('echorank-worker-token', UI.workerToken); } render(); return; }
   if (el.dataset.probeLabel !== undefined) { const id = el.dataset.probeLabel; S.probeLabels = S.probeLabels || {}; if (el.value) S.probeLabels[id] = el.value; else delete S.probeLabels[id]; commit(`复核 ${id}：${el.value ? PROBE_CLASS[el.value] : '恢复初标'}`); return; }
   if (el.dataset.reviewFinal) { const r = S.reviews[el.dataset.reviewFinal]; if (r) { r.final = el.value || null; commit(`人工纠正 ${el.dataset.reviewFinal}：${el.value ? FINAL_LABEL[el.value] : '清除'}`); } return; }
@@ -3508,7 +3563,7 @@ document.addEventListener('change', e => {
   setPath(S.truth, path, val);
   // 已确认的口径换了引语或来源，原来的确认不再成立
   const m = path.match(/^(capabilities|offers|prohibited_claims)\.(\d+)\.(source_quote|evidence_url)$/);
-  if (m) { const x = S.truth[m[1]][Number(m[2])]; if (isConfirmed(x)) { unconfirm(x); flash('原文或来源改了，这条口径退回“待复核”。'); } }
+  if (m) { const x = S.truth[m[1]][Number(m[2])]; const c = isClientConfirmed(x); if (isConfirmed(x) || c) { unconfirm(x); unclientConfirm(x); flash(c ? '原文或来源改了，这条口径退回“待复核”，客户确认一并作废，需要客户重新确认。' : '原文或来源改了，这条口径退回“待复核”。'); } }
   guardReview(S.truth); markTruthDraft(); commit();
 });
 document.addEventListener('input', e => { if (e.target.id === 'imp-text') UI.impText = e.target.value; });
@@ -3521,7 +3576,7 @@ window.addEventListener('hashchange', () => { const p = location.hash.slice(1); 
   { const p = PRESETS[S.preset]; if (p && p.anonymize && [p.truth.entity_name, ANON_NAME].includes(S.truth.entity_name) && effectivePreset() === 'custom') applyPreset(S.preset); }
   UI.scope = realRuns().length ? 'real' : 'sample';
   const p = location.hash.slice(1);
-  if (PAGES[p]) UI.page = p;
+  if (PAGES[p] && !pageHidden(p)) UI.page = p;
   render();
   Store.connect().then(res => {
     if (res && res !== 'empty') { S = res; UI.saveWhere = 'Claude 工作区'; if (realRuns().length) UI.scope = 'real'; render(); }
