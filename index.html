@@ -1026,7 +1026,13 @@ function page_gap() {
 /* ---------- 【改这里 20】合规风险：AI 替品牌宣称疗效 ----------
    只看归属给目标品牌的小句；否定语境、转述争议（宣称、号称、被罚等）、问句都不算。 */
 const EFFICACY_RX = /治疗|治愈|治好|治病|根治|抗癌|防癌|消炎|降血压|降血糖|降血脂|替代药物|代替药物|代替药|药到病除|包治|疗效|医治|缓解.{0,6}(疾病|症状|病)|提高免疫力|增强免疫力/;
-const REPORTED_RX = /宣称|声称|号称|所谓|夸大|虚假|误导|被罚|起诉|处罚|违规|警告信|FTC|不实|被指/;
+const REPORTED_RX = /宣称|声称|号称|所谓|夸大|虚假|误导|被罚|起诉|处罚|违规|警告信|FTC|不实|被指|鼓吹|宣传|营销|话术|包治百病|神药|迷信|谎言|洗脑|忽悠|吹嘘|批评|通报|暗示|警惕|流传|说法|经销商|代理|直销人员|推广|涉嫌|违反/;
+/* v5.3（R3 抽检后，见 docs/SPOTCHECK.md）：
+   - “治疗级”“CPTG（认证纯正治疗级）”是品牌用语，去掉之后再找疗效词；
+   - 提到医生、治疗师、就医、监管审批、“耽误正规治疗”的小句是在划医疗边界，不是替品牌宣称疗效；
+   - 转述以整句为范围：同一句里出现“鼓吹”“宣称”等转述词，后面被逗号隔开的小句（“…替代药物给病人用等等”）也算转述。 */
+const BRAND_TERM_RX = /治疗级|CPTG/g;
+const MEDICAL_RX = /医生|医师|治疗师|芳疗师|就医|正规治疗|正规医疗|医疗属性|医学|临床|循证|延误|耽误|确诊|药监|获批|批准/;
 const SEVERITY = { overclaim: 4, denied: 3, unsupported: 3, misattribution: 2, outdated: 2, deviation: 2, omission: 1, unverified: 1 };
 const TYPE_NAME = { overclaim: '合规风险', denied: '说反了', unsupported: '与官方口径冲突', misattribution: '错误归属', outdated: '过期', deviation: '定位偏差', omission: '该说没说', unverified: '无法核对' };
 
@@ -1060,6 +1066,8 @@ function exportDirectQueries() {
 const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains": ["doterra.cn", "doterra.com"], "extra": [["多特瑞（上海）商贸有限公司", "品牌 A 中国公司"], ["多特瑞(上海)商贸有限公司", "品牌 A 中国公司"], "9131000009421894XY", "YB13101060018558", "400-920-9191", "沪ICP备14052891号-1", "沪 ICP 备 14052891 号-1", "南京西路 699 号", "南京西路699号", "南京西路", "3101–3108", "3101-3108", "chinaservice@doterra.com", "021-2227-1888", "31010602004501", ["小多", "客服"], "赋活呼吸", "Air Repair", "CPTG", "LRP", "轻松购"]};
 // 帮助中心是单页应用，所有问题共用一个网址；具体位置写在 evidence_locator，报告里显示在链接旁边
 const DIRECT_A_SRC = 'https://doterra.cn/client/index.html#/show/help';
+// v5.3：退货口径只管“认可渠道”。说假货、代购、海外购、电商平台法定规则的小句，不拿来和这条口径比
+const DIRECT_A_OTHER_CHANNEL = '假货|仿品|非正规|非官方|非授权|未授权|未经授权|非认可|二手|海外|境外|代购|直邮|跨境|闲鱼|微商|个人卖家|私下|转卖|第三方|电商平台|天猫|京东|拼多多|淘宝|网购|消费者权益|消保法|电商法|法定|法律规定|条例|7 ?天|七天|临期|特价|(?<!未)(开封|拆封)|已使用|使用过|超过|逾期';
 const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', ...x });
 const DIRECT_A_TRUTH = {
   product_id: 'direct_a', entity_name: '多特瑞', aliases: DIRECT_A_PUBLIC.names,
@@ -1088,7 +1096,7 @@ const DIRECT_A_TRUTH = {
       source_quote: '纯正、安全、有效；效果出众；Aroma Essential Oil Blend',
       source_note: '整页由图片拼成，引语为图片上的文字；产品页网址待补。' }),
     DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）商贸有限公司认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单办理退换货；已开发票的退货后发票自动作废；在“我的订单”里申请',
-      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
+      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', unless: DIRECT_A_OTHER_CHANNEL, evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
       source_quote: '凡通过多特瑞（上海）商贸有限公司认可的渠道购买的产品，自购买之日起30天内，只要产品完好无损，不影响二次销售，均可凭商品清单办理退换货，如已开具发票，退货后发票将自动作废。进入“我的订单”中，选择需退货的订单，点击“申请退货”。' }),
     DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对产品质量不满意的，可以申请换货，在“我的订单”里操作',
       match: '换货', evidence_locator: '帮助中心 → 产品及售后 → 如何办理换货',
@@ -1119,7 +1127,16 @@ const DIRECT_A_TRUTH = {
       match: '零售顾客|按原价|原价购买|零售价购买', evidence_locator: '帮助中心 → 注册问题 → 不是优惠顾客可以购买产品吗？',
       source_quote: '可以购买。可根据需要注册申请为零售顾客，原价购买产品。', source_note: '此条由对话端在浏览器中读取，未附截图。' })
   ],
-  offers: [], prohibited_claims: [], limitations: [],
+  offers: [],
+  prohibited_claims: [
+    // v5.3：R3 里 3 条回答把官方退货政策说成“无理由退货”，官网原文只说“完好无损，不影响二次销售”，没有“无理由”
+    DIRECT_A_FACT({ text: '30 天无理由退货', match: '无理由退|无条件退|不问理由|随时退|想退就退', unless: DIRECT_A_OTHER_CHANNEL, category: '购买与售后',
+      note: '与官方说明冲突：官网只说“完好无损，不影响二次销售”的可以退换货，并没有说“无理由”；把它说成无理由退货会抬高用户预期',
+      evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
+      source_quote: '凡通过多特瑞（上海）商贸有限公司认可的渠道购买的产品，自购买之日起30天内，只要产品完好无损，不影响二次销售，均可凭商品清单办理退换货，如已开具发票，退货后发票将自动作废。',
+      cause: '推断：模型把电商平台的“7 天无理由”和直销条例的退货规定套到了品牌头上，而官网退货页只写了商品状态条件。' })
+  ],
+  limitations: [],
   // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
   unresolved: [
     { category: '资质与经营主体', topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
@@ -1323,7 +1340,7 @@ function page_report() {
     <li>口径只来自官方页面；标注“待复核”的口径需要品牌方确认。</li>${d.retryNote ? `<li>${esc(d.retryNote)}</li>` : ''}
     <li>统计以回答为单位，区间为 Wilson 95% 区间。</li>
     <li>采集为官方 API、未开联网，不代表用户在各家 App 里看到的回答。</li>
-    <li>判定由规则完成，所有发现都应对照原文复核；可以在「大模型回答记录」里逐条纠正。合规风险识别用的疗效词表是规则 v1，尚未经懂广告法的人审核。</li>
+    <li>判定由规则完成，所有发现都应对照原文复核；可以在「大模型回答记录」里逐条纠正。合规风险识别用的疗效词表是规则 v2（v5.3 按 R3 抽检修过否定、正反问、转述、品牌用语四类误判），尚未经懂广告法的人审核。</li>
   </ul></div>`;
 }
 
@@ -1498,6 +1515,7 @@ const ITERATIONS = [
   { v: 'v2', date: '2026-09-23', title: '可信度、溯源、导入', trigger: '竞品研究发现营销人最大的疑虑是“结果不稳定、只能当参照”', changed: '每个比例带 Wilson 区间和可信度等级；错误溯源到引用页并标疑似软文；官网文字抽取事实并做原文校验；国产模型采集脚本与人工导入', why: '“数据本身可不可信”是竞品都没回答的问题', dropped: '豆包、元宝 App 的界面自动化采集（合规风险）', evidence: '竞品矩阵 30 款；Digiday、3·15 报道', lesson: '把测量的不确定性放在台前，反而更可信' },
   { v: 'R1', date: '2026-09-24', title: '第一批真实数据', trigger: '四家 API 跑通，96 次调用 89 次成功', changed: '真实批次写进页面；发现虚构品牌被三个模型编造事实', why: '需要真实数据来验证平台，而不是继续演示', dropped: '把编造率当北极星（它测的是模型，不是 GEO）', evidence: '32 条品牌问题回答，逐条人工标注', lesson: '真实数据会推翻你原来的叙事，这是好事' },
   { v: 'v3', date: '2026-09-24', title: '看板风格', trigger: '用户希望像 AnswerBit 一样自然的看板', changed: '卡片布局、指标卡、条形图、分组导航', why: '演示给品牌方看时，形式要像日常在用的工具', dropped: '环比、综合分（换成区间和可信度）', evidence: 'AnswerBit 界面截图', lesson: '审美可以借，指标不能借' },
+  { v: 'v5.3', date: '2026-09-26', title: 'R3 抽检后修判错规则', trigger: 'docs/SPOTCHECK.md：R3 报告里 6 条“说反了”没有一条是真的说反（4 条是“能不能退”正反问、1 条说假货、1 条说海外代购），33 条“合规风险”的 46 个小句没有一条是模型自己宣称疗效（否定句、复述问题、转述批评经销商、引用免责声明、“治疗级”品牌用语）；另有 3 条把官方退货政策说成“无理由退货”的回答被放过了', changed: '正反问（能不能、是否、能否…）只算提及，不参与判定；退货口径加 unless（假货、代购、海外购、电商平台法定规则、已拆封）：说这些渠道或情形“不能退”不算否认官方口径；否认判定跳过转述句（“上线忽悠你‘不能退’”）；合规风险用更宽的否定词表 NEG_WIDE（不是、并未、不用于、不可能、禁止、达不到…），转述词表加鼓吹、宣传、营销、话术、包治百病、代理等，转述和整句引语以整句为范围，“治疗级”“CPTG”先去掉再找疗效词，提到医生、治疗师、就医、监管审批、耽误正规治疗的小句不算；多特瑞口径新增“不应说：30 天无理由退货”（官网只说完好无损、不影响二次销售）；“X 的规则如下：”这种冒号引出的列表，紧接着 4 行里不提品牌的沿用品牌归属；回归测试从 20 条增加到 44 条（S-01 至 S-08、U-01 至 U-04、C-01 至 C-12）', why: '误判不是个别词漏了，而是四类语言现象没有建模：正反问、范围限定（渠道、商品状态）、转述与引语、品牌用语；每类各修一处，并让每条误判都变成回归测试', dropped: '没有把品牌归属扩展到整篇回答（会让所有统计口径一起变，先只做冒号列表的 4 行）；标题行（“### 常规退货（30 天内未拆封无理由退）”）仍不当作主张，所以 3 条“无理由退货”漏判里有 1 条在标题里，这版仍放过；NEG 本身没有加宽（关键口径的否认仍用旧词表，避免改变腾讯会议预设）；疗效词表仍未经懂广告法的人审核', evidence: '回归测试改动前 20/20、改动后 44/44 通过；R3 头条数字：与官网口径不一致 42/240（18%）→ 7/240（3%，95% 区间 1%–6%），合规风险 33 条 → 0 条，说反了 6 条 → 0 条，新增“与官方说明冲突：30 天无理由退货”2 条，价格未核实 3 → 5 条（冒号列表沿用归属后多算进 2 条会员费 35 元）；腾讯会议预设 R2：不一致 21/72 → 20/72（一条“能力遗漏”因列表沿用归属而说对），否认官方口径 2 条不变；新报告见 docs/REPORT_R3.md', lesson: '规则第一版的数字只能当线索，不能当结论：抽检 11 条就把两个头条数字全推翻了。以后每批新数据先抽检再对外' },
   { v: 'v5.2', date: '2026-09-25', title: '直销演示案例（T6）：匿名、分组汇总、口径录入', trigger: '仓库是公开的、网站手动上传：公开版本不能出现真实品牌名；单条口径样本只有几条回答，区间太宽；对话端从官网整理出 12 条口径，但只有 1 条是逐字原文', changed: '预设可标 anonymize：公开网站上品牌名、别名显示为“品牌 A”，官网链接显示为“官方页面（已核对）”，证照号、电话、专有名词等一起隐藏，AI 原句同样替换；本地和 Claude 里显示真实版，可勾选按公开版预览；build_public.py 生成源代码里也没有真实信息的公开版；体检报告增加“按问题分组汇总”；事实底账新增“对话端整理（转述）”和“官网未说明”两类信息，转述不能代替原文，未说明的话题进报告的“建议补充的口径”；合规风险的官网依据改为引用“功效表述边界”里的官方原话，区分官方原话和 AI 的延伸；报告新增“采集完整性”（模型 × 分组的成功次数，补跑后按“同一题同一次只要有一条成功”合并，缺数据的格子标出并在分模型数字旁注明）；没有 group 字段的问题集按阶段分组；修复被逗号隔开的否定句漏判（前一小句只有主题、后一小句只有否定时合起来判，前一小句已肯定的不合并）', why: '匿名要在数据层做，评测结果才能和真实版一致；分组的样本比单条大一个数量级，才可能给出“仅作方向”以上的结论；转述录进原文字段会让“逐字原文”失去意义', dropped: '只在显示层替换品牌名（源代码里仍然全是真实信息）；把对话端的转述直接当作原文引语', evidence: '批次 R3（30 题 × 4 模型 × 2 次，240/240 成功，30 条补跑）的体检结果：240 条回答里 42 条至少一处与官网口径不一致（18%，95% 区间 13%–23%，结论可用）；替品牌宣称疗效 33 条，集中在“功效”组（17/48）；“说反了”6 条，都是退货政策；建议补充的口径 6 条官网未说明 + 10 条额外说法。回归测试 16 → 20 条全部通过（R-06/R-07 逗号否定、R-08 反例、A-01 至 A-03 匿名）；用虚构回答比对真实版和匿名版，回答数、不一致数、五组数字完全一致；模拟公开网站逐页扫描 16 个页面，屏幕文字、输入框、链接和 Markdown 导出里都没有品牌名', lesson: '“匿名”不只是换掉名字：证照号、客服电话、地址、专有的项目名都能把品牌认回来，名单要和口径一起维护' },
   { v: 'v5.1', date: '2026-09-25', title: '官网口径逐条复核（T3）', trigger: '交接文档 T3：事实底账要能按分类看、看到原文和核对日期、逐条确认；同时发现官网抽取默认用 DeepSeek，而 DeepSeek 也是被测模型', changed: '「事实底账」页把能力、套餐、不应出现的说法合并为“官网口径”，按六类分组展示，每条显示原文引语、来源、核对日期、复核状态，可以逐条确认或撤回并记下复核人和时间；没有原文引语不能确认，已确认的口径改了原文或来源会退回待复核；从官网导入的口径保留校验过的引语，标为待复核；体检报告里待复核的口径会标出来；Worker 的官网抽取和理由抽取改用 EXTRACT_ENGINE（默认 Claude），不允许设成被测模型', why: '人是最后一道门：确认必须针对一句能被别人核对的原文，而不是一句转述；裁判和被测对象是同一个模型时，它的偏差会同时出现在答案和判卷里', dropped: '让“已确认”决定参不参与评测（会让腾讯会议预设里没有引语的 5 条口径一下子失效）；另建 source_url 字段（与已有的 evidence_url 重复）', evidence: '回归测试改动前 14/14、改动后 14/14 通过；腾讯会议预设 11 条口径里，2 条有引语的可以确认，其余 9 条（5 条能力、3 个套餐、1 条不应出现的说法）确认按钮不可用；绕过按钮直接触发确认也会被拦下', lesson: '“已验证”和“已确认”是两件事：前者说这条口径能不能用来判卷，后者说有没有人看过原文。混在一个字段里，任何一个都说不清' },
   { v: 'v5.0', date: '2026-09-25', title: '直销口径体检：只做“发现问题”', trigger: '还没有真实用户和数据来源，持续监测暂时做不起来；直销品牌最关心的是 AI 的说法和官网口径哪里不一样', changed: '新增「体检报告」页和 Markdown 导出：逐条发现附官网原文、AI 原句、出现比例和区间、推断原因、一句修改方向；新增“合规风险”判定（AI 替品牌宣称疗效，否定、转述争议、问句、竞品说法都不算）；新增“建议补充的口径”（官网没说清、模型各说各话的地方）；新增直销问题模板（五组 30 条）和导出；事实底账增加原文引语、分类、核对日期、复核状态；回归测试增加到 14 条', why: '“发现问题”这一步不依赖持续数据，一轮采集就能交付，而且合规风险对应的是法务和合规的预算', dropped: '持续监测列入待办；不代写、不代发、不删帖', evidence: '交接文档 HANDOFF_直销口径体检.md', lesson: '先做一次就能交付价值的事，需要数据积累的事排在后面' },
@@ -1809,6 +1827,11 @@ const truthReady = () => S.truth.status === 'APPROVED';
    v2 新增：每个错误都带上它能追溯到的引用页面（links）。
    ========================================================= */
 const NEG = /不支持|暂不|无法|不提供|没有|不具备|不能|并不/;
+/* v5.3（R3 抽检后，见 docs/SPOTCHECK.md）
+   正反问（“能不能退”“是否有效”）是在复述问题，不是否定也不是主张：这样的小句只算提及，不参与判定。
+   NEG_WIDE 是更宽的否定词表，用于“不应出现的说法”和合规风险；关键口径的否认仍用 NEG，避免改变腾讯会议预设的判定。 */
+const ANOTA_RX = /能不能|能否|可不可以|可否|是不是|是否|有没有|会不会|行不行|要不要|该不该|靠不靠谱|管不管用|好不好用/;
+const NEG_WIDE = new RegExp(NEG.source + '|不是|不属于|不算|并非|而非|绝非|不用于|不用来|不可能|不要|不可以|不该|不应|不宜|禁止|切勿|勿|并未|尚未|从未|未获|未经|未被|不会|不存在|无任何|很难|难以|达不到|够不上|谈不上|≠|不等于|不代表|不意味着');
 function classifyUrl(url) {
   const T = S.truth, host = hostOf(url);
   const m = d => host === d || host.endsWith('.' + d);
@@ -1839,18 +1862,21 @@ function evaluate(run, ctx = {}) {
   const flags = new Map();
   const brandIdx = [];
   const tsubs = [];   // 归属给目标品牌的小句 {i, s}
+  let carry = null, carryLeft = 0;   // v5.3：“多特瑞的退货规则如下：”这种以冒号引出列表的句子，紧接着的 4 行里不提品牌的沿用它的品牌（再远就不可靠了，见迭代日志 v5.3）
   parts.forEach((p, i) => {
     // 'T' 目标，'C' 竞品，'B' 同时提到；没有品牌的小句沿用前一个小句，句首的沿用后面第一个出现的品牌
     const subs = subClauses(p.c).map(s => {
       const hasT = brandRe && brandRe.test(s), hasC = compRes.some(c => c.re && c.re.test(s));
       return { s, own: hasT && hasC ? 'B' : hasT ? 'T' : hasC ? 'C' : null };
     });
-    const first = (subs.find(x => x.own) || {}).own || null;
+    const named = (subs.find(x => x.own) || {}).own || null;
+    const first = named || (carryLeft > 0 ? carry : null);
+    if (named) { carry = /[:：]\s*[*\s]*$/.test(p.c) ? named : null; carryLeft = carry ? 4 : 0; } else if (carryLeft > 0) carryLeft--;
     let cur = first, hit = false;
     subs.forEach(x => {
       if (x.own) cur = x.own;
       // 问句和标题只算提及，不当作主张来判断对错
-      if (cur === 'T' || cur === 'B') { hit = true; if (!/[吗？?]\s*[*]*$/.test(x.s) && !/^#/.test(x.s)) tsubs.push({ i, s: x.s }); }
+      if (cur === 'T' || cur === 'B') { hit = true; if (!/[吗？?]\s*[*]*$/.test(x.s) && !/^#/.test(x.s) && !ANOTA_RX.test(x.s)) tsubs.push({ i, s: x.s }); }
     });
     if (hit) brandIdx.push(i);
   });
@@ -1874,8 +1900,10 @@ function evaluate(run, ctx = {}) {
     // 关键口径被否认：说“不能”“已收费”，而官方口径是“可以”
     // 否定被逗号隔开时（“…的元宝纪要功能，免费版不能用”）：前一小句提到了主题但没有肯定，后一小句只有否定，
     // 把两句合起来再判。前一小句已经肯定过的不合并（“免费版可以用，但不支持离线部署”是另一件事的限制，不是否认）
-    const denies = (s, prev) => (test(cap.match, s) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, s))
-      || (prev != null && NEG.test(s) && !(test(cap.match, prev) && !NEG.test(prev)) && (() => { const j = prev + '，' + s; return (test(cap.match, j) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, j)); })());
+    // v5.3：口径写了 unless（别的渠道：假货、代购、海外购、电商平台的法定规则）时，说的是那些渠道“不能退”不算否认官方渠道的口径
+    const outOfScope = (s, prev) => !!cap.unless && (test(cap.unless, s) || (prev != null && test(cap.unless, prev)));
+    const denies = (s, prev) => !outOfScope(s, prev) && !REPORTED_RX.test(s) && ((test(cap.match, s) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, s))
+      || (prev != null && NEG.test(s) && !(test(cap.match, prev) && !NEG.test(prev)) && (() => { const j = prev + '，' + s; return (test(cap.match, j) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, j)); })()));
     const den = cap.critical ? tsubs.find(({ i, s }, k) => denies(s, k > 0 && tsubs[k - 1].i === i ? tsubs[k - 1].s : null)) : null;
     if (den) { flags.set(den.i, 'bad'); issues.push({ type: 'denied', label: '否认官方口径', text: `说“${den.s.replace(/\*\*/g, '').slice(0, 36)}…”，官方口径是“${cap.statement}”`, clause: den.s, claim: cap.claim_id, idx: [den.i] }); }
     const hit = tsubs.find(({ s }) => test(cap.match, s) && !NEG.test(s) && !(cap.deny_match && test(cap.deny_match, s)));
@@ -1902,7 +1930,8 @@ function evaluate(run, ctx = {}) {
   T.prohibited_claims.forEach(pc => {
     tsubs.forEach(({ i, s }) => {
       if (!test(pc.match, s)) return;
-      if (NEG.test(s)) { goods.push({ claim: 'limit:' + pc.text, text: `正确说明限制：${pc.note}`, clause: s, limitAck: true }); if (!flags.has(i)) flags.set(i, 'ok'); }
+      if (pc.unless && test(pc.unless, s)) return;   // v5.3：说的是别的渠道或法定规则（“电商平台 7 天无理由”），与这条口径无关
+      if (NEG_WIDE.test(s)) { goods.push({ claim: 'limit:' + pc.text, text: `正确说明限制：${pc.note}`, clause: s, limitAck: true }); if (!flags.has(i)) flags.set(i, 'ok'); }
       else { flags.set(i, 'bad'); issues.push({ type: 'unsupported', label: /^与官方说明冲突/.test(pc.note) ? '与官方说明冲突' : '无依据能力', text: `声称“${pc.text}”，${pc.note}`, clause: s, claim: 'prohibited:' + pc.text, idx: [i] }); }
     });
   });
@@ -1916,9 +1945,12 @@ function evaluate(run, ctx = {}) {
     });
   });
 
-  // 合规风险：AI 替品牌宣称疗效（否定、转述争议、问句不算）
+  // 合规风险：AI 替品牌宣称疗效（否定、转述争议、问句、品牌用语、医疗边界不算；正反问在上面已经排除）
+  // 转述与整句引语都以整句为范围：“请警惕以下话术：”下面一整行引号里的“医院治不好的精油能治好”不是模型自己的主张
+  const reportedPart = new Set(); parts.forEach((p, i) => { if (REPORTED_RX.test(p.c) || /^[\s*\-•>·\d.]*[“"「『]/.test(p.c)) reportedPart.add(i); });
   tsubs.forEach(({ i, s }) => {
-    if (!EFFICACY_RX.test(s) || NEG.test(s) || REPORTED_RX.test(s) || /[吗？?]\s*[*]*$/.test(s)) return;
+    const core = s.replace(BRAND_TERM_RX, '');
+    if (!EFFICACY_RX.test(core) || NEG_WIDE.test(core) || reportedPart.has(i) || MEDICAL_RX.test(core) || /[吗？?]\s*[*]*$/.test(s)) return;
     if (T.allowed_efficacy && test(T.allowed_efficacy, s)) return;
     flags.set(i, 'bad');
     issues.push({ type: 'overclaim', label: '合规风险', text: `替品牌宣称疗效：“${s.replace(/\*\*/g, '').slice(0, 30)}”`, clause: s, claim: 'overclaim', idx: [i] });
@@ -1947,7 +1979,9 @@ function evaluate(run, ctx = {}) {
 
 /* ---------- 回归测试：评审发现的误判，修完后必须一直通过 ---------- */
 const DIRECT_TEST_TRUTH = { entity_name: '品牌A', aliases: ['品牌A'], positioning: '精油与芳香护理产品', positioning_match: { aligned: '精油|芳香', deviation: '' },
-  capabilities: [{ claim_id: 'cap_care', statement: '产品用于芳香、外用等日常护理', match: '芳香|外用|护理', status: 'VERIFIED' }], offers: [], prohibited_claims: [], limitations: [] };
+  capabilities: [{ claim_id: 'cap_care', statement: '产品用于芳香、外用等日常护理', match: '芳香|外用|护理', status: 'VERIFIED' },
+    { claim_id: 'cap_return', statement: '认可渠道购买、30 天内完好无损、不影响二次销售的可退换货', match: '30 ?天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', unless: DIRECT_A_OTHER_CHANNEL, critical: true, status: 'VERIFIED' }],
+  offers: [], prohibited_claims: [{ text: '30 天无理由退货', match: '无理由退|无条件退', unless: DIRECT_A_OTHER_CHANNEL, note: '与官方说明冲突：官网只说完好无损、不影响二次销售的可退换货，没有说“无理由”' }], limitations: [] };
 const DIRECT_TEST_COMPS = [{ name: '竞品B', aliases: ['竞品B'], domains: [] }];
 const REGRESSION_CASES = [
   { id: 'R-01', found: '外部评审 2026-09-25', text: 'NovaNote 支持日文转写，但不支持离线部署。', focus: ['cap_multilingual'], before: '判成“遗漏日文能力”：整句里的“不支持”把前半句也否定了',
@@ -1972,6 +2006,55 @@ const REGRESSION_CASES = [
   { id: 'O-04', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A主要用于芳香护理，而竞品B说可以治疗失眠。', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '竞品的说法，不算' },
   { id: 'O-05', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油能缓解焦虑症状，还能提高免疫力。', focus: [], before: '新规则', expect: e => e.issues.some(i => i.type === 'overclaim'), want: '合规风险' },
   { id: 'O-06', found: '直销体检 v5.0', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油真的能治疗失眠吗？', focus: [], before: '新规则', expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '问句，不算' },
+  // v5.3：R3 抽检（docs/SPOTCHECK.md）里的 11 条误判，每类至少一条；S = 说反了，C = 合规风险，U = 漏判，末尾带“防回退”的是反例
+  { id: 'S-01', found: 'R3 抽检 2026-09-25 第 1、2 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的产品能不能退，主要取决于你购买的渠道以及购买的时间。', focus: [], before: '“能不能”里的“不能”被当成否定，判成“说反了”',
+    expect: e => !e.issues.some(i => i.type === 'denied'), want: '正反问只算提及，不是否定' },
+  { id: 'S-02', found: 'R3 抽检 2026-09-25 第 4、5 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A能不能退货，主要看你的购买渠道，官方正规渠道是有明确的退换货保障的。', focus: [], before: '同上',
+    expect: e => !e.issues.some(i => i.type === 'denied') && e.capsHit.includes('cap_return'), want: '不算否定，后半句与官网一致' },
+  { id: 'S-03', found: 'R3 抽检 2026-09-25 第 3 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '请务必通过品牌A官方网站购买，避免通过二手平台或非正规渠道购买，以防买到假货且无法享受官方的退换货及售后保障。', focus: [], before: '“无法…退换货”说的是假货，被当成否认官方口径',
+    expect: e => !e.issues.some(i => i.type === 'denied'), want: '说的是非正规渠道，不算' },
+  { id: 'S-04', found: 'R3 抽检 2026-09-25 第 6 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '如果你是通过海外代购、直邮渠道买的品牌A产品，退货需要寄回海外仓，且绝大多数海外购的品牌A产品不支持无条件退货。', focus: [], before: '“不支持…退货”说的是海外代购，被当成否认官方口径',
+    expect: e => !e.issues.some(i => i.type === 'denied' || i.type === 'unsupported'), want: '说的是海外代购渠道，不算' },
+  { id: 'S-05', found: '修规则后新冒出来的误判', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的推荐上线可能忽悠你“退单会扣我奖金不能退”，不要信。', focus: [], before: '引号里转述的“不能退”被当成模型自己的说法',
+    expect: e => !e.issues.some(i => i.type === 'denied'), want: '转述的话，不算' },
+  { id: 'S-06', found: '修规则后新冒出来的误判', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A官方不支持已拆封的非质量问题商品退货。', focus: [], before: '“已拆封不能退”和官网“完好无损”是一回事，却被判成说反了',
+    expect: e => !e.issues.some(i => i.type === 'denied'), want: '说的是已拆封商品，不算' },
+  { id: 'S-07', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的产品一经售出不支持退货。', focus: [], before: '—',
+    expect: e => e.issues.some(i => i.type === 'denied'), want: '真的说反了，照旧标出' },
+  { id: 'S-08', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A官方渠道买的产品，也不能退。', focus: [], before: '—',
+    expect: e => e.issues.some(i => i.type === 'denied'), want: '逗号隔开的否定，照旧标出' },
+  { id: 'U-01', found: 'R3 漏判 2026-09-25（豆包）', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '未拆封、不影响二次销售的品牌A产品，30天内可以申请全额无理由退货，这也是品牌A官方公开承诺的基础售后政策。', focus: [], before: '事实底账里没有“不应说无理由退货”，放过了',
+    expect: e => e.issues.some(i => i.claim === 'prohibited:30 天无理由退货'), want: '与官方说明冲突：官网没有说“无理由”' },
+  { id: 'U-02', found: 'R3 漏判 2026-09-25（千问）', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '以下是品牌A官方一般的退换货规则：\n\n### 1. 未开封产品\n* **30天无理由退换**：自购买之日起30天内，如果产品未开封、包装完好，您可以申请退货。', focus: [], before: '这一行没有品牌名，整句不参与判定',
+    expect: e => e.issues.some(i => i.claim === 'prohibited:30 天无理由退货'), want: '冒号引出的列表沿用品牌归属，标出“无理由”' },
+  { id: 'U-03', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '在天猫、京东买的品牌A产品，适用平台的7天无理由退货规则。', focus: [], before: '—',
+    expect: e => !e.issues.some(i => i.claim === 'prohibited:30 天无理由退货'), want: '电商平台的法定规则，不算' },
+  { id: 'U-04', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '已开封的品牌A产品通常不支持无理由退货，除非有质量问题。', focus: [], before: '—',
+    expect: e => !e.issues.some(i => i.type === 'unsupported' || i.type === 'denied'), want: '否定句，不算' },
+  { id: 'C-01', found: 'R3 抽检 2026-09-25 第 7 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油可能帮你放松下来更容易入睡，但它不是失眠的治疗药物。', focus: [], before: '否定词表没有“不是”',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '否定句，不算' },
+  { id: 'C-02', found: 'R3 抽检 2026-09-25 第 8 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '关于品牌A精油能否治疗失眠，需要从两个层面来看。', focus: [], before: '“能否”开头的复述没有排除',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '复述问题，不算' },
+  { id: 'C-03', found: 'R3 抽检 2026-09-25 第 9 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '在美国，品牌A的精油作为化妆品销售，并未获得FDA批准用于治疗任何疾病。', focus: [], before: '否定词表没有“并未”',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '否定句、监管状态，不算' },
+  { id: 'C-04', found: 'R3 抽检 2026-09-25 第 10 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A中国公司曾多次发布声明，禁止经销商宣传疗效。', focus: [], before: '转述词表没有“禁止”“宣传”',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '转述品牌声明，方向相反，不算' },
+  { id: 'C-05', found: 'R3 抽检 2026-09-25 第 11 条', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的大量线下代理长期存在虚假宣传，鼓吹精油能治疗儿童发烧、感冒等常见病，这些说法完全没有循证医学依据。', focus: [], before: '转述词表没有“鼓吹”',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '转述并批评代理的说法，不算' },
+  { id: 'C-06', found: 'R3 抽检 2026-09-25 附录', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A采用“CPTG（认证纯正治疗级）”标准，纯正不等于疗效。', focus: [], before: '“治疗级”里的“治疗”被当成疗效词',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '品牌用语，不算' },
+  { id: 'C-07', found: 'R3 抽检 2026-09-25 附录', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A官方声明其产品“不用于诊断、治疗、治愈或预防任何疾病”。', focus: [], before: '否定词表没有“不用于”',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '引用免责声明，不算' },
+  { id: 'C-08', found: 'R3 抽检 2026-09-25 附录', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '使用品牌A精油前请先咨询有资质的医生或临床芳香治疗师，以免耽误正规治疗。', focus: [], before: '“治疗师”“正规治疗”被当成疗效词',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '医疗边界提醒，不算' },
+  { id: 'C-09', found: 'R3 抽检 2026-09-25 附录', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的代理为了卖货普遍乱宣传功效：宣称口服精油能治高血压、癌症，替代药物给病人用等等，这些都是非常危险的。', focus: [], before: '“替代药物给病人用”这一小句没有转述词，被单独标出',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '转述以整句为范围，不算' },
+  { id: 'C-10', found: '修规则后新冒出来的误判', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '接触品牌A时请警惕以下话术：\n* *“精油是液态黄金，能调理各种慢性病，医院治不好的精油能治好。”*（真相：涉嫌虚假宣传。）', focus: [], before: '整行引号里的话术被当成模型自己的主张',
+    expect: e => !e.issues.some(i => i.type === 'overclaim'), want: '整句引语，不算' },
+  { id: 'C-11', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油能治疗失眠，很多用户反馈效果很好。', focus: [], before: '—',
+    expect: e => e.issues.some(i => i.type === 'overclaim'), want: '真的替品牌宣称疗效，照旧标出' },
+  { id: 'C-12', found: '防回退', truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A精油不能替代药物，但可以根治焦虑症。', focus: [], before: '—',
+    expect: e => e.issues.some(i => i.type === 'overclaim'), want: '否定只作用于所在小句，后半句照旧标出' },
   { id: 'A-01', found: '公开版匿名 v5.2', anon: true, truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的薰衣草精油可以治疗失眠，详见 https://brand-a.example/oils 。', focus: [], before: '新规则',
     expect: e => e.issues.some(i => i.type === 'overclaim') && !/品牌A|brand-a/i.test(e._text), want: '替换品牌名和官网链接后，合规风险照样识别，原文里不再出现真实品牌' },
   { id: 'A-02', found: '公开版匿名 v5.2', anon: true, truth: DIRECT_TEST_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A主要用于芳香护理，而竞品B说可以治疗失眠。', focus: [], before: '新规则',
