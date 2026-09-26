@@ -447,7 +447,7 @@ code{border-radius:5px}
 .cbar{display:flex;height:44px;border-radius:14px;overflow:hidden;gap:3px;background:var(--bg)}
 .cseg{all:unset;position:relative;cursor:default;display:flex;align-items:center;padding-inline:14px;font-size:14px;font-weight:600;color:#fff;min-width:6px;transition:filter .2s}
 .cseg span{white-space:nowrap;overflow:hidden}
-.cseg.a{background:var(--accent)}.cseg.b{background:var(--rule);color:var(--muted)}.cseg.c{background:var(--bad)}
+.cseg.a{background:var(--accent)}.cseg.b{background:var(--warn-soft);color:var(--warn)}.cseg.c{background:var(--bad)}
 .cbar:hover .cseg{filter:saturate(.5) opacity(.55)}.cbar .cseg:hover,.cbar .cseg:focus-visible{filter:none}
 .cseg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .clg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
@@ -457,7 +457,7 @@ code{border-radius:5px}
 .clg .lg b small{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
 .clg .lg span{color:var(--muted);font-size:13px;display:block;line-height:1.5}
 .clg i,.glg i,.qleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
-.clg i.a,.glg i.a{background:var(--accent)}.clg i.b{background:var(--rule)}.clg i.c,.glg i.c{background:var(--bad)}.glg i.m{background:var(--warn)}
+.clg i.a,.glg i.a{background:var(--accent)}.clg i.b{background:var(--warn-soft);box-shadow:inset 0 0 0 1.5px var(--warn)}.clg i.c,.glg i.c{background:var(--bad)}.glg i.m{background:var(--warn)}
 /* 隐藏信息：灰色斜纹小块 */
 .red{display:inline-block;width:3.2em;height:.95em;border-radius:4px;background:repeating-linear-gradient(135deg,var(--rule) 0 4px,var(--rule-soft) 4px 8px);vertical-align:-1px;cursor:help}
 /* 口径对照：每模型一段色条，整行点开 */
@@ -1117,7 +1117,7 @@ const maskToken = k => MASK_HIDDEN + '\u200b'.repeat(k + 1) + '\u200c';   // 与
 const unmaskTokens = (s, to) => String(s).replace(/（已隐藏）\u200b+\u200c/g, to);
 /* 品牌名和别名都换成“品牌 A”之后，“品牌 A（品牌 A）”“品牌 A（品牌 A，品牌 A）”这类重复括号合并成一个 */
 const ANON_DUP_RE = new RegExp(escRx(ANON_NAME) + '(?:\\s*[（(]\\s*' + escRx(ANON_NAME) + '(?:\\s*[，,、/／或]\\s*' + escRx(ANON_NAME) + ')*\\s*[）)])+', 'g');
-const dedupeAnon = s => String(s).replace(ANON_DUP_RE, ANON_NAME);
+const dedupeAnon = s => String(s).replace(ANON_DUP_RE, ANON_NAME).replace(new RegExp(escRx(ANON_NAME) + '(?=[\u4e00-\u9fa5])', 'g'), ANON_NAME + ' ');
 /* ---------- 【改这里 24】公开版：隐藏自助入口 ----------
    产品定位是 to B 服务交付，不做 SaaS 自助。公开版不显示「分析一个产品」入口（采集由我们用脚本完成，客户只看报告）。
    PUBLIC_BUILD 由 build_public.py 生成公开版时改为 true；本地勾选“按公开版预览”或部署到非本地域名时同样按公开版处理。 */
@@ -1539,7 +1539,7 @@ function gapPublic(runs, fr) {
   <header class="ph"><h1>官方口径和 AI 回答差多少</h1>
     <p class="lede">把官方确认的每一条口径，和各模型回答里的对应说法逐条比对：一致、说错，还是该说没说。点一行可以对照官方原文和 AI 原句。</p></header>
   <div class="kpis">
-    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>说错的回答${infoPop(W.n, W.mentioned, '这个数字有多准？')}</div><div class="kv">${pct(W.n, W.mentioned)}<small>${W.n} / ${W.mentioned}</small></div><div class="ks">至少有一处和官方说明冲突${W.typeText ? `：${esc(W.typeText)}` : ''}。与概览、体检报告是同一个数。</div></div>
+    <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>说错的回答${infoPop(W.n, W.mentioned, '这个数字有多准？')}</div><div class="kv">${pct(W.n, W.mentioned)}<small>${W.n} / ${W.mentioned}</small></div><div class="ks">至少有一处和官方说明冲突${W.typeText ? `：${esc(W.typeText)}` : ''}。</div></div>
     <div class="kpi"><div class="kt"><i></i>被 AI 提到的口径</div><div class="kv">${shown.length}<small>/ ${fr.length} 条</small></div><div class="ks">每条都附官方原文　${factBtn('all', '全部口径')}</div></div>
   </div>
   <h2>逐条口径</h2>
@@ -1685,7 +1685,7 @@ const DIRECT_A_TRUTH = {
     DIRECT_A_FACT({ claim_id: 'cap_entity', category: '资质与经营主体', statement: '中国经营主体为多特瑞（上海）商贸有限公司，有限责任公司（港澳台法人独资），2014 年 5 月 28 日成立，注册资本 8000 万元，住所上海市静安区南京西路 699 号 3101–3108 室',
       match: '(上海).{0,4}商贸有限公司|港澳台法人独资|2014 ?年.{0,8}(成立|注册)|成立于 ?2014|注册资本.{0,6}8 ?000 ?万', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 营业执照（图片）',
       source_quote: '名称 多特瑞（上海）商贸有限公司；类型 有限责任公司(港澳台法人独资)；统一社会信用代码 9131000009421894XY；注册资本 人民币8000.0000万；成立日期 2014年05月28日；营业期限 2014年05月28日至2044年05月27日；住所 上海市静安区南京西路699号3101-3108室；登记机关 上海市市场监督管理局，2022年06月21日。',
-      source_note: '营业执照是图片，引语为对照图片转录；经营范围为图片小字，需人工核对全文。' }),
+      source_note: '营业执照是图片，引语为对照图片转录。' }),
     DIRECT_A_FACT({ claim_id: 'cap_food_license', category: '资质与经营主体', statement: '食品经营备案：备案编号 YB13101060018558，预包装食品销售（不含冷藏冷冻食品），批发兼零售，有效期 2023 年 4 月 3 日至 2044 年 5 月 27 日',
       match: '食品经营(备案|许可)|预包装食品|YB13101060018558', evidence_url: 'https://doterra.cn/client/index.html#/culture/article?code=BusinessLicense', evidence_locator: '企业证照页 → 备案信息',
       source_quote: '备案编号 YB13101060018558；销售方式 食品销售经营者（商贸企业，批发兼零售）；经营项目 食品销售经营者：预包装食品销售(不含冷藏冷冻食品销售)；有效期 2023年04月03日至2044年05月27日。' }),
@@ -1745,7 +1745,7 @@ const DIRECT_A_TRUTH = {
   limitations: [],
   // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
   unresolved: [
-    { category: '资质与经营主体', topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里能看清的部分也没有“直销”字样（图片小字，需人工核对全文）。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
+    { category: '资质与经营主体', topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里也未见“直销”字样。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
     { category: '使用与安全', topic: '能否内服', note: '中国官网没有说明。产品页整页由营销图片拼成，没有使用方法；瓶身标签为 Aroma Essential Oil Blend（芳香用复方精油）。线索（其他地区官网，不能作为中国口径）：香港区产品页写这款复方“专为扩香而设计”、外用 1–2 滴并建议稀释；香港区《精油使用方法》手册写内服一次一至两滴。',
       cause_links: ['https://wave0.doterra.com/HK/zh_HK/p/doterra-air-repair-oil', 'https://media.doterra.com/hk-otg/zh/brochures/usage-guide.pdf'] },
     { category: '使用与安全', topic: '孕妇和儿童能否使用', note: '中国官网没有说明，产品页没有禁忌人群。线索（其他地区官网，不能作为中国口径）：香港区《精油使用方法》手册写孕妇或接受治疗者先咨询医生、儿童稀释后先涂足底、两岁以下先从扩香开始、孩童务必在大人陪同下使用。用户问 AI 最多的安全问题，中国官网恰好没有给出答案。',
