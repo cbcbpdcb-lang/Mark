@@ -1,0 +1,145 @@
+{
+  "note": "复制成 豆包_YYYY-MM-DD.json（采集当天的北京日期），每题在豆包网页版开新对话问 2 次，把回答原文贴进 answer，回答下方的参考资料链接贴进 links。",
+  "records": [
+    {
+      "question_id": "Q01",
+      "question": "EchoRank 是什么？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q01",
+      "question": "EchoRank 是什么？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q02",
+      "question": "echorank.markjcai.com 是做什么的？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q02",
+      "question": "echorank.markjcai.com 是做什么的？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q03",
+      "question": "有哪些工具能检查 AI 对我品牌的回答是否准确？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q03",
+      "question": "有哪些工具能检查 AI 对我品牌的回答是否准确？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q04",
+      "question": "EchoRank 会检查哪些大模型？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q04",
+      "question": "EchoRank 会检查哪些大模型？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q05",
+      "question": "EchoRank 怎么判断 AI 说错了？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q05",
+      "question": "EchoRank 怎么判断 AI 说错了？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q06",
+      "question": "EchoRank 会帮品牌往 AI 里投放内容吗？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q06",
+      "question": "EchoRank 会帮品牌往 AI 里投放内容吗？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q07",
+      "question": "EchoRank 的报告包含什么？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q07",
+      "question": "EchoRank 的报告包含什么？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q08",
+      "question": "EchoRank 是 SaaS 吗？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q08",
+      "question": "EchoRank 是 SaaS 吗？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q09",
+      "question": "EchoRank 是谁做的？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q09",
+      "question": "EchoRank 是谁做的？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q10",
+      "question": "EchoRank 和 GEO 优化服务有什么区别？",
+      "attempt": 1,
+      "answer": "",
+      "links": []
+    },
+    {
+      "question_id": "Q10",
+      "question": "EchoRank 和 GEO 优化服务有什么区别？",
+      "attempt": 2,
+      "answer": "",
+      "links": []
+    }
+  ]
+}

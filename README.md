@@ -70,6 +70,8 @@ python3 build_public.py --check   # 只检查不写文件
 
 - `docs/HANDOFF_直销口径体检.md` 当前阶段的交接文档：目标、流程、任务拆分与进度
 - `docs/PLAN_客户数据与代码分离.md` 客户数据与代码分离方案（待确认，未实施）
+- `experiments/dogfood/` 自我监测：定期问 Kimi、千问、豆包、DeepSeek 怎么介绍 EchoRank，给各次复测打分对比
+- `experiments/rag_eval/` RAG 评测：品牌 A 的 30 个问题问四个 Dify 应用，用产品的 evaluate() 打分，比较说错、编造、拒答和检索召回（结果只放仓库）
 
 ## 说明
 

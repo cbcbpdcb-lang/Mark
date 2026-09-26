@@ -1,0 +1,141 @@
+{
+  "version": "final-1",
+  "source": "实验计划定稿附录 A（FAQ 定稿文案），一条事实键对应一条 FAQ",
+  "brand": "EchoRank",
+  "brand_match": "echo\\s*rank",
+  "site": "echorank.markjcai.com",
+  "negation": "不|没|非|无|别",
+  "facts": [
+    {
+      "claim_id": "f_what",
+      "faq": "EchoRank 是什么？",
+      "questions": [
+        "Q01",
+        "Q02",
+        "Q03"
+      ],
+      "group": "key",
+      "source_quote": "一项 AI 回答事实体检服务：检查 DeepSeek、Kimi、通义千问、豆包等主流大模型在回答消费者问题时，关于品牌的说法是否与品牌官方口径一致。",
+      "match": "AI\\s*回答(事实)?体检|(检查|核对|比对|对照|核查)[^。\\n]{0,20}(AI|大模型|模型)[^。\\n]{0,20}(说法|回答|介绍)[^。\\n]{0,12}(官方口径|官网|官方)|(是否|有没有|和|与)[^。\\n]{0,6}(品牌)?官方口径[^。\\n]{0,4}一致",
+      "wrong": "(是|为|提供)[^。，,\\n]{0,10}(SEO|搜索引擎优化|关键词排名|刷排名|音乐|音频|播客|声学|游戏|加密货币|区块链)",
+      "wrong_needs_brand": true,
+      "wrong_note": "把 EchoRank 说成 SEO 排名、音频、游戏、加密货币之类的别的东西",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_models",
+      "faq": "检查哪些模型？",
+      "questions": [
+        "Q04"
+      ],
+      "group": "key",
+      "source_quote": "目前是 DeepSeek、Kimi、通义千问、豆包。",
+      "match": "DeepSeek[^。\\n]{0,30}(Kimi|千问|通义|豆包)|(Kimi|千问|通义|豆包)[^。\\n]{0,30}DeepSeek",
+      "wrong": "ChatGPT|GPT-?\\d|Gemini|Claude|Perplexity|文心一言|Copilot",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 检查定稿里没列出的模型（官网首页另外提到元宝，不算说错）",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_method",
+      "faq": "怎么判断 AI 说错了？",
+      "questions": [
+        "Q05"
+      ],
+      "group": "key",
+      "source_quote": "把回答逐句和品牌官网原文对照，分为“说错”“数字冲突待确认”“官网没说清”三类，每条都附原文和来源页面。",
+      "match": "逐句|官网原文|数字冲突|官网没说清|(对照|比对|核对)[^。\\n]{0,10}(品牌)?官方口径|附(上)?(官网)?原文",
+      "wrong": "(靠|用|通过|依据|基于)[^。\\n]{0,6}(全网共识|网友评价|人工打分|主观判断|点赞数)",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 靠全网共识或主观打分判断对错",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_nopush",
+      "faq": "会往 AI 里投放内容吗？",
+      "questions": [
+        "Q06"
+      ],
+      "group": "key",
+      "source_quote": "不会。EchoRank 只做诊断，只建议品牌在自己的官方页面补上可以核对的事实，不在外部批量发布内容。",
+      "match": "只做诊断|不(会)?[^。\\n]{0,12}(投放|批量发布|代写|代发)|(自己|自有)的?官方页面|官方页面[^。\\n]{0,4}补",
+      "wrong": "(会|可以|能|帮|替|提供|负责)[^。\\n]{0,8}(投放|批量发布|批量发|代发|代写|铺量|发布软文|发软文)",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 会替品牌投放或批量发布内容",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_report",
+      "faq": "报告包含什么？",
+      "questions": [
+        "Q07"
+      ],
+      "group": "key",
+      "source_quote": "一句话结论、优先修改清单、AI 原话与官方原文的对照、官网没说清的话题、数字的计算方法，并附在线核对页。",
+      "match": "一句话结论|(优先)?修改清单|原话[^。\\n]{0,8}(官方|官网)原文|官网没说清|计算方法|在线核对",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_notsaas",
+      "faq": "是 SaaS 吗？",
+      "questions": [
+        "Q08"
+      ],
+      "group": "key",
+      "source_quote": "不是。它是面向企业的服务，每个品牌都要单独梳理官方口径。",
+      "match": "(不是|并非|不属于)[^。\\n]{0,6}SaaS|面向企业的服务|单独梳理",
+      "wrong": "(是|属于)[^。，,\\n]{0,8}SaaS",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 是 SaaS",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_maker",
+      "faq": "谁做的？",
+      "questions": [
+        "Q09"
+      ],
+      "group": "key",
+      "source_quote": "由独立产品经理 Jiacheng 设计和开发。",
+      "match": "Jiacheng|独立产品经理",
+      "wrong": "(由|是)[^。，,\\n]{0,15}(有限公司|科技公司|公司|团队|工作室|集团)[^。，,\\n]{0,6}(开发|推出|打造|创立|研发|运营|出品)",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 由某家公司或团队开发",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_pricing",
+      "faq": "收费吗？",
+      "questions": [],
+      "group": "key",
+      "source_quote": "目前处于试点阶段，首次体检免费。",
+      "match": "首次[^。\\n]{0,8}免费|试点",
+      "wrong": "(首次|第一次)[^。\\n]{0,10}(收费|付费|\\d+\\s*元)",
+      "wrong_note": "把首次体检说成收费",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_notgeo",
+      "faq": "和 GEO 优化有什么区别？",
+      "questions": [
+        "Q10"
+      ],
+      "group": "key",
+      "source_quote": "GEO 通常是在外部发布内容来影响 AI 的回答；EchoRank 只做诊断，并建议品牌在自己的官方页面补上可以核对的事实。",
+      "match": "只做诊断|(自己|自有)的?官方页面|不在外部[^。\\n]{0,6}发布|不(会)?[^。\\n]{0,12}(投放|批量发布|代写)",
+      "wrong": "(会|可以|能|帮|替|提供|负责)[^。\\n]{0,8}(投放|批量发布|批量发|代发|代写|铺量|发布软文|发软文)",
+      "wrong_needs_brand": true,
+      "wrong_note": "说 EchoRank 会替品牌投放或批量发布内容",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    },
+    {
+      "claim_id": "f_contact",
+      "faq": "怎么联系？",
+      "questions": [],
+      "group": "marketing",
+      "source_quote": "通过官网首页的“提交品牌”表单。",
+      "match": "提交品牌|官网[^。\\n]{0,8}表单",
+      "evidence_url": "https://echorank.markjcai.com/faq/"
+    }
+  ]
+}

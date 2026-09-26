@@ -1,0 +1,15 @@
+{
+  "name": "echorank-rag-eval",
+  "private": true,
+  "type": "module",
+  "description": "品牌 A 的 RAG 评测：导出问题、调用 Dify 应用、用产品的 evaluate() 打分",
+  "scripts": {
+    "export": "node export_questions.mjs",
+    "run": "node run.mjs",
+    "score": "node score.mjs",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.56.1"
+  }
+}

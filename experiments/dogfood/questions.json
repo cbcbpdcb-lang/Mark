@@ -1,0 +1,88 @@
+{
+  "version": "final-1",
+  "source": "实验计划定稿 2.1 节",
+  "brand": "EchoRank",
+  "site": "echorank.markjcai.com",
+  "questions": [
+    {
+      "id": "Q01",
+      "type": "品牌词",
+      "text": "EchoRank 是什么？",
+      "facts": [
+        "f_what"
+      ]
+    },
+    {
+      "id": "Q02",
+      "type": "网址",
+      "text": "echorank.markjcai.com 是做什么的？",
+      "facts": [
+        "f_what"
+      ]
+    },
+    {
+      "id": "Q03",
+      "type": "非品牌词",
+      "text": "有哪些工具能检查 AI 对我品牌的回答是否准确？",
+      "facts": [
+        "f_what"
+      ]
+    },
+    {
+      "id": "Q04",
+      "type": "品牌词",
+      "text": "EchoRank 会检查哪些大模型？",
+      "facts": [
+        "f_models"
+      ]
+    },
+    {
+      "id": "Q05",
+      "type": "品牌词",
+      "text": "EchoRank 怎么判断 AI 说错了？",
+      "facts": [
+        "f_method"
+      ]
+    },
+    {
+      "id": "Q06",
+      "type": "品牌词",
+      "text": "EchoRank 会帮品牌往 AI 里投放内容吗？",
+      "facts": [
+        "f_nopush"
+      ]
+    },
+    {
+      "id": "Q07",
+      "type": "品牌词",
+      "text": "EchoRank 的报告包含什么？",
+      "facts": [
+        "f_report"
+      ]
+    },
+    {
+      "id": "Q08",
+      "type": "品牌词",
+      "text": "EchoRank 是 SaaS 吗？",
+      "facts": [
+        "f_notsaas"
+      ]
+    },
+    {
+      "id": "Q09",
+      "type": "品牌词",
+      "text": "EchoRank 是谁做的？",
+      "facts": [
+        "f_maker"
+      ]
+    },
+    {
+      "id": "Q10",
+      "type": "品牌词",
+      "text": "EchoRank 和 GEO 优化服务有什么区别？",
+      "facts": [
+        "f_notgeo"
+      ]
+    }
+  ]
+}
