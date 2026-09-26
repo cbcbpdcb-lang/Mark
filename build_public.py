@@ -93,6 +93,10 @@ def build(html):
     # 4. 品牌名
     out, n = name_re.subn(ANON, out)
     bump('品牌名', n)
+    # 品牌名和别名都换成“品牌 A”之后，“品牌 A（品牌 A）”这类重复括号合并成一个（页面运行时的 dedupeAnon 同样处理）
+    a = re.escape(ANON)
+    out, n = re.subn(a + r'(?:\s*[（(]\s*' + a + r'(?:\s*[，,、/／或]\s*' + a + r')*\s*[）)])+', ANON, out)
+    bump('重复括号合并', n)
 
     # 5. 公开版开关：隐藏「分析一个产品」等自助入口（to B 交付，不做 SaaS 自助）
     out, n = re.subn(r'^const PUBLIC_BUILD = false;', 'const PUBLIC_BUILD = true;', out, count=1, flags=re.M)
