@@ -1027,6 +1027,9 @@ function applyPreset(key) {
    替换发生在数据层（事实底账、竞品、问题、回答原文一起换），所以评测结果和真实版一致，导出的 Markdown 也不会漏出品牌名。 */
 const ANON_NAME = '品牌 A', MASK_OFFICIAL = '官方页面（已核对）', MASK_OTHER = '外部页面（已隐藏）', MASK_DOMAIN = '官方网站（已隐藏）', MASK_HIDDEN = '（已隐藏）';
 const isMaskedUrl = u => u === MASK_OFFICIAL || u === MASK_OTHER;
+/* 品牌名和别名都换成“品牌 A”之后，“品牌 A（品牌 A）”“品牌 A（品牌 A，品牌 A）”这类重复括号合并成一个 */
+const ANON_DUP_RE = new RegExp(escRx(ANON_NAME) + '(?:\\s*[（(]\\s*' + escRx(ANON_NAME) + '(?:\\s*[，,、/／或]\\s*' + escRx(ANON_NAME) + ')*\\s*[）)])+', 'g');
+const dedupeAnon = s => String(s).replace(ANON_DUP_RE, ANON_NAME);
 /* ---------- 【改这里 24】公开版：隐藏自助入口 ----------
    产品定位是 to B 服务交付，不做 SaaS 自助。公开版不显示「分析一个产品」入口（采集由我们用脚本完成，客户只看报告）。
    PUBLIC_BUILD 由 build_public.py 生成公开版时改为 true；本地勾选“按公开版预览”或部署到非本地域名时同样按公开版处理。 */
@@ -1058,6 +1061,14 @@ function publicHiddenPages() {
 const pageHidden = k => isPublicView() && publicHiddenPages().has(k);
 const pub = () => isPublicView();
 const plainQ = s => pub() ? String(s || '').replace(/[#*`]+/g, '').replace(/^\s*[-•]\s*/, '').trim() : String(s || '');
+/* 公开版概览开头的一句话：模型、问题数、回答数都取自当前数据 */
+function introSentence(runs) {
+  const ok = runs.filter(r => r.status === 'SUCCESS');
+  const names = [...new Set(ok.map(r => r.engine))].map(id => (ENG(id) || { name: id }).name.replace(/[（(]\s*API\s*[）)]/g, '').trim());
+  const qn = new Set(ok.map(r => r.query_id)).size;
+  if (!ok.length) return '采集完成后，这里会显示各模型的回答与核对结果。';
+  return `我们在 ${esc(names.join('、'))} 上问了 ${qn} 个消费者购买前常问的问题，共收集 ${ok.length} 条回答，逐句对照官方说明。`;
+}
 /* 公开版：日期写成“9 月 25 日” */
 function dayText(s) { const m = /(\d{4})-(\d{2})-(\d{2})/.exec(String(s || '')); return m ? `${Number(m[2])} 月 ${Number(m[3])} 日` : String(s || ''); }
 /* 公开版：各模型官方图标（来自 @lobehub/icons-static-svg，MIT；商标归各公司所有，只用于标识回答来自哪个模型），内联不外链。 */
@@ -1131,7 +1142,7 @@ function makeMasker(t, extras = []) {
     let out = String(str).replace(urlRe, u => { const h = hostOf(u); return domains.some(d => h === d || h.endsWith('.' + d)) ? MASK_OFFICIAL : nameT.test(u) ? MASK_OTHER : u; });
     rules.forEach(([re, to]) => { out = out.replace(re, to); });   // 先于裸域名：邮箱这类含域名的整体先换掉
     if (bareDom) out = out.replace(bareDom, MASK_DOMAIN);
-    return out.replace(nameG, ANON_NAME);
+    return dedupeAnon(out.replace(nameG, ANON_NAME));
   };
   return one;
 }
@@ -1148,7 +1159,8 @@ function presetData(key) {
   const f = maskerFor(key);
   return { truth: maskDeep(d.truth, f), competitors: d.competitors, queries: maskDeep(d.queries, f) };
 }
-const presetLabel = (key) => anonActive(key) ? (PRESETS[key].publicName || ANON_NAME) : PRESETS[key].name;
+const PUBLIC_PRESET_NAMES = { tencent: '腾讯会议', novanote: 'NovaNote（示例）', direct_a: '品牌 A（精油直销）' };
+const presetLabel = (key) => pub() && PUBLIC_PRESET_NAMES[key] ? PUBLIC_PRESET_NAMES[key] : anonActive(key) ? (PRESETS[key].publicName || ANON_NAME) : PRESETS[key].name;
 const _maskedRuns = new Map();
 function viewRun(r) {
   if (!anonActive() || !presetBatches().includes(r.batch)) return r;
@@ -1206,10 +1218,8 @@ function todoCard(m) {
   const engines = [...new Set(m.evs.map(x => x.r.engine))].length;
   const qn = new Set(m.evs.map(x => x.r.query_id)).size;
   if (pub()) {
-    const names = [...new Set(m.evs.map(x => x.r.engine))].map(id => (ENG(id) || { name: id }).name.replace(/[（(]\s*API\s*[）)]/g, '').trim());
-    const intro = `<p class="intro">我们在 ${esc(names.join('、'))} 上问了 ${qn} 个消费者购买前常问的问题，共收集 ${m.n} 条回答，逐句对照官方说明。</p>`;
-    if (!g.length) return intro;
-    return intro + `<div class="hero">
+    if (!g.length) return '';
+    return `<div class="hero">
     <div class="spread"><h3 style="margin:0">先处理这${['一', '两', '三'][g.length - 1]}件事</h3>${pageHidden('case') ? '' : '<button class="btn sm" data-act="nav" data-page="case">先看案例</button>'}</div>
     <div class="scroll"><table class="tbl"><thead><tr><th style="width:36px">#</th><th>发现</th><th class="num">次数</th><th>下一步</th><th></th></tr></thead><tbody>
     ${g.map((x, k) => { const ns = nextStep(x.type) || ['查看', '查看原文后决定']; const f = factFor(x.claim); return `<tr>
@@ -1332,7 +1342,7 @@ const COPY_DEMO = {
 };
 function page_gap() {
   const runs = realRuns();
-  if (isFictional()) return `<header class="ph"><h1>口径对照</h1></header><div class="state info"><h4>当前是虚构探针产品</h4><p>口径对照需要真实产品的官网口径。在左上角切换到“腾讯会议（真实产品演示）”。</p></div>`;
+  if (isFictional()) return `<header class="ph"><h1>口径对照</h1></header><div class="state info"><h4>当前是${pub() ? '示例品牌' : '虚构探针产品'}</h4><p>口径对照需要真实产品的官网口径。在左上角切换到“腾讯会议（真实产品演示）”。</p></div>`;
   const fr = factRows(runs);
   const rel = fr.reduce((s, f) => s + f.n, 0), dev = fr.reduce((s, f) => s + f.dev, 0), bad = fr.reduce((s, f) => s + f.badN, 0);
   const engName = id => (ENG(id) || { name: id }).name;
@@ -1674,7 +1684,7 @@ function reportMarkdown(d) {
   return L.join('\n');
 }
 function page_report() {
-  if (isFictional()) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>当前是虚构探针产品</h4><p>体检报告需要真实产品的官网口径。在左上角切换到真实产品。</p></div>`;
+  if (isFictional()) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>当前是${pub() ? '示例品牌' : '虚构探针产品'}</h4><p>体检报告需要真实产品的官网口径。在左上角切换到真实产品。</p></div>`;
   const d = reportData();
   const engName = id => (ENG(id) || { name: id }).name;
   if (!d.nA) return `<header class="ph"><h1>体检报告</h1></header><div class="state info"><h4>还没有提到${esc(d.T.entity_name)}的回答</h4><p>先用「用户提问」导出问题集，用采集脚本跑一轮，再到「数据导入」导入结果。</p></div>`;
@@ -2856,8 +2866,8 @@ function renderSide() {
   const top = `
     <div class="brand"><span class="logo">E</span><span>EchoRank<small>AI 回答事实审计</small></span></div>
     <div class="pcard">
-      <div class="pname"><span class="pava">${initials}</span><span>${esc(T.entity_name)}<div class="small muted" style="font-weight:400">${isFictional() ? '虚构探针品牌' : esc(T.category)}</div></span></div>
-      <select class="inp sel sm" data-preset style="margin-top:8px" aria-label="演示产品">${Object.entries(PRESETS).map(([k, p]) => `<option value="${k}" ${effectivePreset() === k ? 'selected' : ''}>${esc(presetLabel(k))}</option>`).join('')}<option value="custom" ${effectivePreset() === 'custom' ? 'selected' : ''}>自定义：${esc(S.truth.entity_name)}</option></select>
+      <div class="pname"><span class="pava">${initials}</span><span>${esc(pub() && PRESETS[effectivePreset()] ? presetLabel(effectivePreset()) : T.entity_name)}<div class="small muted" style="font-weight:400">${isFictional() ? (pub() ? '示例品牌' : '虚构探针品牌') : esc(T.category)}</div></span></div>
+      <select class="inp sel sm" data-preset style="margin-top:8px" aria-label="演示产品">${Object.entries(PRESETS).map(([k, p]) => `<option value="${k}" ${effectivePreset() === k ? 'selected' : ''}>${esc(presetLabel(k))}</option>`).join('')}${pub() && effectivePreset() !== 'custom' ? '' : `<option value="custom" ${effectivePreset() === 'custom' ? 'selected' : ''}>自定义：${esc(S.truth.entity_name)}</option>`}</select>
       ${PRESETS[effectivePreset()] && PRESETS[effectivePreset()].anonymize && isLocalView() ? `<label class="small muted" style="display:flex;gap:6px;align-items:center;margin-top:6px"><input type="checkbox" data-anon="1" ${UI.anonPreview ? 'checked' : ''}>按公开版预览（匿名）</label>` : ''}
       ${effectivePreset() === 'custom' ? '<div class="small muted" style="margin-top:6px">这是你用「分析一个产品」创建的自定义产品。选上面的预设可以回到演示数据。</div>' : ''}
       ${pub() ? '' : `<div class="pmeta">
@@ -2949,7 +2959,7 @@ function page_overview() {
   if (!truthReady()) return `<header class="ph"><h1>${esc(S.truth.entity_name)} 在 AI 回答里的样子</h1></header>${blockedByTruth()}`;
   const missingQ = S.querySet.queries.filter(q => !scopeRuns().some(r => r.query_id === q.id));
   const head = `<header class="ph"><h1>${esc(S.truth.entity_name)} 在 AI 回答里的样子</h1>
-    <p class="lede">同一批购买决策问题，在 DeepSeek、Kimi、千问、豆包上各问多次。每个数字旁边都写着它能不能信。${S.preset === 'tencent' && !pub() ? '数据来自真实批次 R2（官方 API，未联网）。事实底账依据官方页面整理，待复核；付费档价格未录入。' : ''}</p></header>
+    <p class="lede">${pub() ? introSentence(runs) : `同一批购买决策问题，在 DeepSeek、Kimi、千问、豆包上各问多次。每个数字旁边都写着它能不能信。${S.preset === 'tencent' ? '数据来自真实批次 R2（官方 API，未联网）。事实底账依据官方页面整理，待复核；付费档价格未录入。' : ''}`}</p></header>
     ${missingQ.length && UI.scope !== 'sample' && !pub() ? `<div class="state info"><h4>${missingQ.length} 条问题还没有回答</h4><p>${missingQ.map(q => esc(q.text)).join('；')}。${isPublicView() ? '' : '用「分析一个产品」的采集服务，或'}在「数据导入」导出问题集后用脚本采集。</p></div>` : ''}`;
   if (!runs.length && pub()) return head + `<div class="state info"><h4>还没有回答数据</h4><p>采集完成后，这里会显示各模型的回答与核对结果。</p></div>`;
   if (!runs.length) return head + `<div class="state info"><h4>还没有真实数据</h4><p>去「数据导入」录入你在豆包、元宝里问到的回答，或导入采集脚本的结果；也可以在「运行结果」用 Claude 实时运行。</p><div class="row"><button class="btn primary" data-act="nav" data-page="import">去导入数据</button><button class="btn" data-act="scope" data-scope="sample">先看样本</button></div></div>`;
