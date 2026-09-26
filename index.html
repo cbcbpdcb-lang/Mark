@@ -448,15 +448,17 @@ code{border-radius:5px}
 .cseg{all:unset;position:relative;cursor:default;display:flex;align-items:center;padding-inline:14px;font-size:14px;font-weight:600;color:#fff;min-width:6px;transition:filter .2s}
 .cseg span{white-space:nowrap;overflow:hidden}
 .cseg.a{background:var(--accent)}.cseg.b{background:var(--warn-soft);color:var(--warn)}.cseg.c{background:var(--bad)}
+.cseg.d,.mb i.d{background:repeating-linear-gradient(135deg,var(--warn-soft) 0 5px,color-mix(in srgb,var(--warn) 28%,var(--warn-soft)) 5px 8px);color:var(--warn)}
 .cbar:hover .cseg{filter:saturate(.5) opacity(.55)}.cbar .cseg:hover,.cbar .cseg:focus-visible{filter:none}
 .cseg:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.clg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.clg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}.clg.c4{grid-template-columns:repeat(4,minmax(0,1fr))}
 .clg .lg{padding:12px 14px;border-radius:14px;background:var(--bg);transition:background .25s,box-shadow .25s}
 .clg .lg.on{background:var(--surface);box-shadow:0 0 0 1.5px var(--accent)}
 .clg .lg b{font-size:22px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;display:block}
 .clg .lg b small{font-size:13px;font-weight:500;color:var(--muted);margin-left:6px}
 .clg .lg span{color:var(--muted);font-size:13px;display:block;line-height:1.5}
 .clg i,.glg i,.qleg i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:1px}
+.clg i.d,.glg i.d{background:var(--warn-soft);box-shadow:inset 0 0 0 1.5px var(--warn);border-radius:2px}
 .clg i.a,.glg i.a{background:var(--accent)}.clg i.b{background:var(--warn-soft);box-shadow:inset 0 0 0 1.5px var(--warn)}.clg i.c,.glg i.c{background:var(--bad)}.glg i.m{background:var(--warn)}
 /* 隐藏信息：灰色斜纹小块 */
 .red{display:inline-block;width:3.2em;height:.95em;border-radius:4px;background:repeating-linear-gradient(135deg,var(--rule) 0 4px,var(--rule-soft) 4px 8px);vertical-align:-1px;cursor:help}
@@ -526,7 +528,9 @@ code{border-radius:5px}
 .factd blockquote{margin:0 0 12px;padding:12px 14px;background:var(--bg);border-radius:12px;font-size:14px;line-height:1.7}
 .factd dl{display:grid;grid-template-columns:72px minmax(0,1fr);gap:6px 10px;margin:0}
 .factd dt{color:var(--muted)}.factd dd{margin:0}
-@media (max-width:860px){.clg{grid-template-columns:1fr}.mstrip{gap:8px}.mb{width:34px}}
+@media (max-width:1100px){.clg.c4{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:860px){.clg,.clg.c4{grid-template-columns:1fr}.mstrip{gap:8px}.mb{width:34px}}
+@media (max-width:600px){.kpi,.hero{position:relative}.ip{position:static}.ip .pop{left:12px;right:12px;width:auto;top:auto;margin-top:22px}}
 /* 欢迎页 */
 .wel{position:fixed;inset:0;z-index:70;background:rgba(11,11,15,.28);display:flex;align-items:center;justify-content:center;padding:16px;opacity:0;pointer-events:none;transition:opacity .35s}
 .wel.on{opacity:1;pointer-events:auto}
@@ -1058,10 +1062,10 @@ const TENCENT_TRUTH = {
       cause: '推断：实时转写是基础能力，模型在推荐时更爱讲“AI 纪要”这类新卖点，基础能力反而被省略。' },
     { claim_id: 'cap_speaker', statement: '录音后按声纹区分说话人', match: '说话人|发言人|区分.{0,4}角色', status: 'VERIFIED', valid_from: '2025-06-19', evidence_url: 'https://meeting.tencent.com/news/aily20250611.html',
       cause: '推断：这项能力只写在 2025 年 6 月的新闻稿里，没有独立的功能说明页。' },
-    { claim_id: 'cap_translate', statement: '录音文件支持翻译为 17 种语言（商业版、企业版）', match: '17 ?种|翻译|同传|多语言', status: 'VERIFIED', valid_from: '2025-06-19', evidence_url: 'https://meeting.tencent.com/news/aily20250611.html',
+    { claim_id: 'cap_translate', statement: '录音文件支持翻译为 17 种语言（商业版、企业版）', match: '17\\s*种|(商业版|企业版)[^。\\n]{0,12}翻译|翻译[^。\\n]{0,12}(商业版|企业版)|录音文件[^。\\n]{0,10}翻译', status: 'VERIFIED', valid_from: '2025-06-19', evidence_url: 'https://meeting.tencent.com/news/aily20250611.html',
       cause: '推断：17 种语言翻译写在新闻稿里而不是功能页，模型对日语等小语种的支持说法不一。' },
-    { claim_id: 'cap_recording', statement: '无需发起线上会议即可用 App 录音并自动转文字', match: '录音', status: 'VERIFIED', valid_from: '2025-06-19', evidence_url: 'https://meeting.tencent.com/news/aily20250611.html' },
-    { claim_id: 'cap_cloud', statement: '支持云端与本地录制会议', match: '云录制|云端录制|录制', status: 'VERIFIED', valid_from: '2024-01-01', evidence_url: 'https://main.qcloudimg.com/raw/document/product/pdf/1095_35535_cn.pdf' }
+    { claim_id: 'cap_recording', statement: '无需发起线上会议即可用 App 录音并自动转文字', match: '(无需|不用|不需要|无须)[^。\\n]{0,8}(发起|开)[^。\\n]{0,8}会议|App[^。\\n]{0,6}录音[^。\\n]{0,10}(转|文字)|录音[^。\\n]{0,4}(自动)?转(成)?文字', status: 'VERIFIED', valid_from: '2025-06-19', evidence_url: 'https://meeting.tencent.com/news/aily20250611.html' },
+    { claim_id: 'cap_cloud', statement: '支持云端与本地录制会议', match: '云录制|云端录制|本地录制', status: 'VERIFIED', valid_from: '2024-01-01', evidence_url: 'https://main.qcloudimg.com/raw/document/product/pdf/1095_35535_cn.pdf' }
   ],
   offers: [
     { offer_id: 'free', name: '免费版', price: 0, purchase_channel: '官网', valid_from: '2024-01-01', valid_to: '' },
@@ -1164,10 +1168,30 @@ function isWrongRun(r, e) {
   const fo = finalOf(r, e); if (fo.corrected) return fo.final === 'wrong';
   return e.issues.some(i => WRONG_TYPES.includes(i.type));
 }
+/* v6.2 数字冲突 · 待确认：回答里的数字和官方口径对不上（例如折扣、到账天数），可能是别的渠道或旧政策。
+   不算说错，也不算说对；人工复核给出结论后按复核结论算。 */
+function isPendingRun(r, e) {
+  if (!e || !e.valid || !e.mentioned || !e.issues.some(i => i.type === 'numeric_conflict')) return false;
+  const fo = finalOf(r, e); return !fo.corrected || fo.final === 'pending';
+}
+/* v6.2 指标拆层：说对且有依据的回答，再看说对的是什么。
+   关键事实：命中 group 为 key 的口径（资质、售后、价格、加入），或说对了官方价格、正确说明了限制；
+   宣传语：只命中 group 为 marketing 的口径（官网对品质的自述）。底账里有宣传语口径时才拆层。 */
+const rightLayer = e => e.goods.some(g => g.group === 'key' || g.limitAck || String(g.claim).startsWith('offer:')) ? 'key' : e.goods.some(g => g.group === 'marketing') ? 'marketing' : 'other';
+function layerStat(evs, T = S.truth) {
+  const out = { on: T.capabilities.some(c => c.group === 'marketing'), n: 0, v: 0, key: 0, mkt: 0 };
+  evs.forEach(x => {
+    if (!x.e.valid || !x.e.mentioned) return; out.n++;
+    if (!finalOf(x.r, x.e).v || isWrongRun(x.r, x.e)) return; out.v++;
+    const l = rightLayer(x.e); if (l === 'key') out.key++; else if (l === 'marketing') out.mkt++;
+  });
+  return out;
+}
 function wrongStat(evs) {
-  const out = { runs: new Set(), byType: {}, unver: new Set(), miss: new Set(), mentioned: 0 };
+  const out = { runs: new Set(), byType: {}, unver: new Set(), miss: new Set(), pend: new Set(), mentioned: 0 };
   evs.forEach(x => {
     if (!x.e.valid || !x.e.mentioned) return; out.mentioned++;
+    if (isPendingRun(x.r, x.e)) out.pend.add(x.r.run_id);
     if (isWrongRun(x.r, x.e)) { out.runs.add(x.r.run_id); [...new Set(x.e.issues.filter(i => WRONG_TYPES.includes(i.type)).map(i => i.type))].forEach(t => { out.byType[t] = (out.byType[t] || 0) + 1; }); }
     if (x.e.issues.some(i => i.type === 'unverified')) out.unver.add(x.r.run_id);
     if (x.e.issues.some(i => i.type === 'omission')) out.miss.add(x.r.run_id);
@@ -1391,7 +1415,8 @@ const NEXT_STEP = {
   outdated: ['纠正', '更新价格页并写明生效日期；找到引用旧价格的页面，联系对方更正'],
   unverified: ['补事实', '把当前价格录入事实库，否则无法判断模型说的价格对不对'],
   misattribution: ['澄清', '在对比页写清楚哪些能力是自家的、哪些不是'],
-  deviation: ['统一口径', '统一官网首屏和介绍页的定位表述']
+  deviation: ['统一口径', '统一官网首屏和介绍页的定位表述'],
+  numeric_conflict: ['确认', '请品牌方确认这个数字是否来自别的渠道、别的地区或旧政策：是官方口径以外的说法，就在官方页面写明适用范围和生效日期；确认是说错，再计入说错']
 };
 const NEXT_STEP_PUBLIC = {
   unsupported: ['核实', '先确认这条说法是真是假：属实就补进官方说明；不属实就在官方页面把限制写清楚，写成一句可以被直接引用的话'],
@@ -1399,7 +1424,8 @@ const NEXT_STEP_PUBLIC = {
 };
 const nextStep = t => (pub() && NEXT_STEP_PUBLIC[t]) || NEXT_STEP[t];
 function todoCard(m) {
-  const g = gaps(m).slice(0, 3);
+  // 公开版和体检报告一样先按严重度再按次数排：说错排在待确认、无法核对前面
+  const g = (pub() ? gaps(m).sort((a, b) => ((SEVERITY[b.type] || 1) - (SEVERITY[a.type] || 1)) || (b.count - a.count)) : gaps(m)).slice(0, 3);
   const pend = m.evs.filter(x => x.e.valid && finalOf(x.r, x.e).pending).length;
   const batch = [...new Set(m.evs.map(x => x.r.batch))].join('、');
   const engines = [...new Set(m.evs.map(x => x.r.engine))].length;
@@ -1411,7 +1437,7 @@ function todoCard(m) {
     <div class="scroll"><table class="tbl"><thead><tr><th style="width:36px">#</th><th>发现</th><th class="num">次数</th><th>下一步</th><th></th></tr></thead><tbody>
     ${g.map((x, k) => { const ns = nextStep(x.type) || ['查看', '查看原文后决定']; const f = factFor(x.claim); return `<tr>
       <td class="num"><b>${k + 1}</b></td>
-      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">官方说明：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　${extLink(f.url, '来源')}` : ''}</div>` : ''}</td>
+      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' || x.type === 'numeric_conflict' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">官方说明：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　${extLink(f.url, '来源')}` : ''}</div>` : ''}</td>
       <td class="num">${x.count}</td>
       <td class="small" style="min-width:220px"><b>${ns[0]}</b>　${ns[1]}</td>
       <td><button class="btn sm" data-act="open-run" data-q="${x.runs[0].query_id}">看原文</button></td></tr>`; }).join('')}
@@ -1424,7 +1450,7 @@ function todoCard(m) {
     <div class="scroll"><table class="tbl"><thead><tr><th style="width:36px">#</th><th>发现</th><th class="num">次数</th><th>下一步</th><th></th></tr></thead><tbody>
     ${g.map((x, k) => { const ns = NEXT_STEP[x.type] || ['查看', '查看原文后决定']; const f = factFor(x.claim); return `<tr>
       <td class="num"><b>${k + 1}</b></td>
-      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">事实库：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　${extLink(f.url, '来源')}` : ''}</div>` : ''}</td>
+      <td class="wide"><span class="tag ${x.type === 'omission' || x.type === 'unverified' || x.type === 'numeric_conflict' ? 'warn' : 'bad'}">${x.label}</span> ${esc(x.text.split('，')[0])}${f && f.text ? `<div class="small muted">事实库：${esc(f.text.length > 64 ? f.text.slice(0, 64) + '…' : f.text)}${f.url ? `　${extLink(f.url, '来源')}` : ''}</div>` : ''}</td>
       <td class="num">${x.count}</td>
       <td class="small" style="min-width:220px"><b>${ns[0]}</b>　${ns[1]}</td>
       <td><button class="btn sm" data-act="open-run" data-q="${x.runs[0].query_id}">看原文</button></td></tr>`; }).join('') || '<tr><td colspan="5" class="muted">没有发现需要处理的问题。</td></tr>'}
@@ -1509,14 +1535,15 @@ function factRows(runs) {
   const T = S.truth;
   const evs = runs.filter(r => r.status === 'SUCCESS').map(r => ({ r, e: evaluate(r) })).filter(x => x.e.valid && x.e.mentioned);
   const facts = T.capabilities.filter(c => c.status === 'VERIFIED').map(c => ({ key: c.claim_id, kind: '能力', statement: c.statement, url: c.evidence_url, note: c.note || '', from: c.valid_from, cause: c.cause || '', causeLinks: c.cause_links || [],
-      ok: x => x.e.goods.some(g => g.claim === c.claim_id), bad: x => x.e.issues.some(i => i.claim === c.claim_id && i.type !== 'omission'), miss: x => x.e.issues.some(i => i.claim === c.claim_id && i.type === 'omission') }))
+      ok: x => x.e.goods.some(g => g.claim === c.claim_id), bad: x => x.e.issues.some(i => i.claim === c.claim_id && i.type !== 'omission' && i.type !== 'numeric_conflict'), miss: x => x.e.issues.some(i => i.claim === c.claim_id && i.type === 'omission'),
+      pend: x => x.e.issues.some(i => i.claim === c.claim_id && i.type === 'numeric_conflict') }))
     .concat(T.prohibited_claims.map(p => ({ key: 'prohibited:' + p.text, kind: '不应出现的说法', statement: '不应说：' + p.text, url: p.evidence_url || (T.capabilities.find(c => c.claim_id === 'cap_assistant') || {}).evidence_url || '', note: p.note, from: '', cause: p.cause || '', causeLinks: p.cause_links || [],
-      ok: x => x.e.goods.some(g => g.claim === 'limit:' + p.text), bad: x => x.e.issues.some(i => i.claim === 'prohibited:' + p.text), miss: () => false })));
+      ok: x => x.e.goods.some(g => g.claim === 'limit:' + p.text), bad: x => x.e.issues.some(i => i.claim === 'prohibited:' + p.text), miss: () => false, pend: () => false })));
   return facts.map(f => {
-    const rows = evs.map(x => ({ x, s: f.bad(x) ? 'bad' : f.miss(x) ? 'miss' : f.ok(x) ? 'ok' : null })).filter(y => y.s);
+    const rows = evs.map(x => ({ x, s: f.bad(x) ? 'bad' : f.pend(x) ? 'pend' : f.miss(x) ? 'miss' : f.ok(x) ? 'ok' : null })).filter(y => y.s);
     const cnt = k => rows.filter(y => y.s === k).length;
-    const engines = [...new Set(rows.map(y => y.x.r.engine))].map(e => { const l = rows.filter(y => y.x.r.engine === e); return { e, n: l.length, dev: l.filter(y => y.s !== 'ok').length }; });
-    return { ...f, n: rows.length, okN: cnt('ok'), badN: cnt('bad'), missN: cnt('miss'), dev: cnt('bad') + cnt('miss'), engines, rows };
+    const engines = [...new Set(rows.map(y => y.x.r.engine))].map(e => { const l = rows.filter(y => y.x.r.engine === e); return { e, n: l.length, dev: l.filter(y => y.s === 'bad' || y.s === 'miss').length }; });
+    return { ...f, n: rows.length, okN: cnt('ok'), badN: cnt('bad'), missN: cnt('miss'), pendN: cnt('pend'), dev: cnt('bad') + cnt('miss'), engines, rows };
   }).filter(f => f.n > 0 || f.kind === '能力');
 }
 /* 示例文案：只开放一条，其余属于付费服务 */
@@ -1539,27 +1566,28 @@ function gapPublic(runs, fr) {
   const refOf = f => f.kind === '能力' ? f.key : f.key;
   const strip = f => `<span class="mstrip" aria-hidden="true">${engs.map(id => {
     const l = f.rows.filter(y => y.x.r.engine === id); if (!l.length) return `<span class="mdl"><span class="mb empty"></span>${esc(engName(id).replace(/（API）/, ''))}</span>`;
-    const ok = l.filter(y => y.s === 'ok').length, bad = l.filter(y => y.s === 'bad').length, miss = l.filter(y => y.s === 'miss').length;
-    return `<span class="mdl" data-tip="${esc(`${engName(id).replace(/（API）/, '')}：一致 ${ok}${bad ? `，说错 ${bad}` : ''}${miss ? `，该说没说 ${miss}` : ''}（共 ${l.length} 次）`)}"><span class="mb">${ok ? `<i class="a" style="flex-grow:${ok}"></i>` : ''}${miss ? `<i class="m" style="flex-grow:${miss}"></i>` : ''}${bad ? `<i class="c" style="flex-grow:${bad}"></i>` : ''}</span>${esc(engName(id).replace(/（API）/, ''))}</span>`;
+    const ok = l.filter(y => y.s === 'ok').length, bad = l.filter(y => y.s === 'bad').length, miss = l.filter(y => y.s === 'miss').length, pend = l.filter(y => y.s === 'pend').length;
+    return `<span class="mdl" data-tip="${esc(`${engName(id).replace(/（API）/, '')}：一致 ${ok}${bad ? `，说错 ${bad}` : ''}${pend ? `，待确认 ${pend}` : ''}${miss ? `，该说没说 ${miss}` : ''}（共 ${l.length} 次）`)}"><span class="mb">${ok ? `<i class="a" style="flex-grow:${ok}"></i>` : ''}${miss ? `<i class="m" style="flex-grow:${miss}"></i>` : ''}${pend ? `<i class="d" style="flex-grow:${pend}"></i>` : ''}${bad ? `<i class="c" style="flex-grow:${bad}"></i>` : ''}</span>${esc(engName(id).replace(/（API）/, ''))}</span>`;
   }).join('')}</span>`;
-  const quote = f => { const y = f.rows.find(z => z.s === 'bad') || f.rows.find(z => z.s === 'miss') || f.rows.find(z => z.s === 'ok'); if (!y) return null;
-    const it = y.s === 'ok' ? y.x.e.goods.find(g => g.claim === f.key || g.claim === 'limit:' + f.key.replace(/^prohibited:/, '')) : y.x.e.issues.find(i => i.claim === f.key);
+  const quote = f => { const y = f.rows.find(z => z.s === 'bad') || f.rows.find(z => z.s === 'pend') || f.rows.find(z => z.s === 'miss') || f.rows.find(z => z.s === 'ok'); if (!y) return null;
+    const it = y.s === 'ok' ? y.x.e.goods.find(g => g.claim === f.key || g.claim === 'limit:' + f.key.replace(/^prohibited:/, '')) : y.x.e.issues.find(i => i.claim === f.key && (y.s !== 'pend' || i.type === 'numeric_conflict'));
     return { y, s: y.s, text: it && it.clause ? plainQ(String(it.clause)).slice(0, 160) : '' }; };
-  const SN = { ok: '一致', bad: '说错', miss: '该说没说' };
+  const SN = { ok: '一致', bad: '说错', miss: '该说没说', pend: '待确认' };
+  const hasPend = shown.some(f => f.pendN);
   return `
   <header class="ph"><h1>官方口径和 AI 回答差多少</h1>
-    <p class="lede">把官方确认的每一条口径，和各模型回答里的对应说法逐条比对：一致、说错，还是该说没说。点一行可以对照官方原文和 AI 原句。</p></header>
+    <p class="lede">把官方确认的每一条口径，和各模型回答里的对应说法逐条比对：一致、说错，还是该说没说${hasPend ? '；数字对不上的单列为待确认' : ''}。点一行可以对照官方原文和 AI 原句。</p></header>
   <div class="kpis">
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>说错的回答${infoPop(W.n, W.mentioned, '这个数字有多准？')}</div><div class="kv">${pct(W.n, W.mentioned)}<small>${W.n} / ${W.mentioned}</small></div><div class="ks">至少有一处和官方说明冲突${W.typeText ? `：${esc(W.typeText)}` : ''}。</div></div>
     <div class="kpi"><div class="kt"><i></i>被 AI 提到的口径</div><div class="kv">${shown.length}<small>/ ${fr.length} 条</small></div><div class="ks">每条都附官方原文　${factBtn('all', '全部口径')}</div></div>
   </div>
   <h2>逐条口径</h2>
-  <div class="glg small muted"><span><i class="a"></i>一致</span>${shown.some(f => f.missN) ? '<span><i class="m"></i>该说没说</span>' : ''}${shown.some(f => f.badN) ? '<span><i class="c"></i>说错</span>' : ''}<span>每段色条是一个模型，悬停看次数</span></div>
+  <div class="glg small muted"><span><i class="a"></i>一致</span>${shown.some(f => f.missN) ? '<span><i class="m"></i>该说没说</span>' : ''}${hasPend ? '<span><i class="d"></i>待确认</span>' : ''}${shown.some(f => f.badN) ? '<span><i class="c"></i>说错</span>' : ''}<span>每段色条是一个模型，悬停看次数</span></div>
   <div class="scroll"><table class="tbl gtab">
-    <thead><tr><th>官方口径</th><th class="num">一致</th>${shown.some(f => f.badN) ? '<th class="num">说错</th>' : ''}${shown.some(f => f.missN) ? '<th class="num">该说没说</th>' : ''}<th>各模型</th><th aria-hidden="true"></th></tr></thead>
-    <tbody>${shown.map(f => { const q = quote(f); const cols = 3 + (shown.some(x => x.badN) ? 1 : 0) + (shown.some(x => x.missN) ? 1 : 0) + 1; return `<tr class="rxh" data-act="gap-toggle" tabindex="0" aria-expanded="false">
+    <thead><tr><th>官方口径</th><th class="num">一致</th>${shown.some(f => f.badN) ? '<th class="num">说错</th>' : ''}${hasPend ? '<th class="num">待确认</th>' : ''}${shown.some(f => f.missN) ? '<th class="num">该说没说</th>' : ''}<th>各模型</th><th aria-hidden="true"></th></tr></thead>
+    <tbody>${shown.map(f => { const q = quote(f); const cols = 3 + (shown.some(x => x.badN) ? 1 : 0) + (hasPend ? 1 : 0) + (shown.some(x => x.missN) ? 1 : 0) + 1; return `<tr class="rxh" data-act="gap-toggle" tabindex="0" aria-expanded="false">
       <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${esc(f.kind === '能力' ? (factEntry(f.key) || {}).cat || '' : '不应出现的说法')}　${f.n < 10 ? '样本少，仅供参考' : `说错 ${pct(f.badN, f.n)}，可能范围 ${wilsonText(f.badN, f.n)}`}</div></td>
-      <td class="num">${f.okN}</td>${shown.some(x => x.badN) ? `<td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td>` : ''}${shown.some(x => x.missN) ? `<td class="num">${f.missN}</td>` : ''}
+      <td class="num">${f.okN}</td>${shown.some(x => x.badN) ? `<td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td>` : ''}${hasPend ? `<td class="num" style="${f.pendN ? 'color:var(--warn);font-weight:600' : ''}">${f.pendN}</td>` : ''}${shown.some(x => x.missN) ? `<td class="num">${f.missN}</td>` : ''}
       <td>${strip(f)}</td><td class="chevc"><span class="chev"></span></td></tr>
       <tr class="rxb"><td colspan="${cols}"><div class="rxw"><div><div class="cmp">
         <div><small>官方原文</small>${esc(((factEntry(f.key) || {}).x || {}).source_quote || f.statement)}<div>${factBtn(f.key, '看出处')}</div></div>
@@ -1585,7 +1613,7 @@ function page_gap() {
   const engName = id => (ENG(id) || { name: id }).name;
   // 统计以“回答”为单位：同一条回答里的多条判断不独立，按判断次数算区间会偏乐观
   const judged = new Set(), devA = new Set(), badA = new Set();
-  fr.forEach(f => f.rows.forEach(y => { judged.add(y.x.r.run_id); if (y.s !== 'ok') devA.add(y.x.r.run_id); if (y.s === 'bad') badA.add(y.x.r.run_id); }));
+  fr.forEach(f => f.rows.forEach(y => { judged.add(y.x.r.run_id); if (y.s === 'bad' || y.s === 'miss') devA.add(y.x.r.run_id); if (y.s === 'bad') badA.add(y.x.r.run_id); }));
   const nA = judged.size, dA = devA.size, bA = badA.size;
   const c1 = cred(dA, nA, false), c2 = cred(bA, nA, false);
   const covered = fr.filter(f => f.n > 0).length;
@@ -1602,10 +1630,10 @@ function page_gap() {
 
   <h2>逐条口径</h2>
   <div class="scroll"><table class="tbl">
-    <thead><tr><th>官网口径</th><th class="num">一致</th><th class="num">说反了</th><th class="num">该说没说</th><th>偏差率</th><th>各模型偏差</th></tr></thead>
+    <thead><tr><th>官网口径</th><th class="num">一致</th><th class="num">说反了</th>${fr.some(f => f.pendN) ? '<th class="num">待确认</th>' : ''}<th class="num">该说没说</th><th>偏差率</th><th>各模型偏差</th></tr></thead>
     <tbody>${fr.map(f => `<tr>
       <td class="wide"><div>${esc(f.statement)}</div><div class="small muted">${f.kind}${f.url ? `　${extLink(f.url, THIRD_PARTY[f.url] || hostOf(f.url))}` : ''}${f.note ? '　' + esc(f.note.length > 50 ? f.note.slice(0, 50) + '…' : f.note) : ''}</div></td>
-      <td class="num">${f.okN}</td><td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td><td class="num">${f.missN}</td>
+      <td class="num">${f.okN}</td><td class="num" style="${f.badN ? 'color:var(--bad);font-weight:600' : ''}">${f.badN}</td>${fr.some(x => x.pendN) ? `<td class="num">${f.pendN}</td>` : ''}<td class="num">${f.missN}</td>
       <td class="small">${f.n ? `${frac(f.dev, f.n)}<br><span class="muted">${wilsonText(f.dev, f.n)}</span>` : '<span class="muted">未涉及</span>'}</td>
       <td class="small">${f.engines.map(x => `${esc(engName(x.e))} ${x.dev}/${x.n}`).join('<br>') || '—'}</td></tr>`).join('')}</tbody>
   </table></div>
@@ -1650,8 +1678,8 @@ const REPORTED_RX = /宣称|声称|号称|所谓|夸大|虚假|误导|被罚|起
    - 转述以整句为范围：同一句里出现“鼓吹”“宣称”等转述词，后面被逗号隔开的小句（“…替代药物给病人用等等”）也算转述。 */
 const BRAND_TERM_RX = /治疗级|CPTG/g;
 const MEDICAL_RX = /医生|医师|治疗师|芳疗师|就医|正规治疗|正规医疗|医疗属性|医学|临床|循证|延误|耽误|确诊|药监|获批|批准/;
-const SEVERITY = { overclaim: 4, denied: 3, unsupported: 3, misattribution: 2, outdated: 2, deviation: 2, omission: 1, unverified: 1 };
-const TYPE_NAME = { overclaim: '合规风险', denied: '说反了', unsupported: '与官方口径冲突', misattribution: '错误归属', outdated: '过期', deviation: '定位偏差', omission: '该说没说', unverified: '无法核对' };
+const SEVERITY = { overclaim: 4, denied: 3, unsupported: 3, misattribution: 2, outdated: 2, deviation: 2, numeric_conflict: 1.5, omission: 1, unverified: 1 };
+const TYPE_NAME = { overclaim: '合规风险', denied: '说反了', unsupported: '与官方口径冲突', misattribution: '错误归属', outdated: '过期', deviation: '定位偏差', numeric_conflict: '待确认', omission: '该说没说', unverified: '无法核对' };
 
 /* ---------- 【改这里 21】直销问题模板（约 30 条，五组） ---------- */
 const DIRECT_TEMPLATES = [
@@ -1686,7 +1714,14 @@ const DIRECT_A_PUBLIC = {"names": ["多特瑞", "doTERRA", "dōTERRA"], "domains
 const DIRECT_A_SRC = 'https://doterra.cn/client/index.html#/show/help';
 // v5.3：退货口径只管“认可渠道”。说假货、代购、海外购、电商平台法定规则的小句，不拿来和这条口径比
 const DIRECT_A_OTHER_CHANNEL = '假货|仿品|非正规|非官方|非授权|未授权|未经授权|非认可|二手|海外|境外|代购|直邮|跨境|闲鱼|微商|个人卖家|私下|转卖|第三方|电商平台|天猫|京东|拼多多|淘宝|网购|消费者权益|消保法|电商法|法定|法律规定|条例|7 ?天|七天|临期|特价|(?<!未)(开封|拆封)|已使用|使用过|超过|逾期';
-const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '', ...x });
+// v6.2：group 区分“购买关键事实”（key：资质、售后、价格、加入）和“宣传语”（marketing：官网对品质的自述）
+const DISC_BAD = /7\.5\s*折|75\s*折|75\s*%|低[^。\n]{0,4}25\s*%/;
+const REF_BAD = /(7|10)\s*[-~到至]\s*15\s*个?工作日/;
+const DIRECT_A_NUMERIC = [
+  { claim: 'cap_discount', topic: '会员折扣', match: DISC_BAD.source, note: '官方口径是零售价的 6.5–7 折' },
+  { claim: 'cap_refund', topic: '退款到账', match: REF_BAD.source, note: '官方口径是一般 5 个工作日内原路退回' }
+];
+const DIRECT_A_FACT = (x) => ({ status: 'VERIFIED', valid_from: '', group: x.category === '功效表述边界' ? 'marketing' : 'key', evidence_url: DIRECT_A_SRC, source_quote: '', checked_at: '2026-09-25', review_status: '待复核', client_confirmed_by: '', client_confirmed_at: '', ...x });
 const DIRECT_A_TRUTH = {
   product_id: 'direct_a', entity_name: '多特瑞', aliases: DIRECT_A_PUBLIC.names,
   category: '精油与个人护理（直销）', positioning: '', target_users: [],
@@ -1705,7 +1740,7 @@ const DIRECT_A_TRUTH = {
       match: '400.?920.?9191|021.?2227.?1888|沪 ?ICP ?备|南京西路', evidence_url: 'https://doterra.cn/', evidence_locator: '官网页脚（每页相同）',
       source_quote: '© 2020 多特瑞（上海）商贸有限公司所有；公司地址：上海市静安区南京西路699号12层；客服专线：400-920-9191；公司电话：021-2227-1888；电子邮箱：chinaservice@doterra.com；沪ICP备14052891号-1；沪公网安备 31010602004501号' }),
     DIRECT_A_FACT({ claim_id: 'cap_cptg', category: '功效表述边界', statement: '精油经过自有的 CPTG 检测标准检验，确保质量及纯度；官方对作用的描述只有“是安全、纯正、有效的”，没有界定是哪方面的作用',
-      match: 'CPTG|检测标准|纯度|纯正|GC.?MS|气相色谱', evidence_locator: '帮助中心 → 产品及售后 → 产品品质？',
+      group: 'marketing', match: 'CPTG|检测标准|GC.?MS|气相色谱', evidence_locator: '帮助中心 → 产品及售后 → 产品品质？',
       source_quote: '多特瑞精油产品都是通过多特瑞CPTG检测标准严格检验程序的检测，确保每一瓶精油的质量及纯度，是安全、纯正、有效的。',
       source_note: '附图标题：每批精油皆经过一系列严格且有效的测试。包括以下测试：感官性能测试、特定重力、气相色谱/质谱分析(GC/MS)、傅里叶转换红外光谱仪测试(FTIR)、旋光度、折射率、污染物测试、稳定性测试。（各项说明为图片小字，需人工核对）',
       cause: '推断：官方自己用了“有效”，但没有界定是哪方面的作用；模型把“有效”展开成具体疗效时，报告要区分“官方原话”和“AI 的延伸”。' }),
@@ -1714,26 +1749,26 @@ const DIRECT_A_TRUTH = {
       source_quote: '纯正、安全、有效；效果出众；Aroma Essential Oil Blend',
       source_note: '整页由图片拼成，引语为图片上的文字；产品页网址待补。' }),
     DIRECT_A_FACT({ claim_id: 'cap_return', category: '购买与售后', critical: true, statement: '通过多特瑞（上海）商贸有限公司认可渠道购买的产品，自购买之日起 30 天内，完好无损、不影响二次销售的，可凭商品清单办理退换货；已开发票的退货后发票自动作废；在“我的订单”里申请',
-      match: '30 ?天|三十天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', unless: DIRECT_A_OTHER_CHANNEL, evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
+      match: '(30\\s*天|三十天)[^。；\\n]{0,14}(退|换)|完好无损|不影响二次销售', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', unless: DIRECT_A_OTHER_CHANNEL, evidence_locator: '帮助中心 → 产品及售后 → 如何办理退货？',
       source_quote: '凡通过多特瑞（上海）商贸有限公司认可的渠道购买的产品，自购买之日起30天内，只要产品完好无损，不影响二次销售，均可凭商品清单办理退换货，如已开具发票，退货后发票将自动作废。进入“我的订单”中，选择需退货的订单，点击“申请退货”。' }),
     DIRECT_A_FACT({ claim_id: 'cap_exchange', category: '购买与售后', statement: '通过官方渠道购买、30 天内对产品质量不满意的，可以申请换货，在“我的订单”里操作',
-      match: '换货', evidence_locator: '帮助中心 → 产品及售后 → 如何办理换货',
+      match: '30\\s*天[^。；\\n]{0,14}换|质量[^。；\\n]{0,10}换货', evidence_locator: '帮助中心 → 产品及售后 → 如何办理换货',
       source_quote: '凡通过多特瑞(上海)商贸有限公司官方渠道购买之产品，自购买之日起30天内，如对产品质量不满意，可申请换货。进入“我的订单”中，选择需换货的订单，点击“申请换货”。' }),
     DIRECT_A_FACT({ claim_id: 'cap_refund', category: '购买与售后', statement: '仓库收到退回产品并确认不影响二次销售的，一般 5 个工作日内原路退回支付账户；该订单所获回馈点数扣回',
-      match: '5 ?个工作日|五个工作日|原路退(款|回)|退款', evidence_locator: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
+      match: '5\\s*个工作日|五个工作日|原路退(款|回)', evidence_locator: '帮助中心 → 产品及售后 → 申请退货后多久退款？',
       source_quote: '仓库收到退回产品，审核确认不影响二次销售，一般在5个工作日内原路退回支付账户，退货后该订单所获回馈点数将扣回。' }),
     DIRECT_A_FACT({ claim_id: 'cap_support', category: '购买与售后', statement: '产品有瑕疵可联系客服：在线客服、客服电话 400-920-9191、客服邮箱；服务时间周一至周六 10:00–19:00，15 日及月末最后一日 10:00–21:00，周日及法定节假日除外',
-      match: '瑕疵|联系客服|客服(电话|热线|邮箱)|服务时间', evidence_locator: '帮助中心 → 产品及售后 → 产品有瑕疵，如何处理？',
+      match: '周一至周六|服务时间|在线客服[^。\\n]{0,20}(邮箱|电话)', evidence_locator: '帮助中心 → 产品及售后 → 产品有瑕疵，如何处理？',
       source_quote: '我们会全力确保商品品质，但若还有不全之处，可与我们的客服联系。在线客服：小多在线；客服电话：400-920-9191；客服邮箱：chinaservice@doterra.com；服务时间：周一至周六10:00-19:00，15日及月末最后一日10:00-21:00（周日及法定节假日除外）' }),
     DIRECT_A_FACT({ claim_id: 'cap_join', category: '商业模式说明', statement: '2026 年 7 月 1 日起，年满 18 周岁可通过官网、微信公众号、小程序、APP 注册优惠顾客：提交注册申请并完成首张订单 ≥125 产品点数，即成为优惠顾客；注册时默认勾选参加 LRP 轻松购',
-      match: '优惠顾客|125 ?(个)?(产品)?点数|125 ?PV|轻松购|LRP|18 ?周岁|年满 ?18', valid_from: '2026-07-01', evidence_locator: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
+      match: '18\\s*周岁|年满\\s*18|125[^。\\n]{0,6}点数|125\\s*PV|首(张|单)[^。\\n]{0,8}(订单|点数)', valid_from: '2026-07-01', evidence_locator: '帮助中心 → 注册问题 → 如何成为优惠顾客？',
       source_quote: '2026年7月1日起，年满18周岁，即可通过多特瑞官网、微信公众号、小程序、APP注册优惠顾客，首先填写个人信息提交注册申请，同时完成首张订单≥125产品点数，即可成为优惠顾客。',
       source_note: '小多温馨提示：1. 如果注册时选择申请为零售顾客，购物车页面点击“进行结账”，会跳出“成为优惠顾客”按钮，可根据页面提示选择是否注册成为优惠顾客。2. 注册时会默认勾选参加LRP轻松购，记得设置提醒时间，否则可能会错失很多福利机会哦！' }),
     DIRECT_A_FACT({ claim_id: 'cap_discount', category: '商业模式说明', statement: '优惠顾客首次订单起享受优惠顾客价格（约为零售价的 6.5–7 折），次月可参加忠诚顾客回馈计划（LRP）等优惠活动',
-      match: '6\\.5 ?折|七折|7 ?折|65 ?%|70 ?%|六五折|优惠顾客价|会员价|忠诚顾客回馈', evidence_locator: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
+      match: '(6\\.5|六五|6\\.5[–-]7)\\s*折|[六七]折|65\\s*%|70\\s*%|零售价的(65|70)%|忠诚顾客回馈', evidence_locator: '帮助中心 → 注册问题 → 成为优惠顾客的好处？',
       source_quote: '优惠顾客福利多多，首次订单即可开始享受优惠顾客价格（约为零售价的6.5-7折），次月还可参加忠诚顾客回馈计划（LRP）等丰富多彩的优惠活动。' }),
     DIRECT_A_FACT({ claim_id: 'cap_sponsor', category: '商业模式说明', statement: '注册优惠顾客时需要填写朋友的优惠顾客号码及姓名；没有认识的会员朋友可以联系客服',
-      match: '推荐人|介绍人|邀请人|朋友的?(优惠)?顾客(号|编号)|会员朋友|需要.{0,6}(推荐|邀请|介绍)', evidence_locator: '帮助中心 → 注册问题 → 优惠顾客注册中的朋友如何填写？',
+      match: '(朋友|会员)[^。\\n]{0,8}(号码|编号)|填写[^。\\n]{0,8}(推荐人|介绍人|朋友)|(需要|必须)[^。\\n]{0,6}(推荐人|介绍人)', evidence_locator: '帮助中心 → 注册问题 → 优惠顾客注册中的朋友如何填写？',
       source_quote: '注册时需要填写您朋友的优惠顾客号码及姓名，如果您没有认识的会员朋友，可以联系客服。' }),
     DIRECT_A_FACT({ claim_id: 'cap_starter', category: '商业模式说明', statement: '每位新优惠顾客注册首单可享首购套装优惠价，详情见下载专区',
       match: '首购套装|首购', evidence_locator: '帮助中心 → 注册问题 → 注册首购套装？',
@@ -1755,6 +1790,8 @@ const DIRECT_A_TRUTH = {
       cause: '推断：模型把电商平台的“7 天无理由”和直销条例的退货规定套到了品牌头上，而官网退货页只写了商品状态条件。' })
   ],
   limitations: [],
+  // v6.2：数字冲突 · 待确认。说了和官方口径不同的数字，规则不能断定是说错（可能是别的渠道或旧政策），单列待确认
+  numeric_conflicts: DIRECT_A_NUMERIC,
   // 官网没有给出口径的话题：不参与评测，报告里列进“建议补充的口径”
   unresolved: [
     { category: '资质与经营主体', topic: '直销经营许可', note: '企业证照页只展示了营业执照和食品经营备案，没有展示直销经营许可；执照经营范围里也未见“直销”字样。页面上没展示不等于没有这个许可，所以只记为“官网口径未说明”，不能写成“没有牌照”。AI 无论说“有”还是“没有”，都缺乏官网依据。' },
@@ -1846,7 +1883,7 @@ function reportData() {
     const cap = T.capabilities.find(c => c.claim_id === g.claim);
     const pc = T.prohibited_claims.find(p => 'prohibited:' + p.text === g.claim);
     return { ...g, k: g.runs.size, n: base, sev: SEVERITY[g.type] || 1, fact, cap, pc,
-      title: g.type === 'overclaim' ? '替品牌宣称疗效' : cap ? cap.statement : pc ? '不应说：' + pc.text : g.text.split('，')[0],
+      title: g.type === 'overclaim' ? '替品牌宣称疗效' : g.type === 'numeric_conflict' ? g.text.split('；')[0] : cap ? cap.statement : pc ? '不应说：' + pc.text : g.text.split('，')[0],
       official: (cap && (cap.source_quote || cap.statement)) || (pc && pc.note) || fact.text || (g.type === 'overclaim' ? (eff ? `官方原话只有“${eff.source_quote}”，没有界定是哪方面的作用；具体疗效是 AI 的延伸` : '官方口径未宣称疗效（请在事实底账中补充“功效表述边界”原文）') : '事实底账中没有对应口径'),
       url: (cap && cap.evidence_url) || (pc && pc.evidence_url) || fact.url || (g.type === 'overclaim' && eff ? eff.evidence_url : '') || '',
       pending: !!(cap || pc || (g.type === 'overclaim' && eff)) && !isConfirmed(cap || pc || eff),
@@ -1855,7 +1892,7 @@ function reportData() {
       locator: (cap && cap.evidence_locator) || (pc && pc.evidence_locator) || (g.type === 'overclaim' && eff ? eff.evidence_locator : '') || '',
       cause: (cap && cap.cause) || (pc && pc.cause) || '' };
   }).sort((a, b) => (b.sev - a.sev) || (b.k - a.k));
-  const withDev = new Set(); list.forEach(g => g.runs.forEach(id => withDev.add(id)));
+  const withDev = new Set(); list.filter(g => g.type !== 'numeric_conflict').forEach(g => g.runs.forEach(id => withDev.add(id)));
   // 按问题分组汇总：同一组里的回答合在一起算，样本比单条发现大，区间窄得多
   const overRuns = new Set(); list.filter(g => g.type === 'overclaim').forEach(g => g.runs.forEach(id => overRuns.add(id)));
   const groupOrder = DIRECT_TEMPLATES.map(t => t[0]).concat(Object.values(STAGES));
@@ -1878,7 +1915,8 @@ function reportData() {
     Object.values(byGroup).forEach(b => { b.dev = 0; });
     evs.forEach(x => { const q = Q(x.r.query_id), name = q && groupOfQuery(q); if (name && W.runs.has(x.r.run_id)) byGroup[name].dev++; });
   }
-  return { T, evs, list, qGroups, coverage, retryNote, W, unresolved: T.unresolved || [], nA: evs.length, dA: pub() ? W.n : withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
+  const pendN = [...W.pend].filter(id => !W.runs.has(id)).length, L = layerStat(evs, T);
+  return { T, evs, list, qGroups, coverage, retryNote, W, pendN, L, unresolved: T.unresolved || [], nA: evs.length, dA: pub() ? W.n : withDev.size, over: list.filter(g => g.type === 'overclaim').reduce((s, g) => s + g.k, 0),
     extras: Object.values(extras).sort((a, b) => b.n - a.n).slice(0, 10), engines: [...new Set(evs.map(x => x.r.engine))], facts: T.capabilities.length + T.prohibited_claims.length,
     // 口径确认状态：报告里逐条列出哪些口径已经过客户确认
     factStatus: FACT_LISTS.filter(f => f.list !== 'offers').flatMap(({ list, kind }) => (T[list] || []).map(x => ({ kind, title: factItemTitle(list, x), cat: catOf(list, x), reviewed: isConfirmed(x), client: isClientConfirmed(x), by: x.client_confirmed_by || '', at: x.client_confirmed_at || '', inEval: list !== 'capabilities' || x.status === 'VERIFIED' }))),
@@ -1888,8 +1926,11 @@ function reportMarkdown(d) {
   const engName = id => (ENG(id) || { name: id }).name;
   const L = [];
   L.push(`# ${d.T.entity_name}：官网口径体检报告`, '', `生成日期：${TODAY}　｜　检查口径 ${d.facts} 条${pub() ? (d.clientOk ? `（客户确认 ${d.clientOk} 条）` : '') : `（客户已确认 ${d.clientOk} 条）`}　｜　提到品牌的回答 ${d.nA} 条　｜　模型：${d.engines.map(e => engName(e) + engineNote(d.coverage, e)).join('、')}`, '');
-  if (pub()) L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条说错（${pct(d.dA, d.nA)}）：至少有一处和官方说明冲突${d.W.typeText ? `（${d.W.typeText}）` : ''}。${d.W.unver.size ? `另有 ${d.W.unver.size} 条说了官方没公布的价格，无法核对，不算说错。` : ''}${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : ''}`, '', '“说错”的定义：一条回答里只要有一处说法和官方说明冲突，就算说错一条；该说没说、无法核对的价格不算说错。', '');
-  else L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}`, '');
+  const pendText = d.pendN ? `另有 ${d.pendN} 条的数字和官方说明对不上，可能来自别的渠道或旧政策，待确认，确认前不算${pub() ? '说错' : '不一致'}。` : '';
+  const gapText = d.unresolved.length + d.extras.length ? `官网有 ${d.unresolved.length + d.extras.length} 处没说清，见“建议补充的口径”。` : '';
+  const rightText = `说对且有依据的 ${d.L.v} 条（${pct(d.L.v, d.nA)}，${pub() ? '可能范围' : '95% 区间'} ${wilsonText(d.L.v, d.nA)}）${d.L.on ? `，其中说对购买关键事实（售后、价格、加入、资质）的 ${d.L.key} 条（${pct(d.L.key, d.nA)}），只复述宣传语的 ${d.L.mkt} 条` : ''}。`;
+  if (pub()) L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条说错（${pct(d.dA, d.nA)}）：至少有一处和官方说明冲突${d.W.typeText ? `（${d.W.typeText}）` : ''}。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : ''}${pendText}${gapText}${rightText}${d.W.unver.size ? `另有 ${d.W.unver.size} 条说了官方没公布的价格，无法核对，不算说错。` : ''}`, '', `“说错”的定义：一条回答里只要有一处说法和官方说明冲突，就算说错一条；该说没说、无法核对的价格${d.pendN ? '、待确认的数字' : ''}不算说错。`, '');
+  else L.push('## 结论', '', `${d.nA} 条提到${d.T.entity_name}的回答里，${d.dA} 条至少有一处与官网口径不一致（${pct(d.dA, d.nA)}，95% 区间 ${wilsonText(d.dA, d.nA)}）。${d.over ? `其中 ${d.over} 条替品牌宣称了疗效，属于合规风险。` : '未发现替品牌宣称疗效的回答。'}${pendText}${gapText}${rightText}`, '');
   if (d.qGroups.length && pub()) {
     const bad = d.qGroups.filter(g => g.dev || g.over), fine = d.qGroups.filter(g => !(g.dev || g.over));
     L.push('## 按问题分组', '');
@@ -1959,12 +2000,14 @@ function page_report() {
     <p class="lede">检查口径 ${d.facts} 条${pub() ? (d.clientOk ? `（客户确认 ${d.clientOk} 条）` : '') : `（客户已确认 ${d.clientOk} 条）`}，提到品牌的回答 ${d.nA} 条，模型：${d.engines.map(e => esc(engName(e)) + engineNote(d.coverage, e)).join('、')}。只列出问题、证据和修改方向，不包含代写内容。</p></header>
   <div class="kpis">
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>${pub() ? '说错的回答' : '与官网不一致的回答'}${pub() ? infoPop(d.dA, d.nA, '这个数字有多准？') : hq('提到品牌的回答里，至少有一处说法和官网口径不一致的比例。')}</div><div class="kv">${pct(d.dA, d.nA)}<small>${d.dA} / ${d.nA}</small></div>${axis(d.dA, d.nA)}<div class="ks">${pub() ? `至少有一处和官方说明冲突${d.W.typeText ? `：${esc(d.W.typeText)}` : ''}` : `95% 区间 ${wilsonText(d.dA, d.nA)}　${credTag(cred(d.dA, d.nA, false))}`}</div></div>
-    ${pub() && d.W.unver.size ? `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>无法核对的价格</div><div class="kv">${d.W.unver.size}<small>条回答</small></div><div class="ks">说了官方没公布的价格，不算说错，也不算说对</div></div>` : ''}
+    ${d.pendN ? `<div class="kpi"><div class="kt"><i style="background:var(--warn-soft);box-shadow:inset 0 0 0 1.5px var(--warn)"></i>待确认${pub() ? '' : hq('回答里的数字和官网口径对不上（例如折扣、到账天数），可能来自别的渠道或旧政策。确认前不算不一致，也不算说对。')}</div><div class="kv">${d.pendN}<small>条回答</small></div><div class="ks">数字和官方说明对不上，可能来自别的渠道或旧政策；确认前不算说错，也不算说对</div></div>` : ''}
+    ${pub() && !(d.unresolved.length + d.extras.length) ? '' : `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>${pub() ? '官网没说清' : '建议补充的口径'}</div><div class="kv">${d.unresolved.length + d.extras.length}${pub() ? '<small>处</small>' : ''}</div><div class="ks">${pub() ? `官网没写，模型各说各话，建议补充口径${d.W.unver.size ? `；另有 ${d.W.unver.size} 条回答说了官方没公布的价格，无法核对` : ''}` : '官网没说清，模型各说各话'}</div></div>`}
+    <div class="kpi"><div class="kt"><i style="background:var(--accent)"></i>说对且有依据${pub() ? infoPop(d.L.v, d.nA, '这个数字有多准？') : hq('提到品牌的回答里，说法能在官网口径里找到依据、且没有任何问题的比例。')}</div><div class="kv">${pct(d.L.v, d.nA)}<small>${d.L.v} / ${d.nA}</small></div>${axis(d.L.v, d.nA)}<div class="ks">${d.L.on ? `其中说对购买关键事实 ${d.L.key} 条（${pct(d.L.key, d.nA)}），只复述宣传语 ${d.L.mkt} 条` : pub() ? '说法能在官方说明里找到依据' : `95% 区间 ${wilsonText(d.L.v, d.nA)}`}</div></div>
+    ${pub() && d.W.unver.size && !(d.unresolved.length + d.extras.length) ? `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>无法核对的价格</div><div class="kv">${d.W.unver.size}<small>条回答</small></div><div class="ks">说了官方没公布的价格，不算说错，也不算说对</div></div>` : ''}
     ${pub() && !d.over ? '' : `<div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>合规风险${hq('AI 替品牌宣称疗效的回答数。由规则识别，每条都应对照原文复核。')}</div><div class="kv">${d.over}<small>条回答</small></div><div class="ks">替品牌宣称疗效</div></div>`}
-    ${pub() && !d.list.length ? '' : `<div class="kpi"><div class="kt"><i></i>发现</div><div class="kv">${d.list.length}<small>类</small></div><div class="ks">先按严重度，再按出现次数排序</div></div>`}
-    ${pub() && !(d.unresolved.length + d.extras.length) ? '' : `<div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>建议补充的口径</div><div class="kv">${d.unresolved.length + d.extras.length}</div><div class="ks">官网没说清，模型各说各话</div></div>`}
+    ${pub() ? '' : `<div class="kpi"><div class="kt"><i></i>发现</div><div class="kv">${d.list.length}<small>类</small></div><div class="ks">先按严重度，再按出现次数排序</div></div>`}
   </div>
-  <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${pub() ? `${d.nA} 条提到${esc(d.T.entity_name)}的回答里，${d.dA} 条说错：至少有一处和官方说明冲突。` : `${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。`}</p>${pub() ? '<button class="btn primary" data-act="report-doc">下载报告</button>' : '<button class="btn primary" data-act="report-md">导出 Markdown</button>'}</div></div>
+  <div class="hero"><div class="spread"><p class="stmt" style="margin:0">${pub() ? `${d.nA} 条提到${esc(d.T.entity_name)}的回答里，${d.dA} 条说错：至少有一处和官方说明冲突。` : `${d.dA} 条提到${esc(d.T.entity_name)}的回答里至少有一处和官网口径不一致。`}${d.pendN ? `另有 ${d.pendN} 条的数字和官方说明对不上，待确认。` : ''}</p>${pub() ? '<button class="btn primary" data-act="report-doc">下载报告</button>' : '<button class="btn primary" data-act="report-md">导出 Markdown</button>'}</div></div>
 
   ${pub() ? reportGroupsPublic(d) : d.qGroups.length ? `<h2>按问题分组汇总</h2>
   <p class="prose muted">同一组问题的回答合在一起统计。分组的样本比单条发现大，区间更窄，适合先看哪一类问题最容易出错；单条发现的样本小，多数只能看方向。</p>
@@ -2011,7 +2054,7 @@ function page_report() {
     ${d.factStatus.map(f => `<tr><td class="wide">${esc(f.title)}${f.inEval ? '' : '<span class="small muted">　不参与评测</span>'}</td><td class="small">${esc(f.cat)}</td><td>${f.reviewed ? '<span class="tag ok">已确认</span>' : '<span class="tag warn">待复核</span>'}</td><td>${f.client ? esc(f.by) : '<span class="muted">未确认</span>'}</td><td class="small">${f.client ? esc(f.at) : '—'}</td></tr>`).join('') || '<tr><td colspan="5" class="muted">无</td></tr>'}
   </tbody></table></div>`}
 
-  ${pub() ? `<p class="small muted" style="margin-top:28px">方法与局限${infoText('方法与局限', `<span style="display:block">口径只来自官方页面，每条附原文或来源。</span><span style="display:block">“说错”：一条回答里只要有一处和官方说明冲突，就算说错一条；该说没说、说了官方没公布的价格，不算说错。</span><span style="display:block">统计以回答为单位；样本少于 10 条时不给范围。</span><span style="display:block">采集为官方 API、未开联网，不代表各家 App 里的回答。判定由规则完成，每条发现都能回到原文核对。</span>`)}</p>` : `<h2>方法与局限</h2>
+  ${pub() ? `<p class="small muted" style="margin-top:28px">方法与局限${infoText('方法与局限', `<span style="display:block">口径只来自官方页面，每条附原文或来源。</span><span style="display:block">“说错”：一条回答里只要有一处和官方说明冲突，就算说错一条；该说没说、说了官方没公布的价格，不算说错。</span>${d.pendN ? '<span style="display:block">“待确认”：回答里的数字和官方说明对不上，可能来自别的渠道或旧政策，确认前不算说错，也不算说对。</span>' : ''}${d.L.on ? '<span style="display:block">“说对购买关键事实”：说对了售后、价格、加入条件或资质中的至少一项；只说对官网对品质的自述，算“只复述宣传语”。</span>' : ''}<span style="display:block">统计以回答为单位；样本少于 10 条时不给范围。</span><span style="display:block">采集为官方 API、未开联网，不代表各家 App 里的回答。判定由规则完成，每条发现都能回到原文核对。</span>`)}</p>` : `<h2>方法与局限</h2>
   <div class="prose"><ul>
     ${pub() ? `<li>口径只来自官方页面，每条附原文或链接。</li>${d.clientOk ? '<li>标注“客户确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考。</li>' : ''}` : `<li>口径只来自官方页面；标注“待复核”的口径需要品牌方确认。</li>
     <li>标注“客户已确认”的口径经客户方确认人认可，附确认人和日期；其余口径的发现仅供参考，待客户确认后生效。</li>`}${d.retryNote ? `<li>${esc(d.retryNote)}</li>` : ''}
@@ -2196,6 +2239,7 @@ async function extractReasonsAll() {
 
 /* ---------- 迭代日志 ---------- */
 const ITERATIONS = [
+  { v: 'v6.2', date: '2026-09-26', title: '北极星改为事实键，新增数字冲突待确认', trigger: '人工抽检 40 条“说对且有依据”，精确率约 65–70%：能力正则只检测“有没有聊到这个话题”（“退货困难”“以会员价诱导”“推荐人可以获得奖金”“纯度高”都算说对）；“会员价 75 折”“退款 7–15 个工作日”和官方数字不一致，却也算说对', changed: '品牌 A 八条能力规则改成事实键（30 天 + 退换、完好无损、5 个工作日、周一至周六、年满 18 周岁、6.5–7 折等），品质一条去掉“纯度”“纯正”；产品 B 的翻译、录音转文字、云录制收紧为事实键，实时转写不变；新增 numeric_conflicts：折扣说成 7.5 折 / 75%、退款说成 7–15 或 10–15 个工作日时记“数字冲突 · 待确认”，不算说对，也不算说错；能力加 group 字段（key 购买关键事实 / marketing 宣传语），概览和报告拆出“说对购买关键事实”和“只复述宣传语”；报告首屏按 说错 → 待确认 → 官网没说清 → 说对率 排；浏览器里保存的旧规则读入时按 claim_id 同步一次', why: '北极星数字要能经得起客户逐条核对：聊到话题不等于说对，复述宣传语也不等于说对了买东西要知道的事', dropped: '只在带品牌名的小句里找冲突数字：“## 会员类型”下面不写品牌名的列表项（“享受零售价约 75 折”）会漏掉，16 条只能找到 10 条；改为回答提到品牌时，在所有没归属给竞品的小句里找', evidence: '公开版：品牌 A 说对且有依据 76/240（32%，26%–38%），其中关键事实 12（5%，3%–9%），只复述宣传语 64，待确认 16，说错 2 不变；产品 B 34/72（47%，36%–59%），说错 3 不变；回归测试 65/65（原 44 条 + 事实键 9 条 + 抽检误判 12 条）。内部版品牌 A 为 88 / 关键事实 24：资质一条在公开版里被隐藏的公司信息只有内部版能命中', lesson: '“说对”要看说的是不是官方口径里的那个事实（数字、条件、期限），不能看关键词；和官方数字对不上但可能来自别的渠道的，先单列待确认，别急着算错' },
   { v: 'v6.0', date: '2026-09-26', title: '官网上线与案例匿名', trigger: '对客官网要放在 echorank.markjcai.com 首页，产品挪到 /app/；腾讯会议案例对外不能认出是腾讯；品牌 A 的成立年份、地址、注册资本、点数门槛、认证商标名仍能反推出真实品牌', changed: '只在 PUBLIC_BUILD 生效：build_public.py 把 site/index.html 复制成 dist/index.html，产品输出到 dist/app/index.html；产品支持 ?case=direct_a / ?case=product_b 打开指定案例（优先于浏览器里保存的案例），侧栏链到官网和“免费体检”；腾讯会议对外为“产品 B（在线会议）”，腾讯为“B 公司”，元宝纪要为“B 纪要”，腾讯文档、企业微信等换成通用叫法，版本号和第三方链接隐藏；品牌 A 的成立年份、营业期限、注册地址、注册资本、125 点数门槛、CPTG 全称、“总部位于美国”“美国公司”这类说法换成灰色斜纹块；--check 增加违禁词检查', why: '对客网站和产品同域上线，案例只保留和结论有关的内容', dropped: '', evidence: '判定规则和数据不变：公开版与内部版逐条回答的判定一致', lesson: '匿名替换在规则正则和回答原文上同时生效，所以只能按字面或用各自的占位替换，并逐条比对两版判定' },
   { v: 'v5.9', date: '2026-09-26', title: '公开版交互走查修正', trigger: '对客网站逐页走查：三个页面的“说错”数字对不上（2 / 7 / 2+2）；认知差异的例句和口径无关；回答记录说“悬停可以看判断依据”却没有标注；表格仍是给自己看的写法', changed: '只在 PUBLIC_BUILD 生效：统一“说错”定义（一条回答里只要有一处说反官方口径、与官方说明冲突、过期、错误归属、定位偏差或替品牌宣称疗效，就算说错一条；该说没说、无法核对的价格不算），概览、体检报告、口径对照引用同一个数；概览用三段构成条（说对且有依据 / 没有可核对的说法 / 说错）替代核心指标和两张 100% 卡片；报告按钮改为“下载报告”（Word），分组表只列有说错的分组，方法说明收进小 i；口径对照每模型一段色条、整行点开对照官方原文与 AI 原句，样本少于 10 条不给区间；用户提问只显示有问题的阶段、按钮带数量、整行可点；回答记录逐句标色（说对蓝、无法核对米、说错陶土），悬停或键盘聚焦弹出依据小卡，同一模型两次回答合成一张卡并可切换，问题列表加图例；认知差异例句按与口径原文的重合度挑选，找不到写“没有 AI 提到这一点”，全为 0 的列不显示、有说错的行排前；“（已隐藏）”换成灰色斜纹小块；事实底账不单列，从各页“官方原文”以右侧抽屉打开', why: '同一个问题在三个页面给出三个数，客户会怀疑整个评测；例句和口径对不上，看起来像评测出错', dropped: '把 5 条“价格未核实”算进说错（官方本来就没公布价格，AI 说的价格无从判断对错，不能叫说错）', evidence: '直销预设：概览、报告、口径对照都是 2 / 240；腾讯会议预设都是 3 / 72；内部版三个预设的数字与改动前一致，回归测试 44/44', lesson: '匿名占位也会参与判定：所有被隐藏的信息共用一个“（已隐藏）”时，口径正则里的占位会命中任何被隐藏的内容，公开版“食品经营备案”一条因此从 1 次说对变成 70 次。现在每项隐藏信息用各自的占位' },
   { v: 'v5.7', date: '2026-09-26', title: '公开版对客口径清理', trigger: 'echorank.markjcai.com 是对客网站：迭代过程、版本号、内部术语不该出现；没有数据的模块不该显示', changed: '只在 PUBLIC_BUILD（公开版）生效，内部版不变：“本次检查 · 批次”改成一句人话；侧栏版本标签、讲解模式、保存位置、数据导入 / 评测与边界 / 迭代日志 / 学习手册全部隐藏；事实底账改为只读展示，去掉“已确认”横幅和导入面板；核心指标旁加小 i（深色卡片 + 区间小图）替代“北极星”说法；计数为 0 的行、模块、页面整块隐藏（信源溯源 0 条时侧栏也不出现）；AI 回答卡改为字母头像 + 模型名 + 日期，回答按 Markdown 渲染，第一句做摘要，底部只显示非零计数；报告与 Markdown 导出去掉“待复核 / 已确认”内部状态。', kept: '规则、数据、评测结果不变；内部版所有编辑功能保持原样。' },
@@ -2556,6 +2600,7 @@ function evaluate(run, ctx = {}) {
   const flags = new Map();
   const brandIdx = [];
   const tsubs = [];   // 归属给目标品牌的小句 {i, s}
+  const osubs = [];   // v6.2：没有归属给竞品的小句（目标品牌的，加上没提品牌名的列表项），数字冲突在这些小句上找
   let carry = null, carryLeft = 0;   // v5.3：“多特瑞的退货规则如下：”这种以冒号引出列表的句子，紧接着的 4 行里不提品牌的沿用它的品牌（再远就不可靠了，见迭代日志 v5.3）
   parts.forEach((p, i) => {
     // 'T' 目标，'C' 竞品，'B' 同时提到；没有品牌的小句沿用前一个小句，句首的沿用后面第一个出现的品牌
@@ -2569,6 +2614,7 @@ function evaluate(run, ctx = {}) {
     let cur = first, hit = false;
     subs.forEach(x => {
       if (x.own) cur = x.own;
+      if (cur !== 'C') osubs.push({ i, s: x.s });
       // 问句和标题只算提及，不当作主张来判断对错
       if (cur === 'T' || cur === 'B') { hit = true; if (!/[吗？?]\s*[*]*$/.test(x.s) && !/^#/.test(x.s) && !ANOTA_RX.test(x.s)) tsubs.push({ i, s: x.s }); }
     });
@@ -2589,6 +2635,12 @@ function evaluate(run, ctx = {}) {
     else if (positioning !== 'deviation' && test(T.positioning_match.aligned, s)) { positioning = 'aligned'; if (!flags.has(i)) flags.set(i, 'ok'); }
   });
 
+  // v6.2：数字冲突 · 待确认（事实底账写了 numeric_conflicts 时）。命中冲突数字的小句不算说对这条口径，也不算说错
+  const numConf = [];
+  // 回答提到了品牌时才找；“## 会员类型”下面不写品牌名的列表项（“享受零售价约 75 折”）说的也是这个品牌，所以不只看带品牌名的小句，只排除归属给竞品的
+  if (mentioned) (T.numeric_conflicts || []).forEach(nc => { const hit = osubs.find(({ s }) => test(nc.match, s)); if (hit) numConf.push({ ...hit, nc }); });
+  const conflicted = (claim, s) => numConf.some(x => x.nc.claim === claim && test(x.nc.match, s));
+
   const capsHit = [];
   T.capabilities.filter(c => c.status === 'VERIFIED').forEach(cap => {
     // 关键口径被否认：说“不能”“已收费”，而官方口径是“可以”
@@ -2600,12 +2652,18 @@ function evaluate(run, ctx = {}) {
       || (prev != null && NEG.test(s) && !(test(cap.match, prev) && !NEG.test(prev)) && (() => { const j = prev + '，' + s; return (test(cap.match, j) && NEG.test(s)) || (cap.deny_match && test(cap.deny_match, j)); })()));
     const den = cap.critical ? tsubs.find(({ i, s }, k) => denies(s, k > 0 && tsubs[k - 1].i === i ? tsubs[k - 1].s : null)) : null;
     if (den) { flags.set(den.i, 'bad'); issues.push({ type: 'denied', label: '否认官方口径', text: `说“${den.s.replace(/\*\*/g, '').slice(0, 36)}…”，官方口径是“${cap.statement}”`, clause: den.s, claim: cap.claim_id, idx: [den.i] }); }
-    const hit = tsubs.find(({ s }) => test(cap.match, s) && !NEG.test(s) && !(cap.deny_match && test(cap.deny_match, s)));
-    if (hit) { capsHit.push(cap.claim_id); goods.push({ claim: cap.claim_id, text: cap.statement, clause: hit.s }); if (!flags.has(hit.i)) flags.set(hit.i, 'ok'); }
-    else if (!den && mentioned && focus.includes(cap.claim_id)) {
+    const hit = tsubs.find(({ s }) => test(cap.match, s) && !NEG.test(s) && !(cap.deny_match && test(cap.deny_match, s)) && !conflicted(cap.claim_id, s));
+    if (hit) { capsHit.push(cap.claim_id); goods.push({ claim: cap.claim_id, text: cap.statement, clause: hit.s, group: cap.group || 'key' }); if (!flags.has(hit.i)) flags.set(hit.i, 'ok'); }
+    else if (!den && mentioned && focus.includes(cap.claim_id) && !numConf.some(x => x.nc.claim === cap.claim_id)) {
       issues.push({ type: 'omission', label: '能力遗漏', text: `没有说到“${cap.statement}”`, clause: brandText, claim: cap.claim_id, idx: brandIdx.slice() });
       brandIdx.forEach(i => { if (!flags.has(i)) flags.set(i, 'warn'); });
     }
+  });
+
+  numConf.forEach(({ i, s, nc }) => {
+    if (!flags.has(i) || flags.get(i) === 'ok') flags.set(i, 'warn');
+    const said = ((s.match(rx(nc.match)) || [''])[0]).trim();
+    issues.push({ type: 'numeric_conflict', kind: 'numeric_conflict', status: '待确认', label: '数字冲突 · 待确认', text: `${nc.topic ? nc.topic + '说成' : '说'}“${said}”，${nc.note}；可能是别的渠道或旧政策，需要人工确认`, clause: s, claim: nc.claim, idx: [i] });
   });
 
   // 价格：当前价、过期价、事实库里没有的价格
@@ -2677,6 +2735,10 @@ const DIRECT_TEST_TRUTH = { entity_name: '品牌A', aliases: ['品牌A'], positi
     { claim_id: 'cap_return', statement: '认可渠道购买、30 天内完好无损、不影响二次销售的可退换货', match: '30 ?天|退换货|退货', deny_match: '(不能|不可|无法|不支持|不给|拒绝|不予)退', unless: DIRECT_A_OTHER_CHANNEL, critical: true, status: 'VERIFIED' }],
   offers: [], prohibited_claims: [{ text: '30 天无理由退货', match: '无理由退|无条件退', unless: DIRECT_A_OTHER_CHANNEL, note: '与官方说明冲突：官网只说完好无损、不影响二次销售的可退换货，没有说“无理由”' }], limitations: [] };
 const DIRECT_TEST_COMPS = [{ name: '竞品B', aliases: ['竞品B'], domains: [] }];
+/* 事实键用例：用品牌 A 的真实口径规则，只把品牌名换成测试名 */
+const DIRECT_KEY_TRUTH = { ...DIRECT_A_TRUTH, entity_name: '品牌A', aliases: ['品牌A'] };
+const isKeyRight = e => e.verifiable && rightLayer(e) === 'key';
+const isPendingOnly = e => e.issues.some(i => i.type === 'numeric_conflict') && !e.verifiable && !e.issues.some(i => WRONG_TYPES.includes(i.type));
 const REGRESSION_CASES = [
   { id: 'R-01', found: '外部评审 2026-09-25', text: 'NovaNote 支持日文转写，但不支持离线部署。', focus: ['cap_multilingual'], before: '判成“遗漏日文能力”：整句里的“不支持”把前半句也否定了',
     expect: e => e.capsHit.includes('cap_multilingual') && !e.issues.length && e.goods.some(g => g.limitAck), want: '说对日文能力，并正确说明不支持离线部署' },
@@ -2760,19 +2822,61 @@ const REGRESSION_CASES = [
   { id: 'G-02', found: '防回退', text: 'NovaNote 支持私有化部署，适合大企业。', focus: [], before: '—',
     expect: e => e.issues.some(i => i.type === 'unsupported'), want: '无依据能力' },
   { id: 'G-03', found: '防回退', text: '专业版每月 79 元，NovaNote 很划算。', focus: [], before: '—',
-    expect: e => e.issues.some(i => i.type === 'outdated'), want: '过期价格（小句沿用品牌归属）' }
+    expect: e => e.issues.some(i => i.type === 'outdated'), want: '过期价格（小句沿用品牌归属）' },
+  // 北极星事实键：能力规则只认“说到了官方口径里的事实”，不认“聊到了这个话题”
+  { id: 'N-01', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A退货困难，客服推诿。', focus: [], before: '“退货”命中话题，算说对退换货口径',
+    expect: e => !e.verifiable && !e.capsHit.length, want: '不算说对' },
+  { id: 'N-02', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A定价欺诈（以会员价诱导）。', focus: [], before: '“会员价”命中话题，算说对会员折扣',
+    expect: e => !e.verifiable && !e.capsHit.length, want: '不算说对' },
+  { id: 'N-03', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的推荐人可以获得奖金。', focus: [], before: '“推荐人”命中话题，算说对加入口径',
+    expect: e => !e.verifiable && !e.capsHit.length, want: '不算说对' },
+  { id: 'N-04', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A的产品纯度高、品质纯正。', focus: [], before: '“纯度”“纯正”命中话题，算说对品质口径',
+    expect: e => !e.verifiable && !e.capsHit.length, want: '不算说对' },
+  { id: 'N-05', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A会员价是零售价的 75 折。', focus: [], before: '“会员价”“零售价”命中话题，算说对会员折扣',
+    expect: e => isPendingOnly(e) && !e.capsHit.includes('cap_discount'), want: '数字冲突 · 待确认，不算说对，也不算说错' },
+  { id: 'N-06', found: '人工抽检 40 条 2026-09-26', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A退款一般 7-15 个工作日到账。', focus: [], before: '“退款”命中话题，算说对退款口径',
+    expect: e => isPendingOnly(e) && !e.capsHit.includes('cap_refund'), want: '数字冲突 · 待确认，不算说对，也不算说错' },
+  { id: 'P-01', found: '防回退', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A规定 30 天内完好无损的产品可以退换。', focus: [], before: '—',
+    expect: e => isKeyRight(e) && e.capsHit.includes('cap_return'), want: '说对购买关键事实（退换货）' },
+  { id: 'P-02', found: '防回退', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A会员享零售价 6.5–7 折。', focus: [], before: '—',
+    expect: e => isKeyRight(e) && e.capsHit.includes('cap_discount') && !e.issues.length, want: '说对购买关键事实（会员折扣）' },
+  { id: 'P-03', found: '防回退', truth: DIRECT_KEY_TRUTH, comps: DIRECT_TEST_COMPS, text: '品牌A年满 18 周岁即可加入。', focus: [], before: '—',
+    expect: e => isKeyRight(e) && e.capsHit.includes('cap_join'), want: '说对购买关键事实（加入条件）' },
+  // 人工抽检标出的 12 条误判：原来都算“说对且有依据”，编号是抽样清单里的序号，用真实回答复测
+  { id: 'M-12', found: '人工抽检 40 条 第 12 条', run: 'API-20260925-1945-deepseek-q_sf_03-1', before: '“纯正不等于儿童可直接用”里的“纯正”算说对品质口径', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-13', found: '人工抽检 40 条 第 13 条', run: 'API-20260925-1945-deepseek-q_sf_03-2', before: '转述营销人员“纯正、安全到可以口服”，算说对品质口径', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-25', found: '人工抽检 40 条 第 25 条', run: 'API-20260925-1945-deepseek-q_pr_05-2', before: '“能享受会员价”算说对会员折扣', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-31', found: '人工抽检 40 条 第 31 条', run: 'API-20260925-1945-deepseek-q_jo_02-2', before: '“退货处理时间取决于渠道”“退款到账”算说对；原文说的是 7-15 个工作日', expect: isPendingOnly, want: '数字冲突 · 待确认' },
+  { id: 'M-36', found: '人工抽检 40 条 第 36 条', run: 'API-20260925-1945-deepseek-q_jo_06-1', before: '“高品质、纯正度”算说对品质口径', expect: e => !isKeyRight(e) && (!e.verifiable || rightLayer(e) === 'marketing'), want: '不算说对购买关键事实（最多算只复述宣传语）' },
+  { id: 'M-52', found: '人工抽检 40 条 第 52 条', run: 'API-20260925-1945-kimi-q_pr_04-2', before: '“精油纯度总体有保障”算说对品质口径', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-59', found: '人工抽检 40 条 第 59 条', run: 'API-20260925-1945-kimi-q_jo_02-1', before: '“退货的时间”“联系客服”算说对；原文说的是 7~15 个工作日', expect: isPendingOnly, want: '数字冲突 · 待确认' },
+  { id: 'M-81', found: '人工抽检 40 条 第 81 条', run: 'API-20260925-1945-qwen-q_pr_05-1', before: '“会员价大约是零售价的 75%”算说对会员折扣', expect: isPendingOnly, want: '数字冲突 · 待确认' },
+  { id: 'M-84', found: '人工抽检 40 条 第 84 条', run: 'API-20260925-1945-qwen-q_pr_06-2', before: '只复述了官网的品质宣传语，算说对', expect: e => !isKeyRight(e) && (!e.verifiable || rightLayer(e) === 'marketing'), want: '不算说对购买关键事实（最多算只复述宣传语）' },
+  { id: 'M-85', found: '人工抽检 40 条 第 85 条', run: 'API-20260925-1945-qwen-q_jo_01-2', before: '“退货条件取决于渠道”“客服热线”算说对退换货、退款和客服口径', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-96', found: '人工抽检 40 条 第 96 条', run: 'API-20260925-1945-doubao_api-q_sf_04-1', before: '“宣传自身产品是高纯度”算说对品质口径', expect: e => !e.verifiable, want: '不算说对' },
+  { id: 'M-109', found: '人工抽检 40 条 第 109 条', run: 'API-20260925-1945-doubao_api-q_jo_02-2', before: '“全流程 7~15 个工作日”算说对退款口径', expect: isPendingOnly, want: '数字冲突 · 待确认' }
 ];
 function runRegression() {
   return REGRESSION_CASES.map(c => {
+    // 真实回答用例：按这条回答所属的案例取口径（和产品里的判定同一套数据与匿名规则）
+    if (c.run) {
+      const key = c.preset || 'direct_a', r = REAL_RUNS.find(x => x.run_id === c.run);
+      if (!r) return { ...c, text: c.run, pass: false, got: '找不到这条回答' };
+      const d = presetData(key), q = d.queries.find(x => x.id === r.query_id);
+      const e = evaluate({ ...r, raw: anonActive(key) ? maskerFor(key)(r.raw) : r.raw }, { truth: d.truth, competitors: d.competitors, focus: q ? q.focus : [] });
+      let pass = false; try { pass = !!c.expect(e); } catch (err) {}
+      return { ...c, text: `${(ENG(r.engine) || { name: r.engine }).name}回答“${q ? q.text : r.query_id}”`, pass, got: regressionGot(e) };
+    }
     let truth = c.truth || DEFAULT_TRUTH, text = c.text;
     // 匿名用例：事实底账和回答原文用同一个替换规则，结果应与真实版一致
     if (c.anon) { const f = makeMasker({ ...truth, official_domains: ['brand-a.example'] }, c.extras || []); truth = maskDeep(truth, f); text = f(text); }
     const e = evaluate({ run_id: c.id, status: 'SUCCESS', raw: text, query_id: '_test' }, { truth, competitors: c.comps || (c.truth ? TENCENT_COMPETITORS : DEFAULT_COMPETITORS), focus: c.focus });
     e._text = text;
     let pass = false; try { pass = !!c.expect(e); } catch (err) {}
-    return { ...c, pass, got: e.verifiable ? '说对且有依据' : e.issues.map(i => i.label).join('、') || (e.goods.length ? '说对（' + e.goods.map(g => g.text).join('、') + '）' : '未涉及') };
+    return { ...c, pass, got: regressionGot(e) };
   });
 }
+const regressionGot = e => e.verifiable ? '说对且有依据' + (e.goods.length && rightLayer(e) === 'marketing' ? '（只复述宣传语）' : '') : e.issues.map(i => i.label).join('、') || (e.goods.length ? '说对（' + e.goods.map(g => g.text).join('、') + '）' : '未涉及');
 
 /* ---------- 【改这里 07】北极星：可验证认知覆盖率 ---------- */
 function isVerifiable(e) {
@@ -2807,6 +2911,8 @@ function metrics(runs) {
     misattr: mentioned.filter(x => has(x, 'misattribution')).length,
     omission: mentioned.filter(x => has(x, 'omission')).length,
     unverified: mentioned.filter(x => has(x, 'unverified')).length,
+    pending: mentioned.filter(x => isPendingRun(x.r, x.e)).length,
+    layer: layerStat(valid),
     official: valid.filter(x => x.e.citations.some(c => c.official)).length,
     withCite: valid.filter(x => x.e.citations.length).length,
     verifiable: valid.filter(x => finalOf(x.r, x.e).v).length,
@@ -3202,7 +3308,7 @@ function runCellInfo(run) {
   const e = evaluate(run);
   const fo = finalOf(run, e);
   const cls = fo.pending ? 'm' : fo.v ? 'v' : (fo.corrected && fo.final === 'none') ? 'n' : pub() && isWrongRun(run, e) ? 'f' : e.mentioned ? 'm' : 'n';
-  const tip = fo.corrected ? '人工纠正为：' + FINAL_LABEL[fo.final] : e.verifiable ? '说对且有依据' : e.mentioned ? (e.issues.length ? '提到了，但有问题：' + e.issues.map(i => i.label).join('、') : '提到了，但没有可核对的说法') : '没有提到';
+  const tip = fo.corrected ? '人工纠正为：' + FINAL_LABEL[fo.final] : e.verifiable ? '说对且有依据' : pub() && !isWrongRun(run, e) && isPendingRun(run, e) ? '待确认：数字和官方说明对不上' : e.mentioned ? (e.issues.length ? '提到了，但有问题：' + e.issues.map(i => i.label).join('、') : '提到了，但没有可核对的说法') : '没有提到';
   return { cls, tip };
 }
 function cellFor(runs, qid, eid) {
@@ -3230,18 +3336,19 @@ function captureMixText(m) {
 function overviewComp(m, W) {
   const n = W.mentioned; if (!n) return '';
   const ok = m.evs.filter(x => x.e.valid && x.e.mentioned && finalOf(x.r, x.e).v && !W.runs.has(x.r.run_id)).length;
-  const bad = W.n, mid = n - ok - bad;
+  const bad = W.n, pend = [...W.pend].filter(id => !W.runs.has(id)).length, mid = n - ok - bad - pend, L = m.layer;
   const p = k => Math.round(k / n * 100);
   const seg = (cls, k, label) => k ? `<button class="cseg ${cls}" style="flex-grow:${k}" data-k="${cls}" aria-label="${label} ${k} 条，${p(k)}%"><span>${p(k) >= 8 ? `${label} ${p(k)}%` : ''}</span></button>` : '';
   const engN = new Set(m.evs.map(x => x.r.engine)).size;
   const allMention = m.mention === m.n, stable = m.pairsN && m.stable === m.pairsN;
   const one = [allMention ? `${engN} 个模型每次都提到了品牌` : `${m.mention} / ${m.n} 条回答提到了品牌`, m.pairsN ? (stable ? '同一问题问两次，结论都一致' : `同一问题问两次，${m.stable} / ${m.pairsN} 组结论一致`) : ''].filter(Boolean).join('，') + '。';
   return `<div class="hero comp">
-    <div class="spread"><h3 style="margin:0">${n} 条提到品牌的回答，分成三类${infoPop(ok, n, '“说对且有依据”这个数字有多准？')}</h3></div>
-    <div class="cbar" role="group" aria-label="回答构成">${seg('a', ok, '说对且有依据')}${seg('b', mid, '没有可核对的说法')}${seg('c', bad, '说错')}</div>
-    <div class="clg">
-      <div class="lg" data-k="a"><b>${ok} 条<small>${p(ok)}%</small></b><span><i class="a"></i>说对且有依据：说法能在官方说明里找到</span></div>
+    <div class="spread"><h3 style="margin:0">${n} 条提到品牌的回答，分成${pend ? '四' : '三'}类${infoPop(ok, n, '“说对且有依据”这个数字有多准？')}</h3></div>
+    <div class="cbar" role="group" aria-label="回答构成">${seg('a', ok, '说对且有依据')}${seg('b', mid, '没有可核对的说法')}${seg('d', pend, '待确认')}${seg('c', bad, '说错')}</div>
+    <div class="clg${pend ? ' c4' : ''}">
+      <div class="lg" data-k="a"><b>${ok} 条<small>${p(ok)}%</small></b><span><i class="a"></i>说对且有依据：说法能在官方说明里找到${L.on && ok ? `。其中说对购买关键事实（售后、价格、加入、资质）${L.key} 条，占 ${p(L.key)}%；只复述宣传语 ${L.mkt} 条` : ''}</span></div>
       <div class="lg" data-k="b"><b>${mid} 条<small>${p(mid)}%</small></b><span><i class="b"></i>没有可核对的说法：提到了品牌，但没说具体事实，或说的事实官方没写${W.unver.size ? `（其中 ${W.unver.size} 条说了官方没公布的价格）` : ''}</span></div>
+      ${pend ? `<div class="lg" data-k="d"><b>${pend} 条<small>${p(pend)}%</small></b><span><i class="d"></i>待确认：数字和官方说明对不上，可能来自别的渠道或旧政策，确认前不算说错，也不算说对</span></div>` : ''}
       <div class="lg" data-k="c"><b>${bad} 条<small>${p(bad)}%</small></b><span><i class="c"></i>说错：至少有一处和官方说明冲突${W.typeText ? `（${esc(W.typeText)}）` : ''}</span></div>
     </div>
     <p class="small muted" style="margin:12px 0 0">${esc(one)}</p>
@@ -3269,7 +3376,7 @@ function page_overview() {
   const W = P0 ? wrongStat(m.evs) : null;
   return head + todoCard(m) + (P0 ? overviewComp(m, W) : '') + `
   <div class="kpis"${P0 ? ' hidden' : ''}>
-    <div class="kpi"><div class="kt"><i></i>说对且有依据${pub() ? infoPop(m.verifiable, m.n, '这个数字有多准？') : hq('提到产品的回答里，说法能在事实底账里找到依据的比例。行业里也叫“可验证认知覆盖率”。')}</div><div class="kv">${pct(m.verifiable, m.n)}<small>${m.verifiable} / ${m.n}</small></div>${axis(m.verifiable, m.n)}<div class="ks">${pub() ? `AI 提到品牌时，说法能在官方说明里找到依据　${credTag(cN)}` : `95% 区间 ${wilsonText(m.verifiable, m.n)}　${credTag(cN)}`}${m.corrected ? `<br>含人工纠正 ${m.corrected} 条` : ''}</div></div>
+    <div class="kpi"><div class="kt"><i></i>说对且有依据${pub() ? infoPop(m.verifiable, m.n, '这个数字有多准？') : hq('提到产品的回答里，说法能在事实底账里找到依据的比例。行业里也叫“可验证认知覆盖率”。')}</div><div class="kv">${pct(m.verifiable, m.n)}<small>${m.verifiable} / ${m.n}</small></div>${axis(m.verifiable, m.n)}<div class="ks">${pub() ? `AI 提到品牌时，说法能在官方说明里找到依据　${credTag(cN)}` : `95% 区间 ${wilsonText(m.verifiable, m.n)}　${credTag(cN)}`}${m.corrected ? `<br>含人工纠正 ${m.corrected} 条` : ''}${m.layer.on ? `<br>其中说对购买关键事实 ${m.layer.key}，只复述宣传语 ${m.layer.mkt}` : ''}${m.pending ? `<br>另有 ${m.pending} 条数字待确认，不计入` : ''}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--accent-2)"></i>提到了产品${hq('所有有效回答里，提到产品名字或别名的比例。')}</div><div class="kv">${pct(m.mention, m.n)}<small>${m.mention} / ${m.n}</small></div><div class="ks">${pub() && !m.nbN ? '所有回答里提到品牌的比例' : `非品牌问题进入候选 ${frac(m.nbRec, m.nbN)}`}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--bad)"></i>事实错误${hq(pub() ? '和官方说明冲突、说了已经过期的信息，或把别家的事安到品牌头上的次数。' : '与事实底账不一致的说法次数，按类型分开数。每一类都对应底账里的一条记录。')}</div><div class="kv">${m.unsupported + m.outdated + m.misattr + (m.denied || 0)}<small>次</small></div><div class="ks">${pub() ? ([['说反', m.denied || 0], ['冲突', m.unsupported], ['过期', m.outdated], ['错误归属', m.misattr], ['遗漏', m.omission]].filter(x => x[1]).map(x => `${x[0]} ${x[1]}`).join('，') || '没有发现事实错误') : `说反 ${m.denied || 0}，冲突 ${m.unsupported}，过期 ${m.outdated}，错误归属 ${m.misattr}，遗漏 ${m.omission}`}</div></div>
     <div class="kpi"><div class="kt"><i style="background:var(--warn)"></i>重复一致${hq('同一问题、同一模型问多次，结论是否一致。不一致的问题，结论不要只看一次。')}</div><div class="kv">${pct(m.stable, m.pairsN)}<small>${m.stable} / ${m.pairsN}</small></div><div class="ks">同一问题同一模型多次是否一致</div></div>
@@ -3333,7 +3440,7 @@ function page_overview() {
       const top = Object.entries(x.urls).sort((a, b) => b[1] - a[1])[0];
       const st = top ? srcTag(top[0]) : null;
       return `<tr>
-      <td><span class="tag ${x.type === 'omission' ? 'warn' : 'bad'}">${x.label}</span></td>
+      <td><span class="tag ${x.type === 'omission' || x.type === 'numeric_conflict' ? 'warn' : 'bad'}">${x.label}</span></td>
       <td class="wide">${esc(x.text)}</td><td class="num">${x.count}</td>
       <td class="small">${top ? `<button class="linkbtn" data-act="open-source" data-url="${esc(top[0])}">${esc(hostOf(top[0]))}</button><br><span class="tag ${STATUS_TAG[st]}">${STATUS_LABEL[st]}</span>` : '<span class="muted">无同句引用</span>'}</td>
       <td><button class="btn sm" data-act="open-run" data-q="${x.runs[0].query_id}">看原文</button></td></tr>`;
@@ -3683,7 +3790,7 @@ function renderTextPublic(e, raw) {
     const wrong = WRONG_TYPES.includes(it.type);
     const ev = evidenceOf(it.type === 'overclaim' ? '' : it.claim);
     const f = it.type === 'overclaim' ? '官方没有宣称疗效，具体疗效是 AI 的延伸' : it.type === 'unverified' ? (pub() ? '官方说明里没有公布这个价格' : ev.f) : ev.f;
-    (it.idx || []).forEach(i => { const cur = verdict.get(i); if (!cur || (wrong && cur.v !== 'er')) verdict.set(i, { v: wrong ? 'er' : 'dv', label: wrong ? '说错 · ' + (WRONG_NAME[it.type] || it.label) : '无法核对', f, s: ev.s, ref: ev.ref }); });
+    (it.idx || []).forEach(i => { const cur = verdict.get(i); if (!cur || (wrong && cur.v !== 'er')) verdict.set(i, { v: wrong ? 'er' : 'dv', label: wrong ? '说错 · ' + (WRONG_NAME[it.type] || it.label) : it.type === 'numeric_conflict' ? '待确认 · 数字和官方说明对不上' : '无法核对', f, s: ev.s, ref: ev.ref }); });
   });
   e.parts.forEach((p, i) => {
     if (verdict.has(i) || e.flags.get(i) !== 'ok') return;
@@ -3728,6 +3835,7 @@ function pubChips(run, e) {
   if (e.mentioned) chips.push(`<span class="chip ok">提到 · 第 ${e.rank} 位</span>`); else chips.push('<span class="chip">没有提到</span>');
   if (fo.corrected) chips.push(`<span class="chip">${esc(FINAL_LABEL[fo.final])}</span>`);
   else if (isWrongRun(run, e)) chips.push('<span class="chip err">说错</span>');
+  else if (isPendingRun(run, e)) chips.push('<span class="chip dev">待确认</span>');
   else if (e.verifiable) chips.push('<span class="chip ok">说对且有依据</span>');
   else if (e.mentioned) chips.push('<span class="chip">没有可核对的说法</span>');
   return chips.join('');
@@ -3738,10 +3846,10 @@ function pubBody(run) {
   const promptLine = run.turn > 1 && run.prompt ? `<p class="small muted" style="margin:0 16px 6px">追问：${esc(run.prompt)}</p>` : '';
   const e = truthReady() ? evaluate(run) : null;
   const wrongN = e ? e.issues.filter(i => WRONG_TYPES.includes(i.type)).length : 0;
-  const counts = e ? [['说对', e.goods.length], ['说错', wrongN], ['该说没说', e.issues.filter(i => i.type === 'omission').length], ['无法核对', e.issues.filter(i => i.type === 'unverified').length], ['引用', e.citations.length]].filter(x => x[1]) : [];
+  const counts = e ? [['说对', e.goods.length], ['说错', wrongN], ['待确认', e.issues.filter(i => i.type === 'numeric_conflict').length], ['该说没说', e.issues.filter(i => i.type === 'omission').length], ['无法核对', e.issues.filter(i => i.type === 'unverified').length], ['引用', e.citations.length]].filter(x => x[1]) : [];
   const detail = e && (e.goods.length || e.issues.length) ? `<div class="eval"><dl>
       ${e.goods.length ? `<dt>说对的</dt><dd>${e.goods.map(g => `<span class="tag ok">${esc(g.limitAck ? `正确说明了限制：没有说成“${g.claim.replace(/^limit:/, '')}”` : g.text)}</span>`).join('')}</dd>` : ''}
-      ${e.issues.length ? `<dt>问题</dt><dd>${e.issues.map(i => { const wrong = WRONG_TYPES.includes(i.type); return `<div style="margin-bottom:6px"><span class="tag ${wrong ? 'bad' : 'warn'}">${wrong ? '说错' : i.type === 'omission' ? '该说没说' : '无法核对'}</span> ${esc(pubText(i.text))}${factEntry(i.claim) ? `<div>${factBtn(i.claim)}</div>` : ''}${i.links && i.links.length ? linksHtml(i) : ''}</div>`; }).join('')}</dd>` : ''}
+      ${e.issues.length ? `<dt>问题</dt><dd>${e.issues.map(i => { const wrong = WRONG_TYPES.includes(i.type); return `<div style="margin-bottom:6px"><span class="tag ${wrong ? 'bad' : 'warn'}">${wrong ? '说错' : i.type === 'omission' ? '该说没说' : i.type === 'numeric_conflict' ? '待确认' : '无法核对'}</span> ${esc(pubText(i.text))}${factEntry(i.claim) ? `<div>${factBtn(i.claim)}</div>` : ''}${i.links && i.links.length ? linksHtml(i) : ''}</div>`; }).join('')}</dd>` : ''}
     </dl></div>` : '';
   return { chips: pubChips(run, e), html: `${promptLine}${stale ? '<p class="small" style="color:var(--warn);margin:0 16px 6px">这条回答对应修改前的问题文本，不能和新版本直接比较。</p>' : ''}<div class="txt md">${mdPublic(renderTextPublic(e, run.raw))}</div><button class="more" data-act="card-more" hidden>展开全文</button>${detail}${counts.length ? `<div class="ft">${counts.map(x => `<span>${x[0]} <b>${x[1]}</b></span>`).join('')}</div>` : ''}` };
 }
@@ -3777,7 +3885,7 @@ function respBlock(run) {
     <dt>提及</dt><dd>${e.mentioned ? `提到了，排第 ${e.rank} 位${e.recommended ? '，算进入候选' : ''}` : '没有提到'}</dd>
     <dt>定位</dt><dd>${{ aligned: '<span class="tag ok">一致</span>', deviation: '<span class="tag bad">偏差</span>', unknown: '<span class="muted">未涉及</span>' }[e.positioning]}</dd>
     <dt>说对的</dt><dd>${e.goods.map(g => `<span class="tag ok">${esc(g.text)}</span>`).join('') || '<span class="muted">无</span>'}</dd>
-    <dt>问题</dt><dd>${e.issues.map(i => { const f = factFor(i.claim); return `<div style="margin-bottom:6px"><span class="tag ${i.type === 'omission' || i.type === 'unverified' ? 'warn' : 'bad'}">${i.label}</span> ${esc(i.text)}${f && f.url ? `<div class="small muted">依据：${extLink(f.url, hostOf(f.url))}${f.from ? '，' + esc(f.from) + ' 起' : ''}</div>` : ''}${linksHtml(i)}</div>`; }).join('') || '<span class="muted">无</span>'}</dd>
+    <dt>问题</dt><dd>${e.issues.map(i => { const f = factFor(i.claim); return `<div style="margin-bottom:6px"><span class="tag ${i.type === 'omission' || i.type === 'unverified' || i.type === 'numeric_conflict' ? 'warn' : 'bad'}">${i.label}</span> ${esc(i.text)}${f && f.url ? `<div class="small muted">依据：${extLink(f.url, hostOf(f.url))}${f.from ? '，' + esc(f.from) + ' 起' : ''}</div>` : ''}${linksHtml(i)}</div>`; }).join('') || '<span class="muted">无</span>'}</dd>
     <dt>引用</dt><dd>${e.citations.length ? e.citations.map(c => { const st = srcTag(c.url); return `<div class="small"><span class="tag">${c.kind}</span>${st !== 'normal' && st !== 'official' ? `<span class="tag ${STATUS_TAG[st]}">${STATUS_LABEL[st]}</span>` : ''} <button class="linkbtn small" data-act="open-source" data-url="${esc(c.url)}">${esc(c.url)}</button></div>`; }).join('') : '<span class="muted">没有引用</span>'}</dd>
     <dt>结论</dt><dd>${e.verifiable ? '<span class="tag acc">说对且有依据</span>' : '<span class="muted">不计入可验证覆盖</span>'}</dd>
   </dl>
@@ -3819,7 +3927,7 @@ function page_runs() {
   const sampleState = UI.sample === undefined ? 'checking' : UI.sample ? 'ok' : 'none';
   return `
   <header class="ph"><h1>大模型回答记录</h1>
-    <p class="lede">${pub() ? '同一个问题在不同模型上的回答并排对齐。被核对的句子按判定标色：蓝色说对、米色无法核对、陶土色说错；悬停或用 Tab 键聚焦，可以看判定、官方口径原文和来源。' : '同一个问题在不同模型上的回答并排对齐。每个错误下面都写着它能追溯到哪个页面：同句引用最可信，同回答引用次之。'}</p></header>
+    <p class="lede">${pub() ? '同一个问题在不同模型上的回答并排对齐。被核对的句子按判定标色：蓝色说对、米色无法核对或待确认、陶土色说错；悬停或用 Tab 键聚焦，可以看判定、官方口径原文和来源。' : '同一个问题在不同模型上的回答并排对齐。每个错误下面都写着它能追溯到哪个页面：同句引用最可信，同回答引用次之。'}</p></header>
   ${!truthReady() ? blockedByTruth() : ''}
   <h2>回答对比</h2>
   <div class="runs-layout">
@@ -3962,7 +4070,7 @@ function page_sources() {
         </div>`}
         <div class="fix"><b>建议动作</b>${esc(suggestAction(r, s.issueCount))}<div class="row" style="margin-top:8px"><button class="btn sm" data-act="src-copy" data-url="${esc(s.url)}">复制纠正要点</button></div></div>
         <p class="small muted">${pub() ? '关联的错误：' : '补上标题和发布日期后，软文与过期判断会自动更新。关联的错误：'}</p>
-        ${s.strong.concat(s.weak).map(x => `<div class="small" style="margin:4px 0"><span class="tag ${s.strong.includes(x) ? 'acc' : ''}">${s.strong.includes(x) ? '强' : '弱'}</span><span class="tag ${x.iss.type === 'omission' ? 'warn' : 'bad'}">${x.iss.label}</span> ${esc(x.iss.text)}　<button class="linkbtn" data-act="open-run" data-q="${x.run.query_id}">${pub() ? '看原文' : esc(x.run.run_id)}</button></div>`).join('') || '<p class="small muted">没有关联的错误。</p>'}
+        ${s.strong.concat(s.weak).map(x => `<div class="small" style="margin:4px 0"><span class="tag ${s.strong.includes(x) ? 'acc' : ''}">${s.strong.includes(x) ? '强' : '弱'}</span><span class="tag ${x.iss.type === 'omission' || x.iss.type === 'numeric_conflict' ? 'warn' : 'bad'}">${x.iss.label}</span> ${esc(x.iss.text)}　<button class="linkbtn" data-act="open-run" data-q="${x.run.query_id}">${pub() ? '看原文' : esc(x.run.run_id)}</button></div>`).join('') || '<p class="small muted">没有关联的错误。</p>'}
       </td></tr>` : ''}`;
     }).join('') || '<tr><td colspan="6" class="muted">这个范围里没有被引用的页面。官方 API 未联网时不会给出链接，需要导入开启联网的 App 回答才有信源可以溯源。</td></tr>'}</tbody>
   </table></div>`;
@@ -4090,7 +4198,7 @@ function page_evals() {
   </table></div>` : ''}
   ${note('复核里标为“有误”的就是 Bad Case。完整迭代：原始回答 → 规则错在哪 → 人工标注 → 根因 → 修复 → 在同一批数据上复测，确认没有引入新错误。')}
   <h2>回归测试</h2>
-  ${(() => { const rr = runRegression(); return `<p class="prose">${rr.filter(x => x.pass).length} / ${rr.length} 通过。R 开头的是外部评审发现的误判，修复后写成测试；G 开头的是防止修复时把原本对的判断改坏。每次改规则后，这张表会重新计算。</p>
+  ${(() => { const rr = runRegression(); return `<p class="prose">${rr.filter(x => x.pass).length} / ${rr.length} 通过。R 开头的是外部评审发现的误判，修复后写成测试；G、P 开头的是防止修复时把原本对的判断改坏；N 开头的是“聊到话题不算说对”，M 开头的是人工抽检标出的真实误判回答。每次改规则后，这张表会重新计算。</p>
   <div class="scroll"><table class="tbl"><thead><tr><th>编号</th><th>句子</th><th>修复前</th><th>期望</th><th>现在的判断</th><th>结果</th></tr></thead><tbody>${rr.map(x => `<tr><td class="small num">${x.id}</td><td class="wide">${esc(x.text)}</td><td class="small muted">${esc(x.before)}</td><td class="small">${esc(x.want)}</td><td class="small">${esc(x.got)}</td><td><span class="tag ${x.pass ? 'ok' : 'bad'}">${x.pass ? '通过' : '未通过'}</span></td></tr>`).join('')}</tbody></table></div>`; })()}
   ${note('每一个被发现的误判都应该变成一条回归测试。这样“修好了”不靠感觉，而且下次改规则时，能立刻知道有没有把别的地方改坏。')}
 
@@ -4598,9 +4706,27 @@ function bindShell() {
   window.addEventListener('resize', moveNavHl);
 }
 
+/* v6.2：能力规则改成“事实键”，并加了数字冲突表。浏览器里保存的案例还是旧规则时，按 claim_id 换成预设里的判定字段，
+   客户确认、复核状态等其余字段不动；只换一次，之后在事实底账里手改的规则保留 */
+const RULES_VERSION = 2;
+function syncPresetRules() {
+  if ((S.rulesVersion || 1) >= RULES_VERSION) return;
+  const key = effectivePreset();
+  if (key !== 'custom') {
+    const src = presetData(key).truth;
+    [S.truth, S.truthApproved].forEach(t => {
+      if (!t || !t.capabilities) return;
+      t.capabilities.forEach(c => { const s = src.capabilities.find(x => x.claim_id === c.claim_id); if (s) ['match', 'deny_match', 'unless', 'group'].forEach(k => { if (s[k] === undefined) delete c[k]; else c[k] = s[k]; }); });
+      if (src.numeric_conflicts) t.numeric_conflicts = clone(src.numeric_conflicts); else delete t.numeric_conflicts;
+    });
+  }
+  S.rulesVersion = RULES_VERSION;
+}
+
 (function boot() {
   const local = Store.loadLocal();
   if (local) S = local;
+  syncPresetRules();
   // 匿名预设：保存的是真实版而当前应显示公开版（或反过来）时，重新载入预设
   { const p = PRESETS[S.preset]; if (p && p.anonymize && effectivePreset() === 'custom' && (PUBLIC_BUILD || [p.truth.entity_name, anonNameOf(S.preset)].includes(S.truth.entity_name))) applyPreset(S.preset); }
   // v6.0：网址里指定的案例（官网“在线核对全部证据”）优先于浏览器里保存的案例
